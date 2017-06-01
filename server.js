@@ -7,6 +7,10 @@ var app = express();
 
 app.set('port', (process.env.PORT || 3001));
 
+//if (process.env.NODE_ENV === 'production') {
+   app.use(express.static(path.join(__dirname, 'client/build')));
+//}
+
 app.get('/anime(/:animeID)?', function(req, res){
     const client = sse.add(req, res);
     if (!req.params.animeID) req.params.animeID = 33674;
@@ -24,7 +28,3 @@ app.get('/*', function (req, res) {
 app.listen(app.get('port'), () => {
   console.log(`Find the server at: http://localhost:${app.get('port')}/`); // eslint-disable-line no-console
 });
-
-//if (process.env.NODE_ENV === 'production') {
-   app.use(express.static(path.join(__dirname, 'client/build')));
-//}
