@@ -1,0 +1,28 @@
+{
+  "name": "related-anime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "babel-node server.js",
+    "client": "babel-node start-client.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "6.14.0",
+    "babel-core": "6.14.0",
+    "cheerio": "^0.19.0",
+    "express": "^4.15.3",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "request": "^2.65.0",
+    "simple-sse": "0.0.3",
+    "url-parse": "^1.0.5"
+  },
+  "devDependencies": {
+    "concurrently": "^3.4.0"
+  }
+}
