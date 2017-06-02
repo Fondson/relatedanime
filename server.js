@@ -7,9 +7,6 @@ var app = express();
 
 app.set('port', (process.env.PORT || 3001));
 
-//if (process.env.NODE_ENV === 'production') {
-   app.use(express.static(path.join(__dirname, 'client/build')));
-//}
 
 app.get('/anime(/:animeID)?', function(req, res){
     const client = sse.add(req, res);
@@ -20,6 +17,10 @@ app.get('/anime(/:animeID)?', function(req, res){
 app.get('/search/:searchStr', function(req, res){
     searchAnime(req.params.searchStr, res);
 });
+
+//if (process.env.NODE_ENV === 'production') {
+   app.use(express.static(path.join(__dirname, 'client/build')));
+//}
 
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
