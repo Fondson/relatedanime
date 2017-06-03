@@ -6,7 +6,7 @@ import SearchForm from './SearchForm';
 import history from './history';
 import { StickyContainer, Sticky } from 'react-sticky';
 import SectionsContainer from './SectionsContainer';
-import { Route } from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import Loader from 'react-loader-advanced';
 import kirinoMouse from './media/kirino-mouse.gif';
 
@@ -33,6 +33,11 @@ class App extends Component {
 		e.preventDefault()
     this.setState({ isLoading: true, animes: {} });
     Client.search(this.state.searchValue, (jsonObj) => {
+      if (jsonObj.error) {
+        history.push('/error');
+        this.setState({ isLoading: false, searchValue: "" });
+        return;
+      }
       history.push('/'+jsonObj.id);
       Client.crawl(jsonObj.id, 
         (e) => {
@@ -99,15 +104,19 @@ class App extends Component {
               </span>
             </div>
           } messageStyle={ { background:'#191919' } } hideContentOnLoad disableDefaultStyles >
-              <Sticky>
-                {
-                  ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
-                    return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>;
-                  }
+            <Sticky>
+              {
+                ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
+                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>;
                 }
-              </Sticky>
-            <Route exact path='/' render={() => <h1>Welcome.<br/>Start by searching an anime.</h1>}/>
-            <Route exact path='/:id' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
+              }
+            </Sticky>
+            <Switch>
+              <Route exact path='/' render={() => <h1>Welcome.<br/>Start by searching an anime.</h1>}/>
+              <Route exact path='/error' render={() => <h1>Sorry.<br/>We could not find that anime.</h1>}/>
+              <Route exact path='/:id([0-9]+)' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
+              <Route exact path='/*' render={() => <Redirect to="/error"/>}/>
+            </Switch>
           </Loader>
         </StickyContainer>
       </div>
