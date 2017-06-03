@@ -1,0 +1,24 @@
+div .entry{
+    text-align: center;
+    margin: auto;
+    max-width: 225px;
+}
+
+td{
+    vertical-align: middle!important;
+    padding: 10px!important;
+    border-top: 0px!important;
+}
+
+div .wrap-text{
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+@media(min-width:768px) {
+    td{
+        vertical-align: middle!important;
+        padding: 15px!important;
+        border-top: 0px!important;
+    }
+}
