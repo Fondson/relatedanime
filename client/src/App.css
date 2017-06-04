@@ -6,6 +6,11 @@ html{
   text-align: center;
   background: #191919;
   color: white;
+  text-shadow:
+    -0.5px -0.5px 0 #000,
+    0.5px -0.5px 0 #000,
+    -0.5px 0.5px 0 #000,
+    0.5px 0.5px 0 #000;
 }
 
 .App-logo {
@@ -25,7 +30,16 @@ html{
 }
 
 h1.title{
-    font-weight: bold;
+  font-weight: bold;
+}
+
+h3.horizontal-center{
+  padding-left: 20px;
+  padding-right: 20px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
 }
 
 .form-group{
@@ -55,21 +69,20 @@ img.loading{
   padding-bottom: 1em;
 }
 
-.center-text{
-  top: 30%;
-  right: 0;
-  left: 0;
-  text-align: center;
-  position: fixed;
+.row{
+  margin-left: 0px!important;
+  margin-right: 0px!important;
+}
+
+.col-lg-6{
 }
 
 hr.star-light,
 hr.star-primary {
-    margin: 25px auto 30px;
     padding: 0;
     max-width: 250px;
     border: 0;
-    border-top: solid 4px;
+    border-top: solid 2px;
     text-align: center;
 }
 
@@ -98,6 +111,13 @@ hr.star-primary {
 hr.star-primary:after {
     color: #141B41;
     background-color: #fff;
+}
+
+.btn{
+  background-color: rgba(0, 0, 0, 0.31)!important;
+  border-color: #dbdbdb!important;
+  color: #f5f5f5!important;
+  text-shadow: 0 1px 0px #ccc!important;
 }
 
 @media(min-width:600px){

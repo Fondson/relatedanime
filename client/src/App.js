@@ -3,13 +3,16 @@ import './App.css';
 import Client from './Client';
 import Section from './Section';
 import SearchForm from './SearchForm';
-import AnimeBackground from './AnimeBackground';
+import LandingPage from './LandingPage';
 import history from './history';
 import { StickyContainer, Sticky } from 'react-sticky';
+import { Button } from 'react-bootstrap';
 import SectionsContainer from './SectionsContainer';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import Loader from 'react-loader-advanced';
 import kirinoMouse from './media/kirino-mouse.gif';
+import {AnimeBackground, numOfPics, getRandomInt} from './AnimeBackground';
+
 
 class App extends Component {
   constructor(props, context){
@@ -114,16 +117,13 @@ class App extends Component {
             </Sticky>
             <Switch>
               <Route exact path='/' render={() => ((
-                <AnimeBackground>
-                  <div className='center-text'>
-                    <h1 className='title'>Related Anime</h1>
-                    <hr className='star-light'/>
-                    <h2 >Welcome.<br/>Start by searching an anime.</h2>
-                  </div>
-                </AnimeBackground>))}/>
+                <LandingPage/>))}/>
               <Route exact path='/error' render={() => ((
-                <AnimeBackground>
-                  <h1 className='center-text'>Sorry.<br/>We could not find that anime.</h1>
+                <AnimeBackground picNum={getRandomInt(0, numOfPics - 1)}>
+                  <div>
+                    <h1 className='center-text'>Sorry.<br/>We could not find that anime.</h1>
+                    <Button bsSize='large' onClick={ () => history.push('/') } active>HOME</Button>
+                  </div>
                 </AnimeBackground>))}/>
               <Route exact path='/:id([0-9]+)' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
               <Route exact path='/*' render={() => <Redirect to="/error"/>}/>
