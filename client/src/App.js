@@ -109,7 +109,11 @@ class App extends Component {
             <Switch>
               <Route exact path='/' render={() => ((
                 <AnimeBackground>
-                  <h1 className='center-text'>Welcome.<br/>Start by searching an anime.</h1>
+                  <div className='center-text'>
+                    <h1 className='title'>Related Anime</h1>
+                    <hr className='star-light'/>
+                    <h2 >Welcome.<br/>Start by searching an anime.</h2>
+                  </div>
                 </AnimeBackground>))}/>
               <Route exact path='/error' render={() => ((
                 <AnimeBackground>

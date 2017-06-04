@@ -24,6 +24,10 @@ html{
   font-size: large;
 }
 
+h1.title{
+    font-weight: bold;
+}
+
 .form-group{
   margin-bottom: 0px!important;
 }
@@ -51,13 +55,49 @@ img.loading{
   padding-bottom: 1em;
 }
 
-h1.center-text{
+.center-text{
   top: 30%;
-  bottom: 70%;
   right: 0;
   left: 0;
   text-align: center;
   position: fixed;
+}
+
+hr.star-light,
+hr.star-primary {
+    margin: 25px auto 30px;
+    padding: 0;
+    max-width: 250px;
+    border: 0;
+    border-top: solid 4px;
+    text-align: center;
+}
+
+hr.star-light:after,
+hr.star-primary:after {
+    display: inline-block;
+    position: relative;
+    top: -.8em;
+    padding: 0 .25em;
+    font-size: 2em;
+}
+
+hr.star-light {
+    border-color: #fff;
+}
+
+hr.star-light:after {
+    color: #fff;
+    background-color: #306BAC;
+}
+
+hr.star-primary {
+    border-color: #141B41;
+}
+
+hr.star-primary:after {
+    color: #141B41;
+    background-color: #fff;
 }
 
 @media(min-width:600px){
