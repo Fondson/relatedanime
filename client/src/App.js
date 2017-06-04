@@ -104,8 +104,14 @@ class App extends Component {
                 <p style={{paddingRight: '1.5em', paddingLeft: '1.5em', textAlign: 'center'}}>{this.state.loadingString}</p>
               </span>
             </div>
-          } messageStyle={ { background:'#191919' } } hideContentOnLoad disableDefaultStyles > <SearchForm handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>
-
+          } messageStyle={ { background:'#191919' } } hideContentOnLoad disableDefaultStyles>
+            <Sticky>
+              {
+                ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
+                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>;
+                }
+              }
+            </Sticky>
             <Switch>
               <Route exact path='/' render={() => ((
                 <AnimeBackground>
