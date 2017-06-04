@@ -3,6 +3,7 @@ import './App.css';
 import Client from './Client';
 import Section from './Section';
 import SearchForm from './SearchForm';
+import AnimeBackground from './AnimeBackground';
 import history from './history';
 import { StickyContainer, Sticky } from 'react-sticky';
 import SectionsContainer from './SectionsContainer';
@@ -103,20 +104,21 @@ class App extends Component {
                 <p style={{paddingRight: '1.5em', paddingLeft: '1.5em', textAlign: 'center'}}>{this.state.loadingString}</p>
               </span>
             </div>
-          } messageStyle={ { background:'#191919' } } hideContentOnLoad disableDefaultStyles >
-            <Sticky>
-              {
-                ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
-                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>;
-                }
-              }
-            </Sticky>
+          } messageStyle={ { background:'#191919' } } hideContentOnLoad disableDefaultStyles > <SearchForm handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>
+
             <Switch>
-              <Route exact path='/' render={() => <h1>Welcome.<br/>Start by searching an anime.</h1>}/>
-              <Route exact path='/error' render={() => <h1>Sorry.<br/>We could not find that anime.</h1>}/>
+              <Route exact path='/' render={() => ((
+                <AnimeBackground>
+                  <h1 className='center-text'>Welcome.<br/>Start by searching an anime.</h1>
+                </AnimeBackground>))}/>
+              <Route exact path='/error' render={() => ((
+                <AnimeBackground>
+                  <h1 className='center-text'>Sorry.<br/>We could not find that anime.</h1>
+                </AnimeBackground>))}/>
               <Route exact path='/:id([0-9]+)' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
               <Route exact path='/*' render={() => <Redirect to="/error"/>}/>
             </Switch>
+
           </Loader>
         </StickyContainer>
       </div>

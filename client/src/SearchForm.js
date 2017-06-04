@@ -5,7 +5,7 @@ class SearchForm extends Component{
 	
 	render() {
 		return (
-			<form style={{ ...this.props.style, overflow: 'auto'}} onSubmit={this.props.searchWithValue}>
+			<form style={{ ...this.props.style}} onSubmit={this.props.searchWithValue}>
 				<FormGroup
 					controlId="formBasicText"
 				>

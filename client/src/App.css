@@ -24,6 +24,10 @@ html{
   font-size: large;
 }
 
+.form-group{
+  margin-bottom: 0px!important;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -45,6 +49,15 @@ img.loading{
   border-radius: 25%;
   margin: auto;
   padding-bottom: 1em;
+}
+
+h1.center-text{
+  top: 30%;
+  bottom: 70%;
+  right: 0;
+  left: 0;
+  text-align: center;
+  position: fixed;
 }
 
 @media(min-width:600px){
