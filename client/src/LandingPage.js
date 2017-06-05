@@ -21,7 +21,7 @@ class LandingPage extends Component{
                   <div className='page-scroll'>
                     <h1 className='title'>About</h1>
                     <hr className='star-light'/>
-                    <h3 className='horizontal-center'>Discover anime's source material, sequels, specials, and more all on one page!</h3>
+                    <h3 className='horizontal-center'>Discover an anime series' source material, sequels, specials, and more all on one page!</h3>
                     <h3 className='horizontal-center'>Search for an anime series using the search bar up top to get started.</h3>
                     <Button bsSize='large' href='#home' active>HOME</Button>
                   </div>
