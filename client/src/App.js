@@ -115,6 +115,7 @@ class App extends Component {
                 }
               }
             </Sticky>
+            
             <Switch>
               <Route exact path='/' render={() => ((
                 <LandingPage/>))}/>
