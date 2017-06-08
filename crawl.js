@@ -1,6 +1,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var sse = require("simple-sse");
+var chrono = require('chrono-node');
 
 /*
     related anime links are relative
@@ -71,7 +72,7 @@ function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRe
                 title: $('span[itemprop=name]')[0].children[0].data,
                 link: url,
                 image: image.length < 1 ? null : image[0].attribs.src,
-                startDate: new Date(getDateString($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim()))
+                startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())//getDateString())
             };
             if (isNaN(newEntry.startDate)) newEntry.startDate = null;
 
@@ -80,31 +81,6 @@ function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRe
             callback(res, client, pagesVisited, pagesToVisit, allRelated);
         }
     });
-};
-
-function getDateString (str){
-    if (str === 'Not available' || str.length < 11) return str;
-    let date = str[0];
-    let maxSpaces = 2;
-    let curSpaces = 0;
-    let i = 1;
-    while (curSpaces < maxSpaces){
-        if (str[i] !== ' '){
-            date += str[i];
-        }else{
-            // ignore consecutive spaces
-            if (date[i - 1] === ' '){
-                ++i;
-                continue;
-            } 
-            date += str[i];
-            curSpaces += 1;
-        }
-        ++i;
-    }
-    while (str[i] && str[i] !== ' ') date += str[i++];
-    
-    return date;
 };
 
 // assumes link is a relative link following the format '/anime/ID/...'
@@ -123,6 +99,7 @@ function sortIntoTypes(animes){
     animes.forEach(function(anime) {
         if (!types.hasOwnProperty(anime.type)){
             types[anime.type] = [];
+            console.log(anime.type);
         }
         types[anime.type].push(anime);
     });
@@ -131,8 +108,19 @@ function sortIntoTypes(animes){
 
 function sortByDate(items){
     let len = items.length, min;
+    let nullArr = [];
 
-    for (let i=0; i < len; i++){
+    // get all nulls and put them at the end
+    for (let i = 0; i < len; i++){
+        if (items[i].startDate === null){
+            items[i].startDate = 'Not available';
+            nullArr.push(items.splice(i, 1));
+            --i;
+            --len;
+        }
+    }
+
+    for (let i = 0; i < len; i++){
         //set minimum to this position
         min = i;
 
@@ -150,10 +138,9 @@ function sortByDate(items){
             items[min] = temp;
         }
         if (items[i].startDate instanceof Date) items[i].startDate = formatDate(items[i].startDate);
-        else console.log(items[i].startDate);
     }
 
-    return items;
+    return items.concat(...nullArr);
 };
 
 function formatDate(date) {

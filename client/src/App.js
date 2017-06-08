@@ -13,6 +13,7 @@ import Loader from 'react-loader-advanced';
 import kirinoMouse from './media/kirino-mouse.gif';
 import {AnimeBackground, numOfPics, getRandomInt} from './AnimeBackground';
 
+const errorPicNum = getRandomInt(0, numOfPics - 1);
 
 class App extends Component {
   constructor(props, context){
@@ -83,15 +84,20 @@ class App extends Component {
 
   render() {
     const { animes, searchValue, isLoading } = this.state;
-    const allSections = Object.keys(animes).map((key) => {
+    const keys = Object.keys(animes);
+    keys.sort();
+    const len = keys.length;
+    let allSections = [];
+    for (let i = 0; i < len; ++i){
+      const key = keys[i];
       const animeSectionObj = {header: key, animes: animes[key]};
-      return (
+      allSections.push(
         <div key = {key}>
           <Section data = {animeSectionObj}/>
           <hr/>
         </div>
       );
-    });
+    }
     return (
       <div className="App">
         <StickyContainer>
@@ -120,7 +126,7 @@ class App extends Component {
               <Route exact path='/' render={() => ((
                 <LandingPage/>))}/>
               <Route exact path='/error' render={() => ((
-                <AnimeBackground picNum={getRandomInt(0, numOfPics - 1)}>
+                <AnimeBackground picNum={errorPicNum}>
                   <div>
                     <h1 className='center-text'>Sorry.<br/>We could not find that anime.</h1>
                     <Button bsSize='large' onClick={ () => history.push('/') } active>HOME</Button>
