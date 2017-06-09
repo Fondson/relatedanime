@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import sakaenoMegumi from './media/sakaeno-megumi.png';
-import spiceAndWolfHolo from './media/spice-and-wolf-holo.png';
-import steinsGateGeneral from './media/steins-gate-general.png';
+import sakaenoMegumi from './media/sakaeno-megumi.jpg';
+import spiceAndWolfHolo from './media/spice-and-wolf-holo.jpg';
+import steinsGateGeneral from './media/steins-gate-general.jpg';
 
 const numOfPics = 3;
 
