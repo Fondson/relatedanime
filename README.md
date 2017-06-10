@@ -9,5 +9,6 @@ It scraps <a href="https://myanimelist.net/">MyAnimeList</a> to get its informat
 
 # Features
 - uses an Express API server instance that scraps information from <a href="https://myanimelist.net/">MyAnimeList</a>
+  - scraping updates are sent by the server using HTML5 server-sent events
 - front-end is done using React (created by [create-react-app](https://github.com/facebookincubator/create-react-app))
 - uses <a href="https://github.com/cheeriojs/cheerio">Cheerio</a> to parse markup data from <a href="https://myanimelist.net/">MyAnimeList</a> HTTP response
