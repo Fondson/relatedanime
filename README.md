@@ -4,7 +4,8 @@
 
 # Description
 Related Anime is a website used to discover all the different media related to an anime series.
-It scraps the popular anime reference website <a href="https://myanimelist.net/">MyAnimeList</a> to get all it's information.
+The creation of Related Anime was motivated by the fact that the popular anime referenence site <a href='https://myanimelist.net/'>MyAnimeList</a> had information on the related media of an anime series, but no easy way to see it visually.
+It scraps the <a href="https://myanimelist.net/">MyAnimeList</a> to get all it's information.
 
 # Features
 - uses an Express server instance that scraps information from <a href="https://myanimelist.net/">MyAnimeList</a>
