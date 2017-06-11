@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import sakaenoMegumi from './media/sakaeno-megumi.jpg';
+import rezeroRem from './media/rezero-rem.jpg';
 import spiceAndWolfHolo from './media/spice-and-wolf-holo.jpg';
 import steinsGateGeneral from './media/steins-gate-general.jpg';
 
@@ -13,7 +13,7 @@ class AnimeBackground extends Component{
 	render() {
         let img;
         switch (this.props.picNum){
-            case 0: img = sakaenoMegumi; break;
+            case 0: img = rezeroRem; break;
             case 1: img = spiceAndWolfHolo; break;
             case 2: img = steinsGateGeneral; break;
         }
@@ -22,7 +22,7 @@ class AnimeBackground extends Component{
 			<div style={
                 {
                     width: '100vw',
-                    height: 'calc(100vh)', /*34px is the size of the searchbar*/
+                    height: 'calc(100vh)',
                     overflow: 'auto',
                     backgroundSize: 'cover',
                     backgroundImage: 'url(\''+img+'\')',
