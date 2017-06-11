@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import rezeroRem from './media/rezero-rem.jpg';
-import spiceAndWolfHolo from './media/spice-and-wolf-holo.jpg';
+import sakaenoGeneral from './media/sakaeno-general.jpg';
+import ngnlGeneral from './media/no-game-no-life-general.jpg';
 import steinsGateGeneral from './media/steins-gate-general.jpg';
 
 const numOfPics = 3;
@@ -13,8 +13,8 @@ class AnimeBackground extends Component{
 	render() {
         let img;
         switch (this.props.picNum){
-            case 0: img = rezeroRem; break;
-            case 1: img = spiceAndWolfHolo; break;
+            case 0: img = sakaenoGeneral; break;
+            case 1: img = ngnlGeneral; break;
             case 2: img = steinsGateGeneral; break;
         }
 
