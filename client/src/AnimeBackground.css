@@ -1,0 +1,27 @@
+div.AnimeBackground{
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position-x: center;
+    background-repeat: no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+@media (min-width:1025px) {
+    div.AnimeBackground{
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        background-size: cover;
+        background-attachment: fixed;
+        background-position-x: center;
+        background-repeat: no-repeat;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+}

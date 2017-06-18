@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './AnimeBackground.css';
 import sakaenoGeneral from './media/sakaeno-general.jpg';
 import ngnlGeneral from './media/no-game-no-life-general.jpg';
 import steinsGateGeneral from './media/steins-gate-general.jpg';
@@ -19,19 +20,7 @@ class AnimeBackground extends Component{
         }
 
 		return (
-			<div style={
-                {
-                    width: '100vw',
-                    height: 'calc(100vh)',
-                    overflow: 'auto',
-                    backgroundSize: 'cover',
-                    backgroundImage: 'url(\''+img+'\')',
-                    backgroundPositionX: 'center',
-                    backgroundAttachment: 'fixed',
-                    backgroundRepeat: 'no-repeat',
-                    display:'flex', justifyContent:'center',alignItems:'center',
-                }
-            } id={this.props.id}>
+			<div className='AnimeBackground' style={ {backgroundImage: 'url(\''+img+'\')'} }id={this.props.id}>
                 {this.props.children}
 			</div>
 		);
