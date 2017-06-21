@@ -125,6 +125,7 @@ class App extends Component {
             <Switch>
               <Route exact path='/' render={() => ((
                 <LandingPage/>))}/>
+              <Route exact path='/index.html' render={() => <Redirect to="/"/>}/> {/*this is to handle the service worker*/}
               <Route exact path='/error' render={() => ((
                 <AnimeBackground picNum={errorPicNum}>
                   <div>
