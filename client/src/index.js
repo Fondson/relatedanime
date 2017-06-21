@@ -5,6 +5,7 @@ import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
+import './related-anime';
 import history from './history';
 import { Router } from 'react-router-dom';
 
