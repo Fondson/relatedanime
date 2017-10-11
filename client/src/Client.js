@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 function crawl(query, updateListener, eventListener) {
-  if (query === 0) query = 11617;
+  if (query === 0) query = 1;
   //http://localhost:3001
   const es = new EventSource(`/anime/${query}`);
   es.addEventListener('update', updateListener);
@@ -30,7 +30,6 @@ function checkStatus(response) {
 
 function parseJSON(response) {
   const obj = response.json();
-  // console.log(obj);
   return obj;
 }
 
