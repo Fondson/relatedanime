@@ -30,9 +30,10 @@ function requestData(creds, searchStr, res){
                 res.end( { error: true, why: "No results"});
                 return;
             }
+            const type = $('type')[0].children[0].data;
             const title = $('title')[0].children[0].data;
             const id = $('id')[0].children[0].data;
-            res.end( JSON.stringify({ error: false, title: title, id: id}) );
+            res.end( JSON.stringify({ error: false, title: title, id: id, type: type}) );
         }
     });
 }

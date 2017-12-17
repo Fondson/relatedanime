@@ -1,47 +1,46 @@
 var request = require('request');
 var cheerio = require('cheerio');
-var sse = require("simple-sse");
 var chrono = require('chrono-node');
 var neo4j = require('./neo4jHelper');
 var transformAnimes = require('./transformAnimes');
 var sortAnimesByDate = require('./sortAnimesByDate');
+
+var args = process.argv.slice(2);
 
 /*
     related anime links are relative
 */
 let baseURL;
 
-function crawl(animeID, res, client){
+function crawl(animeID){
     baseURL = 'https://myanimelist.net';
     let pagesVisited = new Set();
     let pagesToVisit = ["/anime/"+animeID];
     let allRelated = []; // array of all related animes
 
-    startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
+    startCrawl(pagesVisited, pagesToVisit, allRelated);
 }
 
-function startCrawl(res, client, pagesVisited, pagesToVisit, allRelated) {
+function startCrawl(pagesVisited, pagesToVisit, allRelated) {
     if (pagesToVisit.length > 0){
         let nextPage = pagesToVisit.pop();
         if (pagesVisited.has(getID(nextPage))) {
             // We've already visited this page, so repeat the crawl
-            startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
+            startCrawl(pagesVisited, pagesToVisit, allRelated);
         } else {
             // New page we haven't visited
             pagesVisited.add(getID(nextPage));
-            visitPage(baseURL + nextPage, startCrawl, res, client, pagesVisited, pagesToVisit, allRelated);
+            visitPage(baseURL + nextPage, startCrawl, pagesVisited, pagesToVisit, allRelated, nextPage);
         }
     }else{
-        // neo4j.addToDB(allRelated);
-        allRelated = transformAnimes(sortAnimesByDate(allRelated));
-        sse.send(client, 'full-data', JSON.stringify(allRelated));
-        sse.send(client, 'done', 'success');
-        sse.remove(client);
-        res.end();
+        console.log(allRelated);
+        neo4j.addToDB(allRelated);
+        // allRelated = transformAnimes(sortAnimesByDate(allRelated));
+        // console.log(allRelated);
     }
 }
 
-function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRelated){
+function visitPage(url, callback, pagesVisited, pagesToVisit, allRelated, getIDUrl = ''){
     // console.log("Visiting page " + url);
     request(url, function(error, response, body) {
         if(error) {
@@ -54,7 +53,6 @@ function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRe
             // Parse the document body
             let $ = cheerio.load(body);
             console.log("Page title:  " + $('title').text());
-            sse.send(client, 'update', $('title').text().trim() );
             
             // collect related anime links
             let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass');
@@ -64,24 +62,28 @@ function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRe
                 if (type.children[0].data.trim() != 'Other:'){
                     let children = type.next.children;
                     children.forEach((element, elementIndex) => {
-                        if (element.type === 'tag') pagesToVisit.push(element.attribs.href);
+                        if (element.type === 'tag'){
+                            pagesToVisit.push(element.attribs.href);
+                        }
                     });
                 }
             });
 
             let image = $('img[itemprop=image]');
             let newEntry = {
+                malID: getID(getIDUrl),
                 type: $('div a[href*="?type="]')[0].children[0].data,
                 title: $('span[itemprop=name]')[0].children[0].data,
                 link: url,
                 image: image.length < 1 ? null : image[0].attribs.src,
                 startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())//getDateString())
             };
+            console.log(newEntry);
             if (isNaN(newEntry.startDate)) newEntry.startDate = null;
 
             allRelated.push(newEntry);
             
-            callback(res, client, pagesVisited, pagesToVisit, allRelated);
+            callback(pagesVisited, pagesToVisit, allRelated);
         }
     });
 };
@@ -97,4 +99,4 @@ function getID (link) {
     return +ret;
 };
 
-module.exports = crawl;
+crawl(args[0]);

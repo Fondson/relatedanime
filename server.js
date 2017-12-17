@@ -2,11 +2,15 @@ var express = require('express');
 var searchAnime = require('./searchAnime');
 var crawl = require('./crawl');
 var sse = require("simple-sse");
+var neo4j = require('./neo4jHelper');
 const path = require('path');
 var app = express();
 
 app.set('port', (process.env.PORT || 3001));
 
+app.get('/db/:id', function(req, res){
+    neo4j.getFromDBByMalID(decodeURI(req.params.id), res);
+})
 
 app.get('/anime(/:animeID)?', function(req, res){
     const client = sse.add(req, res);
