@@ -5,6 +5,7 @@ import './Section.css';
 
 class Section extends Component{
     render(){
+        console.log(this.props.data.animes);
         const entryList = this.props.data.animes.map((anime) => {
             return <Entry data={anime} key={anime.type + anime.title}/>;
         });

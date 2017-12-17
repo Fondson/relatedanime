@@ -17,6 +17,15 @@ function search(query, cb) {
     .then(cb);
 }
 
+/* eslint-disable no-undef */
+function dbSearch(id, cb) {
+  return fetch(`db/${encodeURIComponent(id)}`, {
+    accept: 'application/json',
+  }).then(checkStatus)
+    .then(parseJSON)
+    .then(cb);
+}
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -56,5 +65,5 @@ function parseJSON(response) {
 //   console.log("Your browser doesn't support SSE")
 // }
 
-const Client = { crawl, search };
+const Client = { crawl, search, dbSearch };
 export default Client;

@@ -44,42 +44,64 @@ class App extends Component {
         return;
       }
       history.push('/'+jsonObj.id);
-      Client.crawl(jsonObj.id, 
-        (e) => {
-          console.log(e.data);
+      Client.dbSearch(jsonObj.id, (dbJsonObj) => {
+        if (dbJsonObj.error) {
+          Client.crawl(jsonObj.id, 
+            (e) => {
+              console.log(e.data);
+              this.setState({
+                loadingString: 'Found ' + e.data,
+              });
+            }, 
+            (e) => {
+              this.setState({
+                animes : JSON.parse(e.data),
+                searchValue: "",
+                loadingString: "Scraping MAL...",
+                isLoading: false,
+              });
+            });
+        } else {
           this.setState({
-            loadingString: 'Found ' + e.data,
-          });
-        }, 
-        (e) => {
-          this.setState({
-            animes : JSON.parse(e.data),
+            animes : dbJsonObj.animes,
             searchValue: "",
             loadingString: "Scraping MAL...",
             isLoading: false,
           });
-        });
+        }
+      });
     });
 	}
 
   sectionsDidMount(match){
     if (this.state.isLoading) {return;}
     this.setState({ isLoading: true, animes: {} });
-    Client.crawl(match.params.id, 
-      (e) => {
-        console.log(e.data);
+    Client.dbSearch(match.params.id, (dbJsonObj) => {
+      if (dbJsonObj.error) {
+        Client.crawl(match.params.id, 
+          (e) => {
+            console.log(e.data);
+            this.setState({
+              loadingString: 'Found ' + e.data,
+            });
+          }, 
+          (e) => {
+            this.setState({
+              animes : JSON.parse(e.data),
+              searchValue: "",
+              loadingString: "Scraping MAL...",
+              isLoading: false,
+            });
+          });
+      } else {
         this.setState({
-          loadingString: 'Found ' + e.data,
-        });
-      }, 
-      (e) => {
-        this.setState({
-          animes : JSON.parse(e.data),
+          animes : dbJsonObj.animes,
           searchValue: "",
           loadingString: "Scraping MAL...",
           isLoading: false,
         });
-      });
+      }
+    });
   }
 
   render() {
