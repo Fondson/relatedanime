@@ -8,7 +8,7 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 
 # Features
 - uses a <a href="https://neo4j.com/">Neo4j</a> graph database to store selected longer series for quick lookup
-  - try searching for the <i>Attack on Titan</i> or <i>Fate</i> anime series for near instant lookip
+  - try searching for the <i>Attack on Titan</i> or <i>Fate</i> anime series for near instant lookup
 - implements an Express API server that scraps information from <a href="https://myanimelist.net/">MyAnimeList</a>
   - scraping updates are sent by the server using HTML5 server-sent events
 - front-end is done using React (created by [create-react-app](https://github.com/facebookincubator/create-react-app))
