@@ -71,9 +71,42 @@ class App extends Component {
         }
       });
     });
-	}
+  }
+  
+  onBackButtonEvent(e){
+    e.preventDefault();
+    const id = +e.target.location.pathname.substring(1);
+    this.setState({ isLoading: true, animes: {} });
+    Client.dbSearch(id, (dbJsonObj) => {
+      if (dbJsonObj.error) {
+        Client.crawl(id, 
+          (e) => {
+            console.log(e.data);
+            this.setState({
+              loadingString: 'Found ' + e.data,
+            });
+          }, 
+          (e) => {
+            this.setState({
+              animes : JSON.parse(e.data),
+              searchValue: "",
+              loadingString: "Scraping MAL...",
+              isLoading: false,
+            });
+          });
+      } else {
+        this.setState({
+          animes : dbJsonObj.animes,
+          searchValue: "",
+          loadingString: "Scraping MAL...",
+          isLoading: false,
+        });
+      }
+    });
+  }
 
   sectionsDidMount(match){
+    window.onpopstate = (e) => this.onBackButtonEvent(e);
     if (this.state.isLoading) {return;}
     this.setState({ isLoading: true, animes: {} });
     Client.dbSearch(match.params.id, (dbJsonObj) => {
