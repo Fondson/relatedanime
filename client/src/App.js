@@ -76,6 +76,12 @@ class App extends Component {
   onBackButtonEvent(e){
     e.preventDefault();
     const id = +e.target.location.pathname.substring(1);
+    if (id == 0) {
+      history.replace('/');
+      this.setState({ isLoading: false, searchValue: "" });
+      return;
+    }
+
     this.setState({ isLoading: true, animes: {} });
     Client.dbSearch(id, (dbJsonObj) => {
       if (dbJsonObj.error) {
