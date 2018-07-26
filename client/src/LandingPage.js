@@ -9,7 +9,6 @@ class LandingPage extends Component{
 	render() {
 		return (
             <div>
-              <h1>IMPORTANT<br/>The MyAnimeList API, which this website depends on, is currently down</h1>
                 <AnimeBackground id='home' picNum={firstPicNum}>
                   <div className='page-scroll'>
                     <h1 className='title'>Related Anime</h1>

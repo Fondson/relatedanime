@@ -9,7 +9,9 @@ class Entry extends Component{
                 <div className="entry">
                     <img src = {image} alt={title}/>
                     <div className="wrap-text">
-                        <a href={link}>{title}</a>
+                        <a href={link} rel="noopener noreferrer" target="_blank">
+                            {title}
+                        </a>
                     </div>
                     <p>{startDate}</p>
                 </div>

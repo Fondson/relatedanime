@@ -60,8 +60,9 @@ function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRe
             let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass');
 
             relatedTypes.each((typeIndex, type) => {
-                // 'Other' type of animes can be really unrelated, we'll discard them
-                if (type.children[0].data.trim() != 'Other:'){
+                const thisType = type.children[0].data.trim();
+                // 'Other' and 'Character' types of animes can be really unrelated, we'll discard them
+                if (thisType != 'Other:' && thisType != 'Character:'){
                     let children = type.next.children;
                     children.forEach((element, elementIndex) => {
                         if (element.type === 'tag') pagesToVisit.push(element.attribs.href);
@@ -75,14 +76,13 @@ function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRe
                 title: $('span[itemprop=name]')[0].children[0].data,
                 link: url,
                 image: image.length < 1 ? null : image[0].attribs.src,
-                startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())//getDateString())
+                startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())
             };
             if (isNaN(newEntry.startDate)) newEntry.startDate = null;
 
             allRelated.push(newEntry);
-            
-            callback(res, client, pagesVisited, pagesToVisit, allRelated);
         }
+        callback(res, client, pagesVisited, pagesToVisit, allRelated);
     });
 };
 
