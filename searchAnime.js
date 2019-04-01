@@ -16,8 +16,7 @@ function scrapSearch(searchStr, res) {
         if(response.statusCode === 200) {
             try {
                 let $ = cheerio.load(body);
-                
-                let url = $('#content')[0].children[9].children[0].children[1].children[3].children[1].attribs.href;
+                let url = $('.js-categories-seasonal').find('.hoverinfo_trigger')[0].attribs.href;
     
                 let pos = 0;
                 let slashCount = 0;
@@ -34,6 +33,7 @@ function scrapSearch(searchStr, res) {
                 res.end( JSON.stringify({ error: false, id: id}) );
             }
             catch(e) {
+                console.log('searchAnime.js: ' + e)
                 res.end(JSON.stringify({ error: true, why: 'No such anime.'}));
                 return;
             }
