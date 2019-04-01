@@ -1,11 +1,10 @@
 var neo4j = require('./neo4jHelper');
-var crawl = require('./crawl');
 
-var args = process.argv.slice(2);
 
 async function main(){
     try{
-        await neo4j.addToDB(await crawl(args[0], null, null));
+        await neo4j.clearDb();
+        console.log('SUCCESS');
     } catch(e) {
         console.log(e)
     }

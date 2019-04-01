@@ -9,167 +9,148 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 var driver = neo4j.driver('bolt://localhost', neo4j.auth.basic('neo4j', 'password'));
 var session = driver.session();
 
-function addToDB(animes){
-    animes.forEach(function(anime) {
-        // add each anime as node
-        session
-            .run("create (n \
-                {\
-                    type: {typeParam},\
-                    title: {titleParam},\
-                    link: {linkParam},\
-                    image: {imageParam},\
-                    startDate: {startDateParam},\
-                    malID: {malIDParam}\
-                }) return n",
-                {
-                    typeParam: anime.type,
-                    titleParam: anime.title,
-                    linkParam: anime.link,
-                    imageParam: anime.image,
-                    startDateParam: anime.startDate ? anime.startDate.toString() : anime.startDate,
-                    malIDParam: anime.malID
-                }
-            )
-            .then(function(result){
-                console.log('Node creation OK!')
-
-                // create relationships
-                animes.forEach(function(animeRel){
-                    if (anime != animeRel) {
-                        session
-                            .run(
-                                "match \
-                                    (a \
-                                        {\
-                                            type: {typeParam},\
-                                            title: {titleParam},\
-                                            link: {linkParam},\
-                                            image: {imageParam},\
-                                            startDate: {startDateParam},\
-                                            malID: {malIDParam}\
-                                        }), \
-                                    (b \
-                                        {\
-                                            type: {relTypeParam},\
-                                            title: {relTitleParam},\
-                                            link: {relLinkParam},\
-                                            image: {relImageParam},\
-                                            startDate: {relStartDateParam},\
-                                            malID: {relMalIDParam}\
-                                        }) \
-                                merge (a)-[r:RELATED_TO]-(b)\
-                                return a,r,b",
-                                {
-                                    typeParam: anime.type,
-                                    titleParam: anime.title,
-                                    linkParam: anime.link,
-                                    imageParam: anime.image,
-                                    startDateParam: anime.startDate ? anime.startDate.toString() : anime.startDate,
-                                    malIDParam: anime.malID,
-
-                                    relTypeParam: animeRel.type,
-                                    relTitleParam: animeRel.title,
-                                    relLinkParam: animeRel.link,
-                                    relImageParam: animeRel.image,
-                                    relStartDateParam: animeRel.startDate ? animeRel.startDate.toString() : animeRel.startDate,
-                                    relMalIDParam: animeRel.malID
-                                }
-                            )
-                            .then(function(result){
-                                console.log('Relationship creation OK!')
-                            })
-                            .catch(function(err){
-                                console.log('Relationship creation FAILED!')
-                                console.log(err);
-                            });
-                    }
-                });
-            })
-            .catch(function(err){
-                console.log('Node creation FAILED!')
-                console.log(err);
-            });
-    });
+async function deleteAnimesIfExist(animes) {
+    for (let i = 0; i < animes.length; ++i) {
+        const result = await session
+        .run(
+            "match (n {malID: {malIDParam}}) detach delete n",
+            {
+                malIDParam: animes[i].malID,
+            }
+        );
+    }
 }
 
-function getFromDB(animeTitle, res){
+async function addToDB(animes){
+    await deleteAnimesIfExist(animes);
+    for (let i = 0; i < animes.length; ++i) {
+        const anime = animes[i]
+        // add each anime as node
+        await session
+        .run("create (n \
+            {\
+                type: {typeParam},\
+                title: {titleParam},\
+                link: {linkParam},\
+                image: {imageParam},\
+                startDate: {startDateParam},\
+                malID: {malIDParam}\
+            }) return n",
+            {
+                typeParam: anime.type,
+                titleParam: anime.title,
+                linkParam: anime.link,
+                imageParam: anime.image,
+                startDateParam: anime.startDate ? anime.startDate.toString() : anime.startDate,
+                malIDParam: anime.malID
+            }
+        );
+    }
+
+    for (let i = 0; i < animes.length; ++i) {
+        if (i < animes.length - 1) {
+            let next = animes[i + 1]
+            await session
+                .run(
+                    "match \
+                        (a \
+                            {\
+                                malID: {malIDParam}\
+                            }), \
+                        (b \
+                            {\
+                                malID: {nextMalIDParam}\
+                            }) \
+                    merge (a)-[r:RELATED_TO]-(b)\
+                    return a,r,b",
+                    {
+                        malIDParam: animes[i].malID,
+                        nextMalIDParam: next.malID
+                    }
+                )
+        }
+    }
+}
+
+async function getFromDB(animeTitle, res){
     console.log(animeTitle);
-    session
+    try{
+        const result = await session
         .run(
-            "match \
-                (a \
-                    {title: {titleParam}}\
-                )-[r]-(b)\
-            return a,b",
+            "match p=()-[*0..1000]-(n {title: {titleParam}})-[*0..1000]-() return p",
             {
                 titleParam: animeTitle
             }
         )
-        .then(function(result){
-            // console.log(result.records[0]._fields[0]);
-            // console.log(result.records[0]._fields[1]);
-            if (result.records.length == 0) {
-                res.end(JSON.stringify({ error: true, why: 'not in db'}));
-            } else {
-                let animes = [];
-                result.records.forEach(function(record){
-                    let anime = record._fields[1].properties;
-                    anime.startDate = new Date(anime.startDate);
-                    animes.push(anime);
-                });
-                console.log(animes);
-                animes = tranformAnimes(sortAnimesByDate(animes));
-                console.log(animes);
-                res.end(JSON.stringify({ error: false, animes: animes}));
-            }
-
-        })
-        .catch(function(err){
-            console.log(err);
-            res.end(JSON.stringify({ error: true, why: err}));
-        });
+        if (result.records.length == 0) {
+            res.end(JSON.stringify({ error: true, why: 'not in db'}));
+        } else {
+            const links = result.records[result.records.length - 1]._fields[0].segments
+            const first = links[0].start
+            first.startDate = new Date(first.startDate)
+            let animes = [first];
+            links.forEach(function(link){
+                console.log(link)
+                let anime = link.end.properties;
+                anime.startDate = new Date(anime.startDate);
+                animes.push(anime);
+            });
+            console.log(animes);
+            animes = tranformAnimes(sortAnimesByDate(animes));
+            console.log(animes);
+            res.end(JSON.stringify({ error: false, animes: animes}));
+        }
+    } catch (e) {
+        console.log(e);
+        res.end(JSON.stringify({ error: true, why: e}));
+    }
 }
 
-function getFromDBByMalID(id, res){
-    session
+async function getFromDBByMalID(id, res){
+    console.log(id);
+    try{
+        const result = await session
         .run(
-            "match \
-                (a \
-                    {malID: {idParam}}\
-                )-[r]-(b)\
-            return a,b",
+            "match p=()-[*0..1000]-(n {malID: {malIDParam}})-[*0..1000]-() return p",
             {
-                idParam: +id
+                malIDParam: +id
             }
         )
-        .then(function(result){
-            //console.log(result.records[0]._fields[0]);
-            //console.log(result.records[0]._fields[1]);
-            if (result.records.length == 0) {
-                res.end(JSON.stringify({ error: true, why: 'not in db'}));
-            } else {
-                let animes = [];
-
-                let init = result.records[0]._fields[0].properties;
-                init.startDate = new Date(init.startDate);
-                animes.push(init);
-                
-                result.records.forEach(function(record){
-                    let anime = record._fields[1].properties;
-                    anime.startDate = new Date(anime.startDate);
-                    animes.push(anime);
-                });
-                console.log(animes);
-                animes = tranformAnimes(sortAnimesByDate(animes));
-                console.log(animes);
-                res.end(JSON.stringify({ error: false, animes: animes}));
-            }
-        })
-        .catch(function(err){
-            console.log(err);
-            res.end(JSON.stringify({ error: true, why: err}));
-        });
+        console.log(result)
+        if (result.records.length == 0) {
+            res.end(JSON.stringify({ error: true, why: 'not in db'}));
+        } else {
+            const links = result.records[result.records.length - 1]._fields[0].segments
+            const first = links[0].start.properties
+            first.startDate = new Date(first.startDate)
+            let animes = [first];
+            links.forEach(function(link){
+                console.log(link)
+                let anime = link.end.properties;
+                anime.startDate = new Date(anime.startDate);
+                animes.push(anime);
+            });
+            console.log(animes);
+            animes = tranformAnimes(sortAnimesByDate(animes));
+            console.log(animes);
+            res.end(JSON.stringify({ error: false, animes: animes}));
+        }
+    } catch (e) {
+        console.log(e);
+        res.end(JSON.stringify({ error: true, why: e}));
+    }
 }
 
-module.exports = {addToDB, getFromDBByMalID};
+async function clearDb() {
+    console.log('CLEARING DB');
+    try {
+        const result = await session
+        .run(
+            "match (n) detach delete n"
+        )
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+module.exports = {addToDB, getFromDBByMalID, clearDb};

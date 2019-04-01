@@ -1,4 +1,4 @@
-var request = require('request');
+var request = require('request-promise');
 var cheerio = require('cheerio');
 var sse = require("simple-sse");
 var chrono = require('chrono-node');
@@ -11,79 +11,83 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 */
 let baseURL;
 
-function crawl(animeID, res, client){
+async function crawl(animeID, res, client){
     baseURL = 'https://myanimelist.net';
     let pagesVisited = new Set();
     let pagesToVisit = ["/anime/"+animeID];
     let allRelated = []; // array of all related animes
-
-    startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
+    return await startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
 }
 
-function startCrawl(res, client, pagesVisited, pagesToVisit, allRelated) {
+async function startCrawl(res, client, pagesVisited, pagesToVisit, allRelated) {
     if (pagesToVisit.length > 0){
         let nextPage = pagesToVisit.pop();
         if (pagesVisited.has(getID(nextPage))) {
             // We've already visited this page, so repeat the crawl
-            startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
+            return await startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
         } else {
             // New page we haven't visited
             pagesVisited.add(getID(nextPage));
-            visitPage(baseURL + nextPage, startCrawl, res, client, pagesVisited, pagesToVisit, allRelated);
+            return await visitPage(nextPage, startCrawl, res, client, pagesVisited, pagesToVisit, allRelated);
         }
     }else{
         // neo4j.addToDB(allRelated);
+        preTransform = allRelated
         allRelated = transformAnimes(sortAnimesByDate(allRelated));
-        sse.send(client, 'full-data', JSON.stringify(allRelated));
-        sse.send(client, 'done', 'success');
-        sse.remove(client);
-        res.end();
+        if (client) {
+            sse.send(client, 'full-data', JSON.stringify(allRelated));
+            sse.send(client, 'done', 'success');
+            sse.remove(client);
+        }
+        if (res) {
+            res.end();
+        }
+        return preTransform;
     }
 }
 
-function visitPage(url, callback, res, client, pagesVisited, pagesToVisit, allRelated){
-    // console.log("Visiting page " + url);
-    request(url, function(error, response, body) {
-        if(error) {
-            // console.log("Error: " + error);
-            return;
-        }
-        // Check status code (200 is HTTP OK)
-        console.log("Status code: " + response.statusCode);
-        if(response.statusCode === 200) {
-            // Parse the document body
-            let $ = cheerio.load(body);
-            console.log("Page title:  " + $('title').text());
+async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated){
+    url = baseURL + relLink
+    // console.log("Visiting page " + url)
+    try{
+        const body = await request(url);
+        // Parse the document body
+        let $ = cheerio.load(body);
+        console.log("Page title:  " + $('title').text());
+        if (client) {
             sse.send(client, 'update', $('title').text().trim() );
-            
-            // collect related anime links
-            let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass');
-
-            relatedTypes.each((typeIndex, type) => {
-                const thisType = type.children[0].data.trim();
-                // 'Other' and 'Character' types of animes can be really unrelated, we'll discard them
-                if (thisType != 'Other:' && thisType != 'Character:'){
-                    let children = type.next.children;
-                    children.forEach((element, elementIndex) => {
-                        if (element.type === 'tag') pagesToVisit.push(element.attribs.href);
-                    });
-                }
-            });
-
-            let image = $('img[itemprop=image]');
-            let newEntry = {
-                type: $('div a[href*="?type="]')[0].children[0].data,
-                title: $('span[itemprop=name]')[0].children[0].data,
-                link: url,
-                image: image.length < 1 ? null : image[0].attribs.src,
-                startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())
-            };
-            if (isNaN(newEntry.startDate)) newEntry.startDate = null;
-
-            allRelated.push(newEntry);
         }
-        callback(res, client, pagesVisited, pagesToVisit, allRelated);
-    });
+        
+        // collect related anime links
+        let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass');
+
+        relatedTypes.each((typeIndex, type) => {
+            const thisType = type.children[0].data.trim();
+            // 'Other' and 'Character' types of animes can be really unrelated, we'll discard them
+            if (thisType != 'Other:' && thisType != 'Character:'){
+                let children = type.next.children;
+                children.forEach((element, elementIndex) => {
+                    if (element.type === 'tag') pagesToVisit.push(element.attribs.href);
+                });
+            }
+        });
+
+        let image = $('img[itemprop=image]');
+        let newEntry = {
+            malID: getID(relLink),
+            type: $('div a[href*="?type="]')[0].children[0].data,
+            title: $('span[itemprop=name]')[0].children[0].data,
+            link: url,
+            image: image.length < 1 ? null : image[0].attribs.src,
+            startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())
+        };
+        if (isNaN(newEntry.startDate)) newEntry.startDate = null;
+
+        allRelated.push(newEntry);
+        return await callback(res, client, pagesVisited, pagesToVisit, allRelated);
+    } catch(e) {
+        console.log(e);
+    }
 };
 
 // assumes link is a relative link following the format '/anime/ID/...'
