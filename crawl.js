@@ -1,4 +1,5 @@
 var request = require('request-promise');
+var PromiseThrottle = require('promise-throttle');
 var cheerio = require('cheerio');
 var sse = require("simple-sse");
 var chrono = require('chrono-node');
@@ -10,6 +11,10 @@ var sortAnimesByDate = require('./sortAnimesByDate');
     related anime links are relative
 */
 let baseURL;
+var promiseThrottle = new PromiseThrottle({
+    requestsPerSecond: 1,           // max requests per second
+    promiseImplementation: Promise  // the Promise library you are using
+  });
 
 async function crawl(animeID, res, client){
     baseURL = 'https://myanimelist.net';
@@ -49,8 +54,8 @@ async function startCrawl(res, client, pagesVisited, pagesToVisit, allRelated) {
 async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated){
     url = baseURL + relLink
     // console.log("Visiting page " + url)
-    try{
-        const body = await request(url);
+    try {
+        const body = await promiseThrottle.add(request.bind(this, encodeURI(url)));
         // Parse the document body
         let $ = cheerio.load(body);
         console.log("Page title:  " + $('title').text());
@@ -87,6 +92,8 @@ async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVi
         return await callback(res, client, pagesVisited, pagesToVisit, allRelated);
     } catch(e) {
         console.log(e);
+        // try again
+        return await visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated);
     }
 };
 

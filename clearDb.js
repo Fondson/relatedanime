@@ -2,7 +2,7 @@ var neo4j = require('./neo4jHelper');
 
 
 async function main(){
-    try{
+    try {
         await neo4j.clearDb();
         console.log('SUCCESS');
     } catch(e) {
