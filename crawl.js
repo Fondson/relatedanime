@@ -72,7 +72,10 @@ async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVi
             if (thisType != 'Other:' && thisType != 'Character:'){
                 let children = type.next.children;
                 children.forEach((element, elementIndex) => {
-                    if (element.type === 'tag') pagesToVisit.push(element.attribs.href);
+                    if (element.type === 'tag') {
+                        const page = element.attribs.href
+                        if (!pagesVisited.has(getID(page))) pagesToVisit.push(page);
+                    }
                 });
             }
         });

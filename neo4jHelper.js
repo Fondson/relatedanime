@@ -9,6 +9,9 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 var driver = neo4j.driver('bolt://localhost', neo4j.auth.basic('neo4j', 'password'));
 var session = driver.session();
 
+// create index
+session.run("create index on :Anime(malID)");
+
 async function deleteAnimesIfExist(animes) {
     for (let i = 0; i < animes.length; ++i) {
         const result = await session
@@ -27,7 +30,7 @@ async function addToDB(animes){
         const anime = animes[i]
         // add each anime as node
         await session
-        .run("create (n \
+        .run("create (n:Anime \
             {\
                 type: {typeParam},\
                 title: {titleParam},\
@@ -53,11 +56,11 @@ async function addToDB(animes){
             await session
                 .run(
                     "match \
-                        (a \
+                        (a:Anime \
                             {\
                                 malID: {malIDParam}\
                             }), \
-                        (b \
+                        (b:Anime \
                             {\
                                 malID: {nextMalIDParam}\
                             }) \
@@ -77,7 +80,7 @@ async function getFromDB(animeTitle, res){
     try{
         const result = await session
         .run(
-            "match p=()-[*0..1000]-(n {title: {titleParam}})-[*0..1000]-() return p",
+            "match p=(a:Anime)-[r1:RELATED_TO*0..1000]-(n:Anime {title: {titleParam}})-[r2:RELATED_TO*0..1000]-(b:Anime) return p",
             {
                 titleParam: animeTitle
             }
@@ -111,7 +114,7 @@ async function getFromDBByMalID(id, res){
     try{
         const result = await session
         .run(
-            "match p=()-[*0..1000]-(n {malID: {malIDParam}})-[*0..1000]-() return p",
+            "match p=(a:Anime)-[r1:RELATED_TO*0..1000]-(n:Anime {malID: {malIDParam}})-[r2:RELATED_TO*0..1000]-(b:Anime) return p",
             {
                 malIDParam: +id
             }
