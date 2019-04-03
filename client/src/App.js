@@ -36,16 +36,9 @@ class App extends Component {
   }
   
   searchById(id) {
-    Client.search(id, (jsonObj) => {
-      if (jsonObj.error) {
-        history.push('/error');
-        this.setState({ isLoading: false, searchValue: "" });
-        return;
-      }
-      history.push('/'+jsonObj.id);
-      Client.dbSearch(jsonObj.id, (dbJsonObj) => {
+      Client.dbSearch(id, (dbJsonObj) => {
         if (dbJsonObj.error) {
-          Client.crawl(jsonObj.id, 
+          Client.crawl(id, 
             (e) => {
               console.log(e.data);
               this.setState({
@@ -69,13 +62,20 @@ class App extends Component {
           });
         }
       });
-    });
   }
 
 	searchWithEvent(e){
 		e.preventDefault()
     this.setState({ isLoading: true, animes: {} });
-    this.searchById(this.state.searchValue);
+    Client.search(this.state.searchValue, (jsonObj) => {
+      if (jsonObj.error) {
+        history.push('/error');
+        this.setState({ isLoading: false, searchValue: "" });
+        return;
+      }
+      history.push('/'+jsonObj.id);
+      this.searchById(jsonObj.id);
+    });
   }
   
   onBackButtonEvent(e){

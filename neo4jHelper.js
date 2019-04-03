@@ -26,12 +26,12 @@ async function _getAnimes(id) {
             return [];
         } else {
             const rootAnime = result.records[0]._fields[0].properties;
-            rootAnime.startDate = new Date(rootAnime.startDate);
+            if (rootAnime.startDate !== 'Not available') rootAnime.startDate = new Date(rootAnime.startDate);
             let animes = [rootAnime];
             result.records.forEach(function(record){
                 const anime = record._fields[1].properties;
                 console.log(anime);
-                anime.startDate = new Date(anime.startDate);
+                if (anime.startDate !== 'Not available')  anime.startDate = new Date(anime.startDate);
                 animes.push(anime);
             });
             console.log(animes);

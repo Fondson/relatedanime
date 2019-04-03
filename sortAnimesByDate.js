@@ -6,7 +6,7 @@ function sortAnimesByDate(items){
     for (let i = 0; i < len; i++){
         if (items[i].startDate === null){
             items[i].startDate = 'Not available';
-            nullArr.push(items.splice(i, 1));
+            nullArr.push.apply(nullArr, items.splice(i, 1));
             --i;
             --len;
         }
@@ -32,7 +32,8 @@ function sortAnimesByDate(items){
         if (items[i].startDate instanceof Date) items[i].startDate = formatDate(items[i].startDate);
     }
 
-    return items.concat(...nullArr);
+    items.push.apply(items, nullArr);
+    return items;
 };
 
 function formatDate(date) {
