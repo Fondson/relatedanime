@@ -50,62 +50,31 @@ async function addToDB(animes){
         );
     }
 
-    for (let i = 0; i < animes.length; ++i) {
-        if (i < animes.length - 1) {
-            let next = animes[i + 1]
-            await session
-                .run(
-                    "match \
-                        (a:Anime \
-                            {\
-                                malID: {malIDParam}\
-                            }), \
-                        (b:Anime \
-                            {\
-                                malID: {nextMalIDParam}\
-                            }) \
-                    merge (a)-[r:RELATED_TO]-(b)\
-                    return a,r,b",
-                    {
-                        malIDParam: animes[i].malID,
-                        nextMalIDParam: next.malID
-                    }
-                )
-        }
+    let rootAnime = null
+    // just to be safe
+    if (animes.length > 0) {
+        rootAnime = animes[0]
     }
-}
-
-async function getFromDB(animeTitle, res){
-    console.log(animeTitle);
-    try{
-        const result = await session
-        .run(
-            "match p=(a:Anime)-[r1:RELATED_TO*0..1000]-(n:Anime {title: {titleParam}})-[r2:RELATED_TO*0..1000]-(b:Anime) return p",
-            {
-                titleParam: animeTitle
-            }
-        )
-        if (result.records.length == 0) {
-            res.end(JSON.stringify({ error: true, why: 'not in db'}));
-        } else {
-            const links = result.records[result.records.length - 1]._fields[0].segments
-            const first = links[0].start
-            first.startDate = new Date(first.startDate)
-            let animes = [first];
-            links.forEach(function(link){
-                console.log(link)
-                let anime = link.end.properties;
-                anime.startDate = new Date(anime.startDate);
-                animes.push(anime);
-            });
-            console.log(animes);
-            animes = tranformAnimes(sortAnimesByDate(animes));
-            console.log(animes);
-            res.end(JSON.stringify({ error: false, animes: animes}));
-        }
-    } catch (e) {
-        console.log(e);
-        res.end(JSON.stringify({ error: true, why: e}));
+    for (let i = 1; i < animes.length; ++i) {
+        const anime = animes[i]
+        await session
+            .run(
+                "match \
+                    (a:Anime \
+                        {\
+                            malID: {malIDParam}\
+                        }), \
+                    (b:Anime \
+                        {\
+                            malID: {otherMalIDParam}\
+                        }) \
+                merge (a)-[r:RELATED_TO]-(b)\
+                return a,r,b",
+                {
+                    malIDParam: rootAnime.malID,
+                    otherMalIDParam: anime.malID
+                }
+            )
     }
 }
 
@@ -114,7 +83,7 @@ async function getFromDBByMalID(id, res){
     try{
         const result = await session
         .run(
-            "match p=(a:Anime)-[r1:RELATED_TO*0..1000]-(n:Anime {malID: {malIDParam}})-[r2:RELATED_TO*0..1000]-(b:Anime) return p",
+            "match (a:Anime {malID:{malIDParam}})-[r1:RELATED_TO*1..2]-(b:Anime) return a, b",
             {
                 malIDParam: +id
             }
@@ -123,13 +92,12 @@ async function getFromDBByMalID(id, res){
         if (result.records.length == 0) {
             res.end(JSON.stringify({ error: true, why: 'not in db'}));
         } else {
-            const links = result.records[result.records.length - 1]._fields[0].segments
-            const first = links[0].start.properties
-            first.startDate = new Date(first.startDate)
-            let animes = [first];
-            links.forEach(function(link){
-                console.log(link)
-                let anime = link.end.properties;
+            const rootAnime = result.records[0]._fields[0].properties
+            rootAnime.startDate = new Date(rootAnime.startDate);
+            let animes = [rootAnime];
+            result.records.forEach(function(record){
+                const anime = record._fields[1].properties
+                console.log(anime)
                 anime.startDate = new Date(anime.startDate);
                 animes.push(anime);
             });

@@ -19,8 +19,9 @@ class App extends Component {
   constructor(props, context){
 		super(props, context);
 		this.handleChange = this.handleChange.bind(this);
-		this.searchWithValue = this.searchWithValue.bind(this);
+		this.searchWithEvent = this.searchWithEvent.bind(this);
     this.sectionsDidMount = this.sectionsDidMount.bind(this);
+    this.searchById = this.searchById.bind(this)
 	}
 
   state = {
@@ -32,12 +33,10 @@ class App extends Component {
 
 	handleChange(e) {
 		this.setState({ searchValue: e.target.value });
-	}
-
-	searchWithValue(e){
-		e.preventDefault()
-    this.setState({ isLoading: true, animes: {} });
-    Client.search(this.state.searchValue, (jsonObj) => {
+  }
+  
+  searchById(id) {
+    Client.search(id, (jsonObj) => {
       if (jsonObj.error) {
         history.push('/error');
         this.setState({ isLoading: false, searchValue: "" });
@@ -72,6 +71,12 @@ class App extends Component {
       });
     });
   }
+
+	searchWithEvent(e){
+		e.preventDefault()
+    this.setState({ isLoading: true, animes: {} });
+    this.searchById(this.state.searchValue);
+  }
   
   onBackButtonEvent(e){
     e.preventDefault();
@@ -83,64 +88,14 @@ class App extends Component {
     }
 
     this.setState({ isLoading: true, animes: {} });
-    Client.dbSearch(id, (dbJsonObj) => {
-      if (dbJsonObj.error) {
-        Client.crawl(id, 
-          (e) => {
-            console.log(e.data);
-            this.setState({
-              loadingString: 'Found ' + e.data,
-            });
-          }, 
-          (e) => {
-            this.setState({
-              animes : JSON.parse(e.data),
-              searchValue: "",
-              loadingString: "Scraping MAL...",
-              isLoading: false,
-            });
-          });
-      } else {
-        this.setState({
-          animes : dbJsonObj.animes,
-          searchValue: "",
-          loadingString: "Scraping MAL...",
-          isLoading: false,
-        });
-      }
-    });
+    this.searchById(id)
   }
 
   sectionsDidMount(match){
     window.onpopstate = (e) => this.onBackButtonEvent(e);
     if (this.state.isLoading) {return;}
     this.setState({ isLoading: true, animes: {} });
-    Client.dbSearch(match.params.id, (dbJsonObj) => {
-      if (dbJsonObj.error) {
-        Client.crawl(match.params.id, 
-          (e) => {
-            console.log(e.data);
-            this.setState({
-              loadingString: 'Found ' + e.data,
-            });
-          }, 
-          (e) => {
-            this.setState({
-              animes : JSON.parse(e.data),
-              searchValue: "",
-              loadingString: "Scraping MAL...",
-              isLoading: false,
-            });
-          });
-      } else {
-        this.setState({
-          animes : dbJsonObj.animes,
-          searchValue: "",
-          loadingString: "Scraping MAL...",
-          isLoading: false,
-        });
-      }
-    });
+    this.searchById(match.params.id)
   }
 
   render() {
@@ -178,7 +133,7 @@ class App extends Component {
             <Sticky>
               {
                 ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
-                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithValue}/>;
+                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithEvent}/>;
                 }
               }
             </Sticky>
