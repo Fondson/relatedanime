@@ -95,8 +95,12 @@ async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVi
         return await callback(res, client, pagesVisited, pagesToVisit, allRelated);
     } catch(e) {
         console.log(e);
-        // try again
-        return await visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated);
+        if (e.statusCode == 429) {  // too many requests error
+            // try again
+            return await visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated);
+        } else {
+            return await callback(res, client, pagesVisited, pagesToVisit, allRelated);
+        }
     }
 };
 
