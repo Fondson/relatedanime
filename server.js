@@ -9,7 +9,7 @@ var app = express();
 app.set('port', (process.env.PORT || 3001));
 
 app.get('/db/:id', function(req, res){
-    neo4j.getFromDBByMalID(decodeURI(req.params.id), res);
+    neo4j.getFromDBByMalID(decodeURI(req.params.id), res, req);
 })
 
 app.get('/anime(/:animeID)?', function(req, res){

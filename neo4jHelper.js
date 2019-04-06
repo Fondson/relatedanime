@@ -7,12 +7,23 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 // var graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
 
 var driver = neo4j.driver('bolt://localhost', neo4j.auth.basic('neo4j', 'password'));
-var session = driver.session();
 
 // create index
-session.run("create index on :Anime(malID)");
+driver.session().run("create index on :Anime(malID)");
 
-async function _getAnimes(id) {
+
+function _getSession(req = null) {
+    if (req === null) {
+        return driver.session();
+    }
+
+    if (!req.session) {
+        req.session = driver.session();
+    }
+    return req.session;
+}
+
+async function _getAnimes(id, session) {
     try {
         const result = await session
         .run(
@@ -42,7 +53,7 @@ async function _getAnimes(id) {
     }
 }
 
-async function deleteAnimesIfExist(animes) {
+async function _deleteAnimesIfExist(animes, session) {
     for (let i = 0; i < animes.length; ++i) {
         const result = await session
         .run(
@@ -56,15 +67,17 @@ async function deleteAnimesIfExist(animes) {
 
 async function deleteAnimesFromDB(id) {
     try {
-        let animes = await _getAnimes(id);
-        await deleteAnimesIfExist(animes);
+        const session = _getSession();
+        let animes = await _getAnimes(id, session);
+        await _deleteAnimesIfExist(animes, session);
     } catch (e) {
         console.log(e);
     }
 }
 
 async function addToDB(animes){
-    await deleteAnimesIfExist(animes);
+    const session = _getSession();
+    await _deleteAnimesIfExist(animes, session);
     for (let i = 0; i < animes.length; ++i) {
         const anime = animes[i]
         // add each anime as node
@@ -117,10 +130,11 @@ async function addToDB(animes){
     }
 }
 
-async function getFromDBByMalID(id, res){
+async function getFromDBByMalID(id, res, req){
     console.log(id);
     try{
-        let animes = await _getAnimes(id);
+        const session = _getSession(req);
+        let animes = await _getAnimes(id, session);
         if (!animes.length) {
             res.end(JSON.stringify({ error: true, why: 'not in db'}));
         } else {
@@ -137,6 +151,7 @@ async function getFromDBByMalID(id, res){
 async function clearDb() {
     console.log('CLEARING DB');
     try {
+        const session = _getSession();
         const result = await session
         .run(
             "match (n) detach delete n"
