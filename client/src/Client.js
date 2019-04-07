@@ -10,36 +10,41 @@ function crawl(query, updateListener, eventListener) {
 
 /* eslint-disable no-undef */
 function search(query, cb) {
-  return fetch(`search/${encodeURIComponent(query)}`, {
-    accept: 'application/json',
-  }).then(checkStatus)
-    .then(parseJSON)
-    .then(cb);
+  fetchWithRetries(`search/${encodeURIComponent(query)}`, cb);
 }
 
 /* eslint-disable no-undef */
 function dbSearch(id, cb) {
-  return fetch(`db/${encodeURIComponent(id)}`, {
-    accept: 'application/json',
-  }).then(checkStatus)
-    .then(parseJSON)
-    .then(cb);
+  fetchWithRetries(`db/${encodeURIComponent(id)}`, cb);
 }
 
-function checkStatus(response) {
+async function fetchWithRetries(url, cb, retries = 0) {
+  try {
+    let response = await fetch(url, {
+      accept: 'application/json',
+    });
+    let obj = await processResponse(response);
+    cb(obj);
+  } catch (e) {
+    // retry up to 2 times (3 tries total)
+    if (retries < 3) {
+      fetchWithRetries(url, cb, retries + 1);
+    } else {
+      cb({ error: true, why: e});
+    }
+  }
+}
+
+function processResponse(response) {
   if (response.status >= 200 && response.status < 300) {
-    return response;
+    const obj = response.json();
+    return obj;
   }
   const error = new Error(`HTTP Error ${response.statusText}`);
   error.status = response.statusText;
   error.response = response;
   console.log(error); // eslint-disable-line no-console
   throw error;
-}
-
-function parseJSON(response) {
-  const obj = response.json();
-  return obj;
 }
 
 // if (!!window.EventSource) {
