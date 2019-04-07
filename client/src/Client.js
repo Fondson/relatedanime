@@ -28,8 +28,10 @@ async function fetchWithRetries(url, cb, retries = 0) {
   } catch (e) {
     // retry up to 2 times (3 tries total)
     if (retries < 3) {
+      console.log('Retry count: ' + retries);
       fetchWithRetries(url, cb, retries + 1);
     } else {
+      console.log('Reached max retry count!');
       cb({ error: true, why: e});
     }
   }
