@@ -3,22 +3,25 @@ var searchAnime = require('./searchAnime');
 var crawl = require('./crawl');
 var sse = require("simple-sse");
 var neo4j = require('./neo4jHelper');
+var pingSelf = require('./pingSelf');
 const path = require('path');
+
+pingSelf();
 var app = express();
 
 app.set('port', (process.env.PORT || 3001));
 
-app.get('/db/:id', function(req, res){
-    neo4j.getFromDBByMalID(decodeURI(req.params.id), res, req);
+app.get('/api/db/:malType(anime|manga)/:malId([0-9]+)', function(req, res){
+    neo4j.getFromDbByMalTypeAndMalID(req.params.malType, req.params.malId, res, req);
 })
 
-app.get('/anime(/:animeID)?', function(req, res){
+app.get('/api/:malType(anime|manga)/:malId([0-9]+)', function(req, res){
     const client = sse.add(req, res);
-    if (!req.params.animeID) req.params.animeID = 33674;
-    crawl(req.params.animeID, res, client);
+    if (!req.params.malId) req.params.malId = 1;
+    crawl(req.params.malType, req.params.malId, res, client);
 });
 
-app.get('/search/:searchStr', function(req, res){
+app.get('/api/search/:searchStr', function(req, res){
     searchAnime(req.params.searchStr, res);
 });
 

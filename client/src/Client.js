@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
-function crawl(query, updateListener, eventListener) {
-  if (query === 0) query = 1;
+function crawl(malType, id, updateListener, eventListener) {
+  if (id === 0) id = 1;
   //http://localhost:3001
-  const es = new EventSource(`/anime/${query}`);
+  const es = new EventSource(`/api/${malType}/${id}`);
   es.addEventListener('update', updateListener);
   es.addEventListener('full-data', eventListener);
   es.addEventListener('done', (e) => es.close());
@@ -10,12 +10,12 @@ function crawl(query, updateListener, eventListener) {
 
 /* eslint-disable no-undef */
 function search(query, cb) {
-  fetchWithRetries(`search/${encodeURIComponent(query)}`, cb);
+  fetchWithRetries(`/api/search/${encodeURIComponent(query)}`, cb);
 }
 
 /* eslint-disable no-undef */
-function dbSearch(id, cb) {
-  fetchWithRetries(`db/${encodeURIComponent(id)}`, cb);
+function dbSearch(malType, id, cb) {
+  fetchWithRetries(`/api/db/${malType}/${id}`, cb);
 }
 
 async function fetchWithRetries(url, cb, retries = 0) {

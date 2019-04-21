@@ -5,7 +5,7 @@ var args = process.argv.slice(2);
 
 async function main(){
     try{
-        await neo4j.deleteAnimesFromDB(args[0]);
+        await neo4j.deleteSeriesFromDB(args[0], args[1]);
     } catch(e) {
         console.log(e)
     }

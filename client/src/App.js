@@ -21,7 +21,7 @@ class App extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.searchWithEvent = this.searchWithEvent.bind(this);
     this.sectionsDidMount = this.sectionsDidMount.bind(this);
-    this.searchById = this.searchById.bind(this)
+    this.searchByMalTypeAndId = this.searchByMalTypeAndId.bind(this)
 	}
 
   state = {
@@ -35,10 +35,10 @@ class App extends Component {
 		this.setState({ searchValue: e.target.value });
   }
   
-  searchById(id) {
-      Client.dbSearch(id, (dbJsonObj) => {
+  searchByMalTypeAndId(malType, id) {
+      Client.dbSearch(malType, id, (dbJsonObj) => {
         if (dbJsonObj.error) {
-          Client.crawl(id, 
+          Client.crawl(malType, id, 
             (e) => {
               console.log(e.data);
               this.setState({
@@ -55,7 +55,7 @@ class App extends Component {
             });
         } else {
           this.setState({
-            animes : dbJsonObj.animes,
+            animes : dbJsonObj.series,
             searchValue: "",
             loadingString: "Scraping MAL...",
             isLoading: false,
@@ -73,14 +73,15 @@ class App extends Component {
         this.setState({ isLoading: false, searchValue: "" });
         return;
       }
-      history.push('/'+jsonObj.id);
-      this.searchById(jsonObj.id);
+      history.push('/' + jsonObj.malType + '/' + jsonObj.id);
+      this.searchByMalTypeAndId(jsonObj.malType, jsonObj.id);
     });
   }
   
   onBackButtonEvent(e){
     e.preventDefault();
-    const id = +e.target.location.pathname.substring(1);
+    const malType = +e.target.location.pathname.substring(1);
+    const id = +e.target.location.pathname.substring(2);
     if (id == 0) {
       history.replace('/');
       this.setState({ isLoading: false, searchValue: "" });
@@ -88,14 +89,14 @@ class App extends Component {
     }
 
     this.setState({ isLoading: true, animes: {} });
-    this.searchById(id)
+    this.searchByMalTypeAndId(malType, id)
   }
 
   sectionsDidMount(match){
     window.onpopstate = (e) => this.onBackButtonEvent(e);
     if (this.state.isLoading) {return;}
     this.setState({ isLoading: true, animes: {} });
-    this.searchById(match.params.id)
+    this.searchByMalTypeAndId(match.params.malType, match.params.id)
   }
 
   render() {
@@ -149,7 +150,7 @@ class App extends Component {
                     <Button bsSize='large' onClick={ () => history.push('/') } active>HOME</Button>
                   </div>
                 </AnimeBackground>))}/>
-              <Route exact path='/:id([0-9]+)' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
+              <Route exact path='/:malType(anime|manga)/:id([0-9]+)' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
               <Route exact path='/*' render={() => <Redirect to="/error"/>}/>
             </Switch>
 

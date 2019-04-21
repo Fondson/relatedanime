@@ -14,44 +14,39 @@ let baseURL;
 var promiseThrottle = new PromiseThrottle({
     requestsPerSecond: 1,           // max requests per second
     promiseImplementation: Promise  // the Promise library you are using
-  });
+});
 
-async function crawl(animeID, res, client){
+// dfs crawl
+async function crawl(malType, malId, res, client){
     baseURL = 'https://myanimelist.net';
     let pagesVisited = new Set();
-    let pagesToVisit = ["/anime/"+animeID];
+    let pagesToVisit = ["/" + malType + "/" + malId];
     let allRelated = []; // array of all related animes
-    return await startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
-}
 
-async function startCrawl(res, client, pagesVisited, pagesToVisit, allRelated) {
-    if (pagesToVisit.length > 0){
-        let nextPage = pagesToVisit.pop();
-        if (pagesVisited.has(getID(nextPage))) {
-            // We've already visited this page, so repeat the crawl
-            return await startCrawl(res, client, pagesVisited, pagesToVisit, allRelated);
-        } else {
-            // New page we haven't visited
-            pagesVisited.add(getID(nextPage));
-            return await visitPage(nextPage, startCrawl, res, client, pagesVisited, pagesToVisit, allRelated);
+    while (pagesToVisit.length) {
+        const nextPage = pagesToVisit.pop();
+        // New page we haven't visited
+        if (!pagesVisited.has(nextPage)) {
+            pagesVisited.add(nextPage);
+            await visitPage(nextPage, client, pagesVisited, pagesToVisit, allRelated);
         }
-    }else{
-        // neo4j.addToDB(allRelated);
-        preTransform = allRelated
-        allRelated = transformAnimes(sortAnimesByDate(allRelated));
-        if (client) {
-            sse.send(client, 'full-data', JSON.stringify(allRelated));
-            sse.send(client, 'done', 'success');
-            sse.remove(client);
-        }
-        if (res) {
-            res.end();
-        }
-        return preTransform;
     }
+
+    // neo4j.addToDB(allRelated);
+    let preTransform = allRelated
+    allRelated = transformAnimes(sortAnimesByDate(allRelated));
+    if (client) {
+        sse.send(client, 'full-data', JSON.stringify(allRelated));
+        sse.send(client, 'done', 'success');
+        sse.remove(client);
+    }
+    if (res) {
+        res.end();
+    }
+    return preTransform;
 }
 
-async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated){
+async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated){
     url = baseURL + relLink
     // console.log("Visiting page " + url)
     try {
@@ -73,16 +68,17 @@ async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVi
                 let children = type.next.children;
                 children.forEach((element, elementIndex) => {
                     if (element.type === 'tag') {
-                        const page = element.attribs.href
-                        if (!pagesVisited.has(getID(page))) pagesToVisit.push(page);
+                        pagesToVisit.push(stripToMalTypeAndId(element.attribs.href));
                     }
                 });
             }
         });
 
         let image = $('img[itemprop=image]');
+        const malTypeAndId = getMalTypeAndId(relLink);
         let newEntry = {
-            malID: getID(relLink),
+            malType: malTypeAndId.malType,
+            malID: malTypeAndId.malID,
             type: $('div a[href*="?type="]')[0].children[0].data,
             title: $('span[itemprop=name]')[0].children[0].data,
             link: url,
@@ -92,27 +88,47 @@ async function visitPage(relLink, callback, res, client, pagesVisited, pagesToVi
         if (isNaN(newEntry.startDate)) newEntry.startDate = null;
 
         allRelated.push(newEntry);
-        return await callback(res, client, pagesVisited, pagesToVisit, allRelated);
     } catch(e) {
         console.log(e);
         if (e.statusCode == 429) {  // too many requests error
             // try again
-            return await visitPage(relLink, callback, res, client, pagesVisited, pagesToVisit, allRelated);
-        } else {
-            return await callback(res, client, pagesVisited, pagesToVisit, allRelated);
+            await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated);
         }
     }
 };
 
-// assumes link is a relative link following the format '/anime/ID/...'
-function getID (link) {
-    let startWithID = link.slice('/anime/'.length);
-    let ret = '';
-    for (let i = 0; i < startWithID.length; ++i){
-        if (startWithID[i] === '/') break;
-        ret += startWithID[i];
+// assumes url is a relative url following the format '/(anime|manga)/ID/...'
+function getMalTypeAndId(url) {
+    let pos = 1;
+    let malType = ''
+    while (pos < url.length && url[pos] != '/') {
+        malType += url[pos++];
     }
-    return +ret;
+    let id = ''
+    pos++;
+    while (pos < url.length && url[pos] != '/') {
+        id += url[pos++];
+    }
+
+    return { malType: malType, malID: +id };
 };
+
+// assumes url is a relative url following the format '/(anime|manga)/ID/...'
+function stripToMalTypeAndId(url) {
+    let ret = '';
+    let slashCount = 0;
+    let pos = 0;
+    while (pos < url.length) {
+        if (url[pos] == '/') {
+            slashCount += 1;
+        }
+        if (slashCount == 3) {
+            break;
+        }
+        ret += url[pos++];
+    }
+
+    return ret;
+}
 
 module.exports = crawl;

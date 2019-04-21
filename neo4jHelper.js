@@ -8,8 +8,9 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 
 var driver = neo4j.driver('bolt://localhost', neo4j.auth.basic('neo4j', 'password'));
 
-// create index
-driver.session().run("create index on :Anime(malID)");
+// create indexes
+driver.session().run("create index on :anime(malID)");
+driver.session().run("create index on :manga(malID)");
 
 
 function _getSession(req = null) {
@@ -23,66 +24,72 @@ function _getSession(req = null) {
     return req.session;
 }
 
-async function _getAnimes(id, session) {
+function _getASeriesFromNode(node) {
+    const aSeries = node.properties
+    if (aSeries.startDate !== 'Not available') aSeries.startDate = new Date(aSeries.startDate);
+    aSeries.malType = node.labels[0];
+    return aSeries;
+}
+
+async function _getSeries(malType, id, session) {
     try {
         const result = await session
         .run(
-            "match (a:Anime {malID:{malIDParam}})-[r1:RELATED_TO*1..2]-(b:Anime) return a, b",
+            "match (a:" + malType + " {malID:{malIDParam}})-[r1:RELATED_TO*1..2]-(b) return a, b",
             {
                 malIDParam: +id
             }
         )
-        console.log(result);
+        // console.log(result);
         if (result.records.length == 0) {
             return [];
         } else {
-            const rootAnime = result.records[0]._fields[0].properties;
-            if (rootAnime.startDate !== 'Not available') rootAnime.startDate = new Date(rootAnime.startDate);
-            let animes = [rootAnime];
+            const rootSeriesNode = result.records[0].toObject().a;
+            let rootSeries = _getASeriesFromNode(rootSeriesNode)
+            let series = [rootSeries];
             result.records.forEach(function(record){
-                const anime = record._fields[1].properties;
-                console.log(anime);
-                if (anime.startDate !== 'Not available')  anime.startDate = new Date(anime.startDate);
-                animes.push(anime);
+                const aSeriesNode = record.toObject().b;
+                let aSeries = _getASeriesFromNode(aSeriesNode)
+                series.push(aSeries);
             });
-            console.log(animes);
-            return animes
+            console.log(series);
+            return series
         }
     } catch (e) {
         throw e;
     }
 }
 
-async function _deleteAnimesIfExist(animes, session) {
-    for (let i = 0; i < animes.length; ++i) {
+async function _deleteSeriesIfExist(series, session) {
+    for (let i = 0; i < series.length; ++i) {
         const result = await session
         .run(
-            "match (n {malID: {malIDParam}}) detach delete n",
+            "match (n:" + series[i].malType + " {malID: {malIDParam}}) detach delete n",
             {
-                malIDParam: animes[i].malID,
+                malIDParam: series[i].malID,
             }
         );
     }
 }
 
-async function deleteAnimesFromDB(id) {
+async function deleteSeriesFromDB(malType, id) {
     try {
         const session = _getSession();
-        let animes = await _getAnimes(id, session);
-        await _deleteAnimesIfExist(animes, session);
+        let series = await _getSeries(malType, id, session);
+        await _deleteSeriesIfExist(series, session);
     } catch (e) {
         console.log(e);
     }
 }
 
-async function addToDB(animes){
+async function addToDB(series){
     const session = _getSession();
-    await _deleteAnimesIfExist(animes, session);
-    for (let i = 0; i < animes.length; ++i) {
-        const anime = animes[i]
-        // add each anime as node
+    await _deleteSeriesIfExist(series, session);
+    for (let i = 0; i < series.length; ++i) {
+        const aSeries = series[i]
+        // add each aSeries as node
         await session
-        .run("create (n:Anime \
+        .run("create (n:" + aSeries.malType + " \
             {\
                 type: {typeParam},\
                 title: {titleParam},\
@@ -92,55 +99,55 @@ async function addToDB(animes){
                 malID: {malIDParam}\
             }) return n",
             {
-                typeParam: anime.type,
-                titleParam: anime.title,
-                linkParam: anime.link,
-                imageParam: anime.image,
-                startDateParam: anime.startDate ? anime.startDate.toString() : anime.startDate,
-                malIDParam: anime.malID
+                typeParam: aSeries.type,
+                titleParam: aSeries.title,
+                linkParam: aSeries.link,
+                imageParam: aSeries.image,
+                startDateParam: aSeries.startDate ? aSeries.startDate.toString() : aSeries.startDate,
+                malIDParam: aSeries.malID
             }
         );
     }
 
-    let rootAnime = null
+    let rootSeries = null
     // just to be safe
-    if (animes.length > 0) {
-        rootAnime = animes[0]
+    if (series.length > 0) {
+        rootSeries = series[0]
     }
-    for (let i = 1; i < animes.length; ++i) {
-        const anime = animes[i]
+    for (let i = 1; i < series.length; ++i) {
+        const aSeries = series[i]
         await session
-            .run(
-                "match \
-                    (a:Anime \
-                        {\
-                            malID: {malIDParam}\
-                        }), \
-                    (b:Anime \
-                        {\
-                            malID: {otherMalIDParam}\
-                        }) \
-                merge (a)-[r:RELATED_TO]-(b)\
-                return a,r,b",
-                {
-                    malIDParam: rootAnime.malID,
-                    otherMalIDParam: anime.malID
-                }
-            )
+        .run(
+            "match \
+                (a:" + rootSeries.malType + " \
+                    {\
+                        malID: {malIDParam}\
+                    }), \
+                (b:" + aSeries.malType + " \
+                    {\
+                        malID: {otherMalIDParam}\
+                    }) \
+            merge (a)-[r:RELATED_TO]-(b)\
+            return a,r,b",
+            {
+                malIDParam: rootSeries.malID,
+                otherMalIDParam: aSeries.malID
+            }
+        )
     }
 }
 
-async function getFromDBByMalID(id, res, req){
-    console.log(id);
+async function getFromDbByMalTypeAndMalID(malType, id, res, req){
+    console.log(malType + ' ' + id);
     try{
         const session = _getSession(req);
-        let animes = await _getAnimes(id, session);
-        if (!animes.length) {
+        let series = await _getSeries(malType, id, session);
+        if (!series.length) {
             res.end(JSON.stringify({ error: true, why: 'not in db'}));
         } else {
-            animes = tranformAnimes(sortAnimesByDate(animes));
-            console.log(animes);
-            res.end(JSON.stringify({ error: false, animes: animes}));
+            series = tranformAnimes(sortAnimesByDate(series));
+            console.log(series);
+            res.end(JSON.stringify({ error: false, series: series}));
         }
     } catch (e) {
         console.log(e);
@@ -161,4 +168,4 @@ async function clearDb() {
     }
 }
 
-module.exports = {addToDB, getFromDBByMalID, clearDb, deleteAnimesFromDB};
+module.exports = {addToDB, getFromDbByMalTypeAndMalID, clearDb, deleteSeriesFromDB};
