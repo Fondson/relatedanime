@@ -80,8 +80,9 @@ class App extends Component {
   
   onBackButtonEvent(e){
     e.preventDefault();
-    const malType = +e.target.location.pathname.substring(1);
-    const id = +e.target.location.pathname.substring(2);
+    const parts = e.target.location.pathname.split('/');
+    const malType = parts[1];
+    const id = +parts[2]
     if (id == 0) {
       history.replace('/');
       this.setState({ isLoading: false, searchValue: "" });

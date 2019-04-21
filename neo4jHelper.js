@@ -168,4 +168,17 @@ async function clearDb() {
     }
 }
 
-module.exports = {addToDB, getFromDbByMalTypeAndMalID, clearDb, deleteSeriesFromDB};
+async function ping() {
+    try {
+        const session = _getSession();
+        const result = await session
+        .run(
+            "match (n) return n limit 1"
+        )
+    } catch (e) {
+        console.log(e);
+    }
+
+}
+
+module.exports = {addToDB, getFromDbByMalTypeAndMalID, clearDb, deleteSeriesFromDB, ping};

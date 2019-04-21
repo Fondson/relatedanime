@@ -6,7 +6,8 @@ var neo4j = require('./neo4jHelper');
 var pingSelf = require('./pingSelf');
 const path = require('path');
 
-pingSelf();
+pingSelf.pingHomepage();
+pingSelf.pingNeo4j();
 var app = express();
 
 app.set('port', (process.env.PORT || 3001));
