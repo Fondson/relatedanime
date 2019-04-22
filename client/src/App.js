@@ -36,8 +36,8 @@ class App extends Component {
   }
   
   searchByMalTypeAndId(malType, id) {
-      Client.dbSearch(malType, id, (dbJsonObj) => {
-        if (dbJsonObj.error) {
+      Client.precrawl(malType, id, (jsonObj) => {
+        if (jsonObj.error) {
           Client.crawl(malType, id, 
             (e) => {
               console.log(e.data);
@@ -55,7 +55,7 @@ class App extends Component {
             });
         } else {
           this.setState({
-            animes : dbJsonObj.series,
+            animes : jsonObj.series,
             searchValue: "",
             loadingString: "Scraping MAL...",
             isLoading: false,

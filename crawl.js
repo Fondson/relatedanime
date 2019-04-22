@@ -4,6 +4,7 @@ var cheerio = require('cheerio');
 var sse = require("simple-sse");
 var chrono = require('chrono-node');
 var neo4j = require('./neo4jHelper');
+var redis = require('./redisHelper');
 var transformAnimes = require('./transformAnimes');
 var sortAnimesByDate = require('./sortAnimesByDate');
 
@@ -36,6 +37,7 @@ async function crawl(malType, malId, res, client){
     let preTransform = allRelated
     allRelated = transformAnimes(sortAnimesByDate(allRelated));
     if (client) {
+        redis.setSeries(malType, malId, allRelated);
         sse.send(client, 'full-data', JSON.stringify(allRelated));
         sse.send(client, 'done', 'success');
         sse.remove(client);

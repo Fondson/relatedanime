@@ -2,20 +2,20 @@
 function crawl(malType, id, updateListener, eventListener) {
   if (id === 0) id = 1;
   //http://localhost:3001
-  const es = new EventSource(`/api/${malType}/${id}`);
+  const es = new EventSource(`/api/crawl/${malType}/${id}`);
   es.addEventListener('update', updateListener);
   es.addEventListener('full-data', eventListener);
   es.addEventListener('done', (e) => es.close());
 }
 
 /* eslint-disable no-undef */
-function search(query, cb) {
-  fetchWithRetries(`/api/search/${encodeURIComponent(query)}`, cb);
+function precrawl(malType, id, cb) {
+  fetchWithRetries(`/api/precrawl/${malType}/${id}`, cb);
 }
 
 /* eslint-disable no-undef */
-function dbSearch(malType, id, cb) {
-  fetchWithRetries(`/api/db/${malType}/${id}`, cb);
+function search(query, cb) {
+  fetchWithRetries(`/api/search/${encodeURIComponent(query)}`, cb);
 }
 
 async function fetchWithRetries(url, cb, retries = 0) {
@@ -26,6 +26,7 @@ async function fetchWithRetries(url, cb, retries = 0) {
     let obj = await processResponse(response);
     cb(obj);
   } catch (e) {
+    console.log(e);
     // retry up to 2 times (3 tries total)
     if (retries < 3) {
       console.log('Retry count: ' + retries);
@@ -72,5 +73,5 @@ function processResponse(response) {
 //   console.log("Your browser doesn't support SSE")
 // }
 
-const Client = { crawl, search, dbSearch };
+const Client = { crawl, search, precrawl };
 export default Client;
