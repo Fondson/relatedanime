@@ -1,6 +1,6 @@
 # Related Anime
 
-<a href="https://related-anime.herokuapp.com/">Visit the website!</a>
+<a href="http://relatedanime.com/">Visit the website!</a>
 
 # Description
 Related Anime is a website used to discover all the different media related to an anime series.
