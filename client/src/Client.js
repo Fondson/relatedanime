@@ -9,11 +9,6 @@ function crawl(malType, id, updateListener, eventListener) {
 }
 
 /* eslint-disable no-undef */
-function precrawl(malType, id, cb) {
-  fetchWithRetries(`/api/precrawl/${malType}/${id}`, cb);
-}
-
-/* eslint-disable no-undef */
 function search(query, cb) {
   fetchWithRetries(`/api/search/${encodeURIComponent(query)}`, cb);
 }
@@ -73,5 +68,5 @@ function processResponse(response) {
 //   console.log("Your browser doesn't support SSE")
 // }
 
-const Client = { crawl, search, precrawl };
+const Client = { crawl, search };
 export default Client;

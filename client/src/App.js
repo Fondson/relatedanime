@@ -22,6 +22,7 @@ class App extends Component {
 		this.searchWithEvent = this.searchWithEvent.bind(this);
     this.sectionsDidMount = this.sectionsDidMount.bind(this);
     this.searchByMalTypeAndId = this.searchByMalTypeAndId.bind(this)
+    this._pushError = this._pushError.bind(this)
 	}
 
   state = {
@@ -31,37 +32,32 @@ class App extends Component {
     loadingString: "Scraping MAL...",
   };
 
+  _pushError() {
+    history.push('/error');
+    this.setState({ isLoading: false, searchValue: "" });
+  }
+
 	handleChange(e) {
 		this.setState({ searchValue: e.target.value });
   }
   
   searchByMalTypeAndId(malType, id) {
-      Client.precrawl(malType, id, (jsonObj) => {
-        if (jsonObj.error) {
-          Client.crawl(malType, id, 
-            (e) => {
-              console.log(e.data);
-              this.setState({
-                loadingString: 'Found ' + e.data,
-              });
-            }, 
-            (e) => {
-              this.setState({
-                animes : JSON.parse(e.data),
-                searchValue: "",
-                loadingString: "Scraping MAL...",
-                isLoading: false,
-              });
-            });
-        } else {
-          this.setState({
-            animes : jsonObj.series,
-            searchValue: "",
-            loadingString: "Scraping MAL...",
-            isLoading: false,
-          });
-        }
-      });
+    Client.crawl(malType, id, 
+      (e) => {
+        console.log(e.data);
+        this.setState({
+          loadingString: 'Found ' + e.data,
+        });
+      }, 
+      (e) => {
+        this.setState({
+          animes : JSON.parse(e.data),
+          searchValue: "",
+          loadingString: "Scraping MAL...",
+          isLoading: false,
+        });
+      },
+    );
   }
 
 	searchWithEvent(e){
@@ -69,8 +65,7 @@ class App extends Component {
     this.setState({ isLoading: true, animes: {} });
     Client.search(this.state.searchValue, (jsonObj) => {
       if (jsonObj.error) {
-        history.push('/error');
-        this.setState({ isLoading: false, searchValue: "" });
+        this._pushError();
         return;
       }
       history.push('/' + jsonObj.malType + '/' + jsonObj.id);
@@ -80,17 +75,23 @@ class App extends Component {
   
   onBackButtonEvent(e){
     e.preventDefault();
-    const parts = e.target.location.pathname.split('/');
-    const malType = parts[1];
-    const id = +parts[2]
-    if (id == 0) {
+    const path = e.target.location.pathname;
+    if (path === '/') {
       history.replace('/');
       this.setState({ isLoading: false, searchValue: "" });
       return;
     }
-
-    this.setState({ isLoading: true, animes: {} });
-    this.searchByMalTypeAndId(malType, id)
+    try {
+      const parts = path.split('/');
+      const malType = parts[1];
+      const id = +parts[2]
+  
+      this.setState({ isLoading: true, animes: {} });
+      this.searchByMalTypeAndId(malType, id)
+    } catch (e) {
+      // invalid path
+      this._pushError();
+    }
   }
 
   sectionsDidMount(match){

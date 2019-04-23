@@ -1,7 +1,6 @@
 var neo4j = require('neo4j-driver').v1;
 var tranformAnimes = require('./transformAnimes');
 var sortAnimesByDate = require('./sortAnimesByDate');
-var redis = require('./redisHelper');
 
 // var graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
 // var graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
@@ -138,22 +137,20 @@ async function addToDB(series){
     }
 }
 
-async function getFromDbByMalTypeAndMalID(malType, id, res, req){
+async function getFromDbByMalTypeAndMalID(malType, id, req){
     console.log(malType + ' ' + id);
     try{
         const session = _getSession(req);
         let series = await _getSeries(malType, id, session);
         if (!series.length) {
-            res.end(JSON.stringify({ error: true, why: 'not in db'}));
+            return null;
         } else {
             series = tranformAnimes(sortAnimesByDate(series));
-            redis.setSeries(malType, id, series);
-            console.log(malType + ' ' + id + ' served from neo4j!')
-            res.end(JSON.stringify({ error: false, series: series}));
+            return series;
         }
     } catch (e) {
         console.log(e);
-        res.end(JSON.stringify({ error: true, why: e}));
+        return null;
     }
 }
 
