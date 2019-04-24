@@ -32,7 +32,7 @@ async function setSeries(malType, malId, value) {
     console.log('Redis setting ' + malType + ' ' + malId) + ' to:';
     console.log(value)
     try {
-        await client.setAsync(_getKey(malType, malId), JSON.stringify(value));
+        await client.setAsync(_createKey(malType, malId), JSON.stringify(value));
     } catch (e) {
         console.log('Redis error:');
         console.log(e);
@@ -41,7 +41,7 @@ async function setSeries(malType, malId, value) {
 
 async function getSeries(malType, malId) {
     try {
-        return JSON.parse(await client.getAsync((_getKey(malType, malId))));
+        return JSON.parse(await client.getAsync((_createKey(malType, malId))));
     } catch (e) {
         console.log('Redis error:');
         console.log(e);
@@ -49,8 +49,8 @@ async function getSeries(malType, malId) {
     }
 }
 
-function _getKey(malType, malId) {
-    return malType + '_' + malId;
+function _createKey(malType, malId) {
+    return malType + ':' + malId;
 }
 
 

@@ -7,7 +7,7 @@ const DEFAUT = 300000;
 
 function pingHomepage(interval=DEFAUT) {
     setInterval(function() {
-        http.get("http://related-anime.herokuapp.com");
+        http.get("http://relatedanime.com");
     }, interval); 
 }
 
