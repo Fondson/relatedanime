@@ -21,8 +21,9 @@ async function _preCrawl(malType, malId, req=null) {
         return redisResult;
     } 
     // check db
-    let neo4jResult = await neo4j.getFromDbByMalTypeAndMalID(malType, malId, req);
+    let neo4jResult = await neo4j.getFromDbByMalTypeAndMalId(malType, malId, req);
     if (neo4jResult !== null) {
+        // explicitly not using await
         redis.setSeries(malType, malId, neo4jResult);
         console.log(malType + ' ' + malId + ' served from neo4j!')
         return neo4jResult;
@@ -49,6 +50,7 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function(req, r
     }
 
     // have to crawl to find data
+    console.log('precrawl failed, crawling...');
     crawl(malType, malId, res, client);
 });
 

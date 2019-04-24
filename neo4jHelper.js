@@ -9,8 +9,8 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 var driver = neo4j.driver('bolt://localhost', neo4j.auth.basic('neo4j', 'password'));
 
 // create indexes
-driver.session().run("create index on :anime(malID)");
-driver.session().run("create index on :manga(malID)");
+driver.session().run("create index on :anime(malId)");
+driver.session().run("create index on :manga(malId)");
 
 
 function _getSession(req = null) {
@@ -35,9 +35,9 @@ async function _getSeries(malType, id, session) {
     try {
         const result = await session
         .run(
-            "match (a:" + malType + " {malID:{malIDParam}})-[r1:RELATED_TO*1..2]-(b) return a, b",
+            "match (a:" + malType + " {malId:{malIdParam}})-[r1:RELATED_TO*1..2]-(b) return a, b",
             {
-                malIDParam: +id
+                malIdParam: +id
             }
         )
         // console.log(result);
@@ -64,9 +64,9 @@ async function _deleteSeriesIfExist(series, session) {
     for (let i = 0; i < series.length; ++i) {
         const result = await session
         .run(
-            "match (n:" + series[i].malType + " {malID: {malIDParam}}) detach delete n",
+            "match (n:" + series[i].malType + " {malId: {malIdParam}}) detach delete n",
             {
-                malIDParam: series[i].malID,
+                malIdParam: series[i].malId,
             }
         );
     }
@@ -96,7 +96,7 @@ async function addToDB(series){
                 link: {linkParam},\
                 image: {imageParam},\
                 startDate: {startDateParam},\
-                malID: {malIDParam}\
+                malId: {malIdParam}\
             }) return n",
             {
                 typeParam: aSeries.type,
@@ -104,7 +104,7 @@ async function addToDB(series){
                 linkParam: aSeries.link,
                 imageParam: aSeries.image,
                 startDateParam: aSeries.startDate ? aSeries.startDate.toString() : aSeries.startDate,
-                malIDParam: aSeries.malID
+                malIdParam: aSeries.malId
             }
         );
     }
@@ -121,23 +121,23 @@ async function addToDB(series){
             "match \
                 (a:" + rootSeries.malType + " \
                     {\
-                        malID: {malIDParam}\
+                        malId: {malIdParam}\
                     }), \
                 (b:" + aSeries.malType + " \
                     {\
-                        malID: {otherMalIDParam}\
+                        malId: {otherMalIdParam}\
                     }) \
             merge (a)-[r:RELATED_TO]-(b)\
             return a,r,b",
             {
-                malIDParam: rootSeries.malID,
-                otherMalIDParam: aSeries.malID
+                malIdParam: rootSeries.malId,
+                otherMalIdParam: aSeries.malId
             }
         )
     }
 }
 
-async function getFromDbByMalTypeAndMalID(malType, id, req){
+async function getFromDbByMalTypeAndMalId(malType, id, req){
     console.log(malType + ' ' + id);
     try{
         const session = _getSession(req);
@@ -180,4 +180,4 @@ async function ping() {
 
 }
 
-module.exports = {addToDB, getFromDbByMalTypeAndMalID, clearDb, deleteSeriesFromDB, ping};
+module.exports = {addToDB, getFromDbByMalTypeAndMalId, clearDb, deleteSeriesFromDB, ping};

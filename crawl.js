@@ -80,7 +80,7 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
         const malTypeAndId = getMalTypeAndId(relLink);
         let newEntry = {
             malType: malTypeAndId.malType,
-            malID: malTypeAndId.malID,
+            malId: malTypeAndId.malId,
             type: $('div a[href*="?type="]')[0].children[0].data,
             title: $('span[itemprop=name]')[0].children[0].data,
             link: url,
@@ -112,7 +112,7 @@ function getMalTypeAndId(url) {
         id += url[pos++];
     }
 
-    return { malType: malType, malID: +id };
+    return { malType: malType, malId: +id };
 };
 
 // assumes url is a relative url following the format '/(anime|manga)/ID/...'
