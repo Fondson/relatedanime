@@ -29,7 +29,7 @@ Description:
 Looks for parents keys and recrawls the entries to keep the cache updated.
 Does not add or update any child keys.
 */
-async function refreshCache(dryrun=true) {
+async function refreshRedis(dryrun=true) {
     const client = redisHelper.getClient();
     let cursor = 0;
     while (true) {
@@ -61,7 +61,7 @@ async function refreshCache(dryrun=true) {
 }
 
 async function main() {
-    await refreshCache(false);
+    await refreshRedis(false);
     console.log('Done!');
     process.exit()
 }
