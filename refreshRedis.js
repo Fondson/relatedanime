@@ -20,9 +20,14 @@ Steps for running this script:
 ----------------------------------------------------------------------------------
 Future:
 
-This can be run periodically using js setInterval() as well. The concern is that
+1. This can be run periodically using js setInterval() as well. The concern is that
 production will be slow if we do this. Maybe find a time with few usages to run this
 if we want to change this to run this in production.
+
+2. Maybe can have this run periodically locally?
+
+3. It would be nice if we could run this on a specific key (pass in key and it will
+recrawl the parent key)
 ----------------------------------------------------------------------------------
 Description:
 
