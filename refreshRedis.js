@@ -61,7 +61,7 @@ async function refreshRedis(dryrun=true) {
 }
 
 async function main() {
-    await refreshRedis(false);
+    await refreshRedis(true);
     console.log('Done!');
     process.exit()
 }
