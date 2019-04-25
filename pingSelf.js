@@ -1,13 +1,15 @@
-var http = require("http");
+var http = require('http');
 var neo4j = require('./neo4jHelper');
 
 // default every 5 minutes (300000)
 const DEFAUT = 300000;
+const LINK = 'https://relatedanime.herokuapp.com/';
 
 
 function pingHomepage(interval=DEFAUT) {
     setInterval(function() {
-        http.get("http://relatedanime.com");
+        console.log('Pinging self at ' + LINK + '...')
+        http.get(LINK);
     }, interval); 
 }
 
