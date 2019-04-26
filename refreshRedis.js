@@ -32,22 +32,44 @@ recrawl the parent key)
 Description:
 
 Looks for parents keys and recrawls the entries to keep the cache updated.
-Does not add or update any child keys.
+Update keys with duplicate values by choosing first key as parent and others as child
+keys.
 */
 async function refreshRedis(dryrun=true) {
     const client = redisHelper.getClient();
     let cursor = 0;
+    let childToParentObj = {};
     while (true) {
         const result = await client.scanAsync(cursor);
         cursor = result[0];
         const keys = result[1];
         for (let i = 0; i < keys.length; ++i) {
             const key = keys[i];
+            // crawled parent already, set child to parent key
+            if (childToParentObj.hasOwnProperty(key)) {
+                if (!dryrun) {
+                    // set child to crawled parent
+                    await client.setAsync(key, childToParentObj[key]);
+                } else {
+                    console.log('Setting ' + key + ' to:');
+                    console.log(childToParentObj[key]);
+                }
+                continue;
+            }
+
             const value = await client.getAsync(key);
+            // recrawl parent key
             if (!redisHelper.isKey(value)) {
                 console.log('Refreshing ' + key);
                 const typeAndIdObj = redisHelper.getMalTypeAndMalIdFromKey(key);
                 let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null);
+                
+                // assign child key to parent key in childToParentObj
+                for (let j = 0; j < preTransform.length; ++j) {
+                    let aSeries = preTransform[j];
+                    childToParentObj[redisHelper.createKey(aSeries.malType, aSeries.malId)] = key;
+                }
+
                 let postTransform = transformAnimes(preTransform);
                 if (!dryrun) {
                     // set to redis without setting all child keys
