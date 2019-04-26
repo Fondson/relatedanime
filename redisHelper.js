@@ -73,20 +73,12 @@ async function _linkChildrenToParent(parentKey, parentSeries) {
 async function getSeries(malType, malId) {
     try {
         const client = getClient();
-        const value = await client.getAsync((createKey(malType, malId)));
-        if (isKey(value)) {
-            const nextValue = await client.getAsync(value);
-            // This means we had anime:1 points to anime:2 and anime:2 points to anime:x instead of a series obj.
-            // We're in a bad state (probably due to concurrent updates), just return null to crawl again
-            if (isKey(nextValue)) {
-                console.log('Redis: Bad key points to key points to key state!');
-                console.log('Redis: Returning null to crawl again.');
-                return null;
-            } else {
-                return JSON.parse(nextValue);
-            }
+        const parentKey = await getParentKey(createKey(malType, malId));
+        if (parentKey === null) {
+            return null;
         }
 
+        const value = await client.getAsync(parentKey);
         return JSON.parse(value);
     } catch (e) {
         console.log('Redis error:');
@@ -123,5 +115,24 @@ function getMalTypeAndMalIdFromKey(key) {
     return {malType: parts[0], malId: parts[1]};
 }
 
+
+async function getParentKey(key) {
+    const client = getClient();
+    let ret = key;
+    const value = await client.getAsync(key);
+    if (isKey(value)) {
+        const nextValue = await client.getAsync(value);
+        // This means we had anime:1 points to anime:2 and anime:2 points to anime:x instead of a series obj.
+        // We're in a bad state (probably due to concurrent updates), just return null
+        if (isKey(nextValue)) {
+            console.log('Redis: Bad key points to key points to key state!');
+            console.log('Redis: Returning null.');
+            ret = null;
+        } else {
+            ret = value;
+        }
+    }
+    return ret;
+}
 
 module.exports = {setSeries, getSeries, isKey, createKey, getClient, getMalTypeAndMalIdFromKey};

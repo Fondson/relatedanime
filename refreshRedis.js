@@ -5,18 +5,25 @@ var crawl = require('./crawl');
 var transformAnimes = require('./transformAnimes');
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
+let dryrun = true;
+let args = process.argv.slice(2);
+const client = redisHelper.getClient();
 
 /*
-THIS METHOD IS MEANT TO BE RUN MANUALLY!
-THIS METHOD SHOULD IDEALLY BE RUN ON ANOTHER SERVER SO PRODUCTION DOES NOT
-GET RATE LIMITED WHEN THIS METHOD IS RUNNING!
+THIS SCRIPT IS MEANT TO BE RUN MANUALLY!
+THIS SCRIPT SHOULD IDEALLY BE RUN ON ANOTHER SERVER SO PRODUCTION DOES NOT
+GET RATE LIMITED WHEN THIS SCRIPT IS RUNNING!
+
+2 modes:
+1. recrawl all parent keys, just call script
+2. recrawl a specific key, call script with key to recrawl
 
 Steps for running this script:
 1. In redisHelper.js, set the url to the production url
 2. Do a dryrun run to see what keys you will be refreshing and spot check some of
    them to make sure they are parents keys (connect to redis production using 
    `redis-cli -u <url>` and run `GET <key>`)
-3. Run method with dryrun=false
+3. Run script with dryrun=false
 ----------------------------------------------------------------------------------
 Future:
 
@@ -25,59 +32,29 @@ production will be slow if we do this. Maybe find a time with few usages to run 
 if we want to change this to run this in production.
 
 2. Maybe can have this run periodically locally?
-
-3. It would be nice if we could run this on a specific key (pass in key and it will
-recrawl the parent key)
-----------------------------------------------------------------------------------
-Description:
-
-Looks for parents keys and recrawls the entries to keep the cache updated.
-Update keys with duplicate values by choosing first key as parent and others as child
-keys.
 */
-async function refreshRedis(dryrun=true) {
-    const client = redisHelper.getClient();
+
+
+// recrawls parent keys to keep cache updated
+async function refreshRedis() {
+    const parentKeys = await getAllParentKeys();
+    for (let i = 0; i < parentKeys.length; ++i) {
+        await refreshASeries(parentKeys[i]);
+    }
+}
+
+async function getAllParentKeys() {
     let cursor = 0;
-    let childToParentObj = {};
+    let parentKeys = []
     while (true) {
         const result = await client.scanAsync(cursor);
         cursor = result[0];
         const keys = result[1];
         for (let i = 0; i < keys.length; ++i) {
             const key = keys[i];
-            // crawled parent already, set child to parent key
-            if (childToParentObj.hasOwnProperty(key)) {
-                if (!dryrun) {
-                    // set child to crawled parent
-                    await client.setAsync(key, childToParentObj[key]);
-                } else {
-                    console.log('Setting ' + key + ' to:');
-                    console.log(childToParentObj[key]);
-                }
-                continue;
-            }
-
             const value = await client.getAsync(key);
-            // recrawl parent key
             if (!redisHelper.isKey(value)) {
-                console.log('Refreshing ' + key);
-                const typeAndIdObj = redisHelper.getMalTypeAndMalIdFromKey(key);
-                let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null);
-                
-                // assign child key to parent key in childToParentObj
-                for (let j = 0; j < preTransform.length; ++j) {
-                    let aSeries = preTransform[j];
-                    childToParentObj[redisHelper.createKey(aSeries.malType, aSeries.malId)] = key;
-                }
-
-                let postTransform = transformAnimes(preTransform);
-                if (!dryrun) {
-                    // set to redis without setting all child keys
-                    await client.setAsync(key, JSON.stringify(postTransform));
-                } else {
-                    console.log('Setting ' + key + ' to:');
-                    console.log(postTransform);
-                }
+                parentKeys.push(key);
             }
         }
 
@@ -85,10 +62,50 @@ async function refreshRedis(dryrun=true) {
             break;
         }
     }
+    return parentKeys;
+}
+
+// Recrawls a specific key and update all existing child keys to point to 
+// key. parentKey does not have to be the current parent key, but it will
+// become the new parent key
+async function refreshASeries(parentKey) {
+    console.log('Refreshing ' + parentKey);
+    const typeAndIdObj = redisHelper.getMalTypeAndMalIdFromKey(parentKey);
+    let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null);
+
+    let postTransform = transformAnimes(preTransform);
+    if (!dryrun) {
+        // set to parent key to crawled result
+        await client.setAsync(parentKey, JSON.stringify(postTransform));
+    } else {
+        console.log('Would have set ' + parentKey + ' to:');
+        console.log(postTransform);
+    }
+
+    // assign existing child keys to parent key
+    for (let j = 0; j < preTransform.length; ++j) {
+        let aSeries = preTransform[j];
+        const childKey = redisHelper.createKey(aSeries.malType, aSeries.malId);
+        if (childKey === parentKey) {
+            continue;
+        }
+        const childKeyExists = await client.existsAsync(childKey);
+        if (childKeyExists) {
+            if (!dryrun) {
+                await client.setAsync(childKey, parentKey);
+            } else {
+                console.log('Would have set ' + childKey + ' to ' + parentKey);
+            }
+        }
+    }
 }
 
 async function main() {
-    await refreshRedis(true);
+    if (args.length == 1) {
+        await refreshASeries(args[0]);
+    } else {
+        await refreshRedis();
+    }
     console.log('Done!');
     process.exit()
 }
