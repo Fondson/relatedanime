@@ -18,4 +18,5 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 
 # Feature Roadmap
 - auto-suggest search bar
+  - this may need to rely on Jikan API (server will probably be making too many requests), workaround for searching *all* -> interleave *anime* and *mange* results
 - current seasonal anime on homepage
