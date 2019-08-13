@@ -18,5 +18,4 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 
 # Feature Roadmap
 - auto-suggest search bar
-  - make request to MAL on client-side (rate limit user based on time -> this should be alright since request is being made on each client browser)
 - current seasonal anime on homepage
