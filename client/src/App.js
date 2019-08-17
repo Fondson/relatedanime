@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import './Autosuggest.css';
 import Client from './Client';
 import Section from './Section';
 import SearchForm from './SearchForm';
@@ -37,8 +38,8 @@ class App extends Component {
     this.setState({ isLoading: false, searchValue: "" });
   }
 
-	handleChange(e) {
-		this.setState({ searchValue: e.target.value });
+	handleChange(e, n) {
+		this.setState({ searchValue: n.newValue });
   }
   
   searchByMalTypeAndId(malType, id) {
@@ -68,6 +69,7 @@ class App extends Component {
         this._pushError();
         return;
       }
+      jsonObj = jsonObj['data'][0];
       history.push('/' + jsonObj.malType + '/' + jsonObj.id);
       this.searchByMalTypeAndId(jsonObj.malType, jsonObj.id);
     });
@@ -136,7 +138,7 @@ class App extends Component {
             <Sticky>
               {
                 ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
-                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue}  searchWithValue={this.searchWithEvent}/>;
+                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue} searchWithValue={this.searchWithEvent}/>;
                 }
               }
             </Sticky>

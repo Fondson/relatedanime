@@ -1,3 +1,5 @@
+const SEARCH_URL = 'https://relatedanime-search.herokuapp.com';
+
 /* eslint-disable no-undef */
 function crawl(malType, id, updateListener, eventListener) {
   if (id === 0) id = 1;
@@ -9,8 +11,16 @@ function crawl(malType, id, updateListener, eventListener) {
 }
 
 /* eslint-disable no-undef */
-function search(query, cb) {
-  fetchWithRetries(`/api/search/${encodeURIComponent(query)}`, cb);
+function search(query, cb, count=1) {
+  fetchWithRetries(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`, cb);
+}
+
+async function searchWithoutCb(query, count) {
+  let obj = await fetchWithRetriesWithoutCb(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`);
+  if (obj.error) {
+    return [];
+  }
+  return obj.data;
 }
 
 async function fetchWithRetries(url, cb, retries = 0) {
@@ -29,6 +39,26 @@ async function fetchWithRetries(url, cb, retries = 0) {
     } else {
       console.log('Reached max retry count!');
       cb({ error: true, why: e});
+    }
+  }
+}
+
+async function fetchWithRetriesWithoutCb(url, retries = 0) {
+  try {
+    let response = await fetch(url, {
+      accept: 'application/json',
+    });
+    let obj = await processResponse(response);
+    return obj;
+  } catch (e) {
+    console.log(e);
+    // retry up to 2 times (3 tries total)
+    if (retries < 3) {
+      console.log('Retry count: ' + retries);
+      return fetchWithRetriesWithoutCb(url, retries + 1);
+    } else {
+      console.log('Reached max retry count!');
+      return { error: true, why: e};
     }
   }
 }
@@ -68,5 +98,5 @@ function processResponse(response) {
 //   console.log("Your browser doesn't support SSE")
 // }
 
-const Client = { crawl, search };
+const Client = { crawl, search, searchWithoutCb };
 export default Client;

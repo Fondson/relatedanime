@@ -5,9 +5,12 @@ var crawl = require('./crawl');
 var transformAnimes = require('./transformAnimes');
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
-let dryrun = true;
+let dryrun = false;
 let args = process.argv.slice(2);
 const client = redisHelper.getClient();
+if (client) {
+    console.log('Got redis client!');
+}
 
 /*
 THIS SCRIPT IS MEANT TO BE RUN MANUALLY!
@@ -83,6 +86,7 @@ async function refreshASeries(parentKey) {
     }
 
     // assign existing child keys to parent key
+    console.log('Reassigning child keys');
     for (let j = 0; j < preTransform.length; ++j) {
         let aSeries = preTransform[j];
         const childKey = redisHelper.createKey(aSeries.malType, aSeries.malId);
