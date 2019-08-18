@@ -20,6 +20,7 @@ GET RATE LIMITED WHEN THIS SCRIPT IS RUNNING!
 2 modes:
 1. recrawl all parent keys, just call script
 2. recrawl a specific key, call script with key to recrawl
+ex; node refreshRedis.js anime:30831
 
 Steps for running this script:
 1. In redisHelper.js, set the url to the production url

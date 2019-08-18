@@ -55,7 +55,7 @@ async function fetchWithRetriesWithoutCb(url, retries = 0) {
     // retry up to 2 times (3 tries total)
     if (retries < 3) {
       console.log('Retry count: ' + retries);
-      return fetchWithRetriesWithoutCb(url, retries + 1);
+      return await fetchWithRetriesWithoutCb(url, retries + 1);
     } else {
       console.log('Reached max retry count!');
       return { error: true, why: e};
