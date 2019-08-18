@@ -76,8 +76,14 @@ class SearchForm extends React.Component {
     // Finally, render it!
     return (
 		<form style={{ ...this.props.style}} onSubmit={(e) => {
-			this.props.searchWithValue(e);
-			this.onSuggestionsClearRequested();
+			e.preventDefault();
+			if (this.state.value && this.state.value.trim() !== '') {
+				this.props.searchWithValue(e);
+				this.onSuggestionsClearRequested();
+			}
+			// clear search bar
+		  	this.onChange(e, { newValue: '' });
+		  	this.props.handleChange(e, { newValue: '' });
 		}}>
 			<Autosuggest
 				suggestions={suggestions}
