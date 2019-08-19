@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Client from './Client';
 import Autosuggest from 'react-autosuggest';
 
+var wait = ms => new Promise((r, j)=>setTimeout(r, ms))
+
 // When suggestion is clicked, Autosuggest needs to populate the input
 // based on the clicked suggestion. Teach Autosuggest how to calculate the
 // input value for every given suggestion.
@@ -27,6 +29,7 @@ class SearchForm extends React.Component {
 			value: '',
 			suggestions: []
 		};
+		this.lastValue = '';
 	}
 
 	onChange = (event, { newValue }) => {
@@ -37,10 +40,23 @@ class SearchForm extends React.Component {
 
 	// Teach Autosuggest how to calculate suggestions for any given input value.
 	getSuggestions = async value => {
+		if (value.length < 3) {
+			return [];
+		}
+
+		this.lastValue = value;
+		if (this.state.suggestions.length > 0) {
+			await wait(800);
+			if (value !== this.lastValue) {
+				// console.log('dropping ' + value);
+				return this.state.suggestions;
+			}
+		}
+
 		const inputValue = value.trim().toLowerCase();
 		if (inputValue.length < 3) {
 			return [];
-		} 
+		}
 		let ret = await Client.searchWithoutCb(inputValue, 5);
 		if (ret.length === 0) {
 			return this.state.suggestions;
