@@ -27,9 +27,10 @@ class SearchForm extends React.Component {
 		// and they are initially empty because the Autosuggest is closed.
 		this.state = {
 			value: '',
-			suggestions: []
+			suggestions: [],
+			isSearching: false,
+			lastValue: ''
 		};
-		this.lastValue = '';
 	}
 
 	onChange = (event, { newValue }) => {
@@ -40,24 +41,30 @@ class SearchForm extends React.Component {
 
 	// Teach Autosuggest how to calculate suggestions for any given input value.
 	getSuggestions = async value => {
-		if (value.length < 3) {
+		const inputValue = value.trim().toLowerCase();
+		if (inputValue.length < 3) {
 			return [];
 		}
 
-		this.lastValue = value;
-		if (this.state.suggestions.length > 0) {
+		this.setState({
+			lastValue: value,
+		});
+		if (this.state.suggestions.length > 0 || this.state.isSearching) {
+			// console.log('waiting at ' + value);
 			await wait(800);
-			if (value !== this.lastValue) {
+			if (value !== this.state.lastValue) {
 				// console.log('dropping ' + value);
 				return this.state.suggestions;
 			}
 		}
 
-		const inputValue = value.trim().toLowerCase();
-		if (inputValue.length < 3) {
-			return [];
-		}
+		this.setState({
+			isSearching: true,
+		});
 		let ret = await Client.searchWithoutCb(inputValue, 5);
+		this.setState({
+			isSearching: false,
+		});
 		if (ret.length === 0) {
 			return this.state.suggestions;
 		} else {
