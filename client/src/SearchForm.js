@@ -2,16 +2,6 @@ import React, { Component } from 'react';
 import Client from './Client';
 import Autosuggest from 'react-autosuggest';
 
-// Teach Autosuggest how to calculate suggestions for any given input value.
-const getSuggestions = async value => {
-  const inputValue = value.trim().toLowerCase();
-  if (inputValue.length < 3) {
-	  return [];
-  } 
-  let ret = await Client.searchWithoutCb(inputValue, 5);
-  return ret;
-};
-
 // When suggestion is clicked, Autosuggest needs to populate the input
 // based on the clicked suggestion. Teach Autosuggest how to calculate the
 // input value for every given suggestion.
@@ -25,77 +15,91 @@ const renderSuggestion = suggestion => (
 );
 
 class SearchForm extends React.Component {
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    // Autosuggest is a controlled component.
-    // This means that you need to provide an input value
-    // and an onChange handler that updates this value (see below).
-    // Suggestions also need to be provided to the Autosuggest,
-    // and they are initially empty because the Autosuggest is closed.
-    this.state = {
-      value: '',
-      suggestions: []
-    };
-  }
+		// Autosuggest is a controlled component.
+		// This means that you need to provide an input value
+		// and an onChange handler that updates this value (see below).
+		// Suggestions also need to be provided to the Autosuggest,
+		// and they are initially empty because the Autosuggest is closed.
+		this.state = {
+			value: '',
+			suggestions: []
+		};
+	}
 
-  onChange = (event, { newValue }) => {
-    this.setState({
-      value: newValue
-    });
-  };
+	onChange = (event, { newValue }) => {
+		this.setState({
+			value: newValue
+		});
+	};
 
-  // Autosuggest will call this function every time you need to update suggestions.
-  // You already implemented this logic above, so just use it.
-  onSuggestionsFetchRequested = async ({ value }) => {
-    this.setState({
-      suggestions: await getSuggestions(value)
-    });
-  };
+	// Teach Autosuggest how to calculate suggestions for any given input value.
+	getSuggestions = async value => {
+		const inputValue = value.trim().toLowerCase();
+		if (inputValue.length < 3) {
+			return [];
+		} 
+		let ret = await Client.searchWithoutCb(inputValue, 5);
+		if (ret.length === 0) {
+			return this.state.suggestions;
+		} else {
+			return ret;
+		}
+	};
 
-  // Autosuggest will call this function every time you need to clear suggestions.
-  onSuggestionsClearRequested = () => {
-    this.setState({
-      suggestions: []
-    });
-  };
+	// Autosuggest will call this function every time you need to update suggestions.
+	// You already implemented this logic above, so just use it.
+	onSuggestionsFetchRequested = async ({ value }) => {
+		this.setState({
+			suggestions: await this.getSuggestions(value)
+		});
+	};
 
-  render() {
-	const { value, suggestions } = this.state;
+	// Autosuggest will call this function every time you need to clear suggestions.
+	onSuggestionsClearRequested = () => {
+		this.setState({
+			suggestions: []
+		});
+	};
 
-	// Autosuggest will pass through all these props to the input.
-    const inputProps = {
-      placeholder: 'Search anime',
-      value,
-      onChange: (e, n) => {
-		  this.onChange(e, n)
-		  this.props.handleChange(e, n);
-	  }
-    };
+	render() {
+		const { value, suggestions } = this.state;
 
-    // Finally, render it!
-    return (
-		<form style={{ ...this.props.style}} onSubmit={(e) => {
-			e.preventDefault();
-			if (this.state.value && this.state.value.trim() !== '') {
-				this.props.searchWithValue(e);
-				this.onSuggestionsClearRequested();
+		// Autosuggest will pass through all these props to the input.
+		const inputProps = {
+			placeholder: 'Search anime',
+			value,
+			onChange: (e, n) => {
+				this.onChange(e, n)
+				this.props.handleChange(e, n);
 			}
-			// clear search bar
-		  	this.onChange(e, { newValue: '' });
-		  	this.props.handleChange(e, { newValue: '' });
-		}}>
-			<Autosuggest
-				suggestions={suggestions}
-				onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-				onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-				getSuggestionValue={getSuggestionValue}
-				renderSuggestion={renderSuggestion}
-				inputProps={inputProps}
-			/>
-		</form>
-    );
-  }
+		};
+
+		// Finally, render it!
+		return (
+			<form style={{ ...this.props.style}} onSubmit={(e) => {
+				e.preventDefault();
+				if (this.state.value && this.state.value.trim() !== '') {
+					this.props.searchWithValue(e);
+					this.onSuggestionsClearRequested();
+				}
+				// clear search bar
+				this.onChange(e, { newValue: '' });
+				this.props.handleChange(e, { newValue: '' });
+			}}>
+				<Autosuggest
+					suggestions={suggestions}
+					onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+					onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+					getSuggestionValue={getSuggestionValue}
+					renderSuggestion={renderSuggestion}
+					inputProps={inputProps}
+				/>
+			</form>
+		);
+	}
 }
 
 export default SearchForm;

@@ -16,7 +16,7 @@ function search(query, cb, count=1) {
 }
 
 async function searchWithoutCb(query, count) {
-  let obj = await fetchWithRetriesWithoutCb(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`);
+  let obj = await fetchWithRetriesWithoutCb(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`, 3);
   if (obj.error) {
     return [];
   }
