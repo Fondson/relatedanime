@@ -15,6 +15,26 @@ div .wrap-text{
     white-space: pre-wrap;
 }
 
+.entry a {
+    color: #337ab7;
+    text-decoration: inherit;
+}
+
+.entry p {
+    color: #ffff;
+    text-decoration: inherit;
+}
+
+.entry:hover{
+    text-decoration: inherit;
+    filter: brightness(75%) !important;
+	transition: filter 0.5s;
+}
+
+.entry a:hover{
+    text-decoration: inherit;
+}
+
 @media(min-width:768px) {
     td{
         vertical-align: middle!important;

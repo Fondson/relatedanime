@@ -15,6 +15,10 @@ function search(query, cb, count=1) {
   fetchWithRetries(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`, cb);
 }
 
+function searchSeasonal(cb) {
+  fetchWithRetries(`${SEARCH_URL}/api/searchSeasonal`, cb);
+}
+
 async function searchWithoutCb(query, count) {
   let obj = await fetchWithRetriesWithoutCb(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`, 3);
   if (obj.error) {
@@ -98,5 +102,5 @@ function processResponse(response) {
 //   console.log("Your browser doesn't support SSE")
 // }
 
-const Client = { crawl, search, searchWithoutCb };
+const Client = { crawl, search, searchWithoutCb, searchSeasonal };
 export default Client;

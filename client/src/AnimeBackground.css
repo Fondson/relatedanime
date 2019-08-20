@@ -1,7 +1,7 @@
 div.AnimeBackground{
     width: 100vw;
     height: 100vh;
-    overflow: auto;
+    overflow: hidden;
     background-size: cover;
     background-attachment: scroll;
     background-position-x: center;
@@ -15,7 +15,7 @@ div.AnimeBackground{
     div.AnimeBackground{
         width: 100vw;
         height: 100vh;
-        overflow: auto;
+        overflow: hidden;
         background-size: cover;
         background-attachment: fixed;
         background-position-x: center;

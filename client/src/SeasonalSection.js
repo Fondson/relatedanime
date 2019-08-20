@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
-import Entry from './Entry';
+import SeasonalEntry from './SeasonalEntry';
+import './SeasonalSection.css';
 import './Section.css';
 
-class Section extends Component{
+class SeasonalSection extends Component{
     render(){
-        // console.log(this.props.data.animes);
-        const entryList = this.props.data.animes.map((anime) => {
-            return <Entry data={anime} key={anime.type + anime.title}/>;
+        const entryList = this.props.animes.map((anime) => {
+            return <SeasonalEntry data={anime} key={anime.malType + anime.id}/>;
         });
         return(
             <div>
-                <h1>{this.props.data.header}</h1>
+                <h1 className='seasonal-header'>{'Currently Airing'}</h1>
                 <Table bsClass="table" responsive>
                     <tbody>
                         <tr>
@@ -24,4 +24,4 @@ class Section extends Component{
     }
 };
 
-export default Section;
+export default SeasonalSection;

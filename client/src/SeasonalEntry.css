@@ -1,0 +1,12 @@
+.seasonal-entry .seasonal-title {
+    color: #ffff;
+    text-decoration: inherit;
+}
+
+div .seasonal-entry{
+    text-align: center;
+    margin: auto;
+    width: 150px;
+    padding-left: 2px;
+    padding-right: 2px;
+}

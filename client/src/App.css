@@ -69,6 +69,10 @@ img.loading{
   padding-bottom: 1em;
 }
 
+.Loader form {
+  z-index: 100;
+}
+
 .row{
   margin-left: 0px!important;
   margin-right: 0px!important;

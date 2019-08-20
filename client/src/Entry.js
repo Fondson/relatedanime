@@ -7,13 +7,13 @@ class Entry extends Component{
         return(
             <td>
                 <div className="entry">
-                    <img src = {image} alt={title}/>
-                    <div className="wrap-text">
-                        <a href={link} rel="noopener noreferrer" target="_blank">
-                            {title}
-                        </a>
-                    </div>
-                    <p>{startDate}</p>
+                    <a href={link} rel="noopener noreferrer" target="_blank">
+                        <img src={image} alt={title}/>
+                        <div className="wrap-text">
+                            <span>{title}</span>
+                        </div>
+                        <p>{startDate}</p>
+                    </a>
                 </div>
             </td>
         )

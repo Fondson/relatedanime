@@ -1,0 +1,13 @@
+.seasonal-table img {
+    height: 22vh;
+}
+
+.seasonal-table {
+    margin-top: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.page-scroll {
+    overflow-x: auto;
+    height: fit-content;
+}
