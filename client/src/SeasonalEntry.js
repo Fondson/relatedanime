@@ -12,7 +12,7 @@ class SeasonalEntry extends Component{
                     <a href={link} rel="noopener noreferrer">
                         <img src={img} alt={title}/>
                         <div className="wrap-text">
-                            <span className='seasonal-title'>{title}</span>
+                            <div className='seasonal-title'>{title}</div>
                         </div>
                     </a>
                 </div>

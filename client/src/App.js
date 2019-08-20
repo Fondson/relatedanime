@@ -138,7 +138,7 @@ class App extends Component {
             <Sticky>
               {
                 ({ isSticky, wasSticky, style, distanceFromTop, distanceFromBottom, calculatedHeight }) => {
-                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue} searchWithValue={this.searchWithEvent}/>;
+                  return <SearchForm style={style} handleChange={this.handleChange} searchValue={searchValue} searchWithValue={this.searchWithEvent} topOffset={calculatedHeight}/>;
                 }
               }
             </Sticky>

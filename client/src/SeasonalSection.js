@@ -10,8 +10,8 @@ class SeasonalSection extends Component{
             return <SeasonalEntry data={anime} key={anime.malType + anime.id}/>;
         });
         return(
-            <div>
-                <h1 className='seasonal-header'>{'Currently Airing'}</h1>
+            <div className='seasonal-section'>
+                <h3 className='seasonal-header'>{'Currently Airing'}</h3>
                 <Table bsClass="table" responsive>
                     <tbody>
                         <tr>

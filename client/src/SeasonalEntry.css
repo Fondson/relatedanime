@@ -1,6 +1,9 @@
 .seasonal-entry .seasonal-title {
     color: #ffff;
     text-decoration: inherit;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 div .seasonal-entry{

@@ -1,6 +1,7 @@
 div.AnimeBackground{
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    height: fit-content;
     overflow: hidden;
     background-size: cover;
     background-attachment: scroll;
@@ -14,7 +15,8 @@ div.AnimeBackground{
 @media (min-width:1025px) {
     div.AnimeBackground{
         width: 100vw;
-        height: 100vh;
+        min-height: 100vh;
+        height: fit-content;
         overflow: hidden;
         background-size: cover;
         background-attachment: fixed;
