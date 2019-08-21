@@ -3,12 +3,14 @@ var redis = require("redis");
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 const TYPES = ['anime', 'manga'];
-let client = null;
+let primaryClient = null;
+let searchClient = null;
 getClient();
+getSearchClient();
 
 function getClient() {
-    if (client === null) {
-        client = redis.createClient({
+    if (primaryClient === null) {
+        primaryClient = redis.createClient({
             url: process.env.REDIS_URL,
             retry_strategy: function (options) {
                 if (options.error && options.error.code === 'ECONNREFUSED') {
@@ -30,11 +32,42 @@ function getClient() {
             }
         });
         
-        client.on('error', function (err) {
+        primaryClient.on('error', function (err) {
             console.log('Redis: Something went wrong ' + err);
         });
     }
-    return client;
+    return primaryClient;
+}
+
+function getSearchClient() {
+    if (searchClient === null) {
+        searchClient = redis.createClient({
+            url: process.env.SEARCH_AND_SEASONAL_REDIS_URL,
+            retry_strategy: function (options) {
+                if (options.error && options.error.code === 'ECONNREFUSED') {
+                    // End reconnecting on a specific error and flush all commands with
+                    // a individual error
+                    return new Error('The server refused the connection');
+                }
+                if (options.total_retry_time > 1000 * 60 * 60) {
+                    // End reconnecting after a specific timeout and flush all commands
+                    // with a individual error
+                    return new Error('Retry time exhausted');
+                }
+                if (options.attempt > 10) {
+                    // End reconnecting with built in error
+                    return undefined;
+                }
+                // reconnect after
+                return Math.min(options.attempt * 100, 3000);
+            }
+        });
+        
+        searchClient.on('error', function (err) {
+            console.log('Redis search: Something went wrong ' + err);
+        });
+    }
+    return searchClient;
 }
 
 async function setSeries(malType, malId, value) {
@@ -135,4 +168,28 @@ async function getParentKey(key) {
     return ret;
 }
 
-module.exports = {setSeries, getSeries, isKey, createKey, getClient, getMalTypeAndMalIdFromKey};
+async function searchSet(key, value) {
+    const client = getSearchClient();
+    console.log('Redis setting ' + key + ' to:');
+    console.log(value)
+    try {
+        await client.setAsync(key, JSON.stringify(value));
+    } catch (e) {
+        console.log('Redis error:');
+        console.log(e);
+    }
+}
+
+async function searchGet(key) {
+    try {
+        const client = getSearchClient();
+        const value = await client.getAsync(key);
+        return JSON.parse(value);
+    } catch (e) {
+        console.log('Redis error:');
+        console.log(e);
+        return null;
+    }
+}
+
+module.exports = {setSeries, getSeries, isKey, createKey, getClient, getSearchClient, getMalTypeAndMalIdFromKey, searchSet, searchGet};

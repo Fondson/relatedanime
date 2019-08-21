@@ -21,9 +21,9 @@ class LandingPage extends Component{
     };
     Client.searchSeasonal((obj) => {
       if (obj.error) {
-        console.log(obj.why);
+        // console.log(obj.why);
       } else {
-        console.log(obj.data);
+        // console.log(obj.data);
         this.setState({
           animes: obj.data,
         })

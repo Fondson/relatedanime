@@ -1,5 +1,3 @@
-const SEARCH_URL = 'https://relatedanime-search.herokuapp.com';
-
 /* eslint-disable no-undef */
 function crawl(malType, id, updateListener, eventListener) {
   if (id === 0) id = 1;
@@ -12,15 +10,15 @@ function crawl(malType, id, updateListener, eventListener) {
 
 /* eslint-disable no-undef */
 function search(query, cb, count=1) {
-  fetchWithRetries(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`, cb);
+  fetchWithRetries(`/api/search/${encodeURIComponent(query)}?count=${count}`, cb);
 }
 
 function searchSeasonal(cb) {
-  fetchWithRetries(`${SEARCH_URL}/api/searchSeasonal`, cb);
+  fetchWithRetries('/api/searchSeasonal', cb);
 }
 
 async function searchWithoutCb(query, count) {
-  let obj = await fetchWithRetriesWithoutCb(`${SEARCH_URL}/api/search/${encodeURIComponent(query)}?count=${count}`, 3);
+  let obj = await fetchWithRetriesWithoutCb(`/api/search/${encodeURIComponent(query)}?count=${count}`, 3);
   if (obj.error) {
     return [];
   }

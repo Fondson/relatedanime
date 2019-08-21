@@ -69,7 +69,7 @@ async function getAllParentKeys() {
     return parentKeys;
 }
 
-// Recrawls a specific key and update all existing child keys to point to 
+// Recrawls a specific key and update all child keys to point to 
 // key. parentKey does not have to be the current parent key, but it will
 // become the new parent key
 async function refreshASeries(parentKey) {
@@ -80,28 +80,11 @@ async function refreshASeries(parentKey) {
     let postTransform = transformAnimes(preTransform);
     if (!dryrun) {
         // set to parent key to crawled result
-        await client.setAsync(parentKey, JSON.stringify(postTransform));
+        await redisHelper.setSeries(typeAndIdObj.malType, typeAndIdObj.malId, postTransform);
     } else {
         console.log('Would have set ' + parentKey + ' to:');
         console.log(postTransform);
-    }
-
-    // assign existing child keys to parent key
-    console.log('Reassigning child keys');
-    for (let j = 0; j < preTransform.length; ++j) {
-        let aSeries = preTransform[j];
-        const childKey = redisHelper.createKey(aSeries.malType, aSeries.malId);
-        if (childKey === parentKey) {
-            continue;
-        }
-        const childKeyExists = await client.existsAsync(childKey);
-        if (childKeyExists) {
-            if (!dryrun) {
-                await client.setAsync(childKey, parentKey);
-            } else {
-                console.log('Would have set ' + childKey + ' to ' + parentKey);
-            }
-        }
+        console.log('All children of ' + parentKey + ' would have been set!');
     }
 }
 

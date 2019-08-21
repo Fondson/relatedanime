@@ -1,5 +1,6 @@
 var express = require('express');
 var searchAnime = require('./searchAnime');
+var searchSeasonal = require('./searchSeasonal');
 var crawl = require('./crawl');
 var sse = require("simple-sse");
 var neo4j = require('./neo4jHelper');
@@ -33,6 +34,22 @@ async function _preCrawl(malType, malId, req=null) {
     return null;
 }
 
+async function _preCrawlSearch(query) {
+    try {
+        // check redis
+        let redisResult = await redis.searchGet(query);
+        if (redisResult !== null && redisResult !== undefined) {
+            console.log(query + ' served from redis!')
+            return redisResult;
+        } 
+    } catch (e) {
+        console.log(e);
+    }
+
+    // couldn't find in redis
+    return null;
+}
+
 app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function(req, res){
     const client = sse.add(req, res);
     const malType = req.params.malType;
@@ -54,9 +71,28 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function(req, r
     crawl(malType, malId, res, client);
 });
 
-app.get('/api/search/:searchStr', function(req, res){
-    const searchStr = req.params.searchStr
-    searchAnime(searchStr, res);
+app.get('/api/search/:searchStr', async function(req, res){
+    const searchStr = req.params.searchStr;
+    let count = 1;
+    if (req.query.count > 1) {
+        count = req.query.count;
+    }
+
+    let redisResult = await _preCrawlSearch(searchStr);
+    if (redisResult !== null) {
+        res.end( JSON.stringify({ error: false, data: redisResult.slice(0, count)}) );
+    } else {
+        searchAnime(searchStr, res, count);
+    }
+});
+
+app.get('/api/searchSeasonal', async function(req, res){
+    let redisResult = await _preCrawlSearch(searchSeasonal.SEASONAL_KEY);
+    if (redisResult !== null) {
+        res.end( JSON.stringify({ error: false, data: redisResult }) );
+    } else {
+        searchSeasonal.searchSeasonal(res);
+    }
 });
 
 //if (process.env.NODE_ENV === 'production') {
