@@ -2,6 +2,7 @@ var request = require('request-promise');
 var cheerio = require('cheerio');
 var PromiseThrottle = require('promise-throttle');
 var redis = require('./redisHelper');
+var crawlUrl = require('./crawlUrl');
 
 const SEASONAL_KEY = '$seasonal$';
 // default every day
@@ -12,13 +13,13 @@ var promiseThrottle = new PromiseThrottle({
     promiseImplementation: Promise  // the Promise library you are using
 });
 
-function searchSeasonal(res = null){
-    scrapSearch(res);
+function searchSeasonal(res = null, proxy = false){
+    scrapSearch(res, proxy);
 }
 
-async function scrapSearch(res) {
+async function scrapSearch(res, proxy) {
     try {
-        const body = await promiseThrottle.add(request.bind(this, encodeURI("https://myanimelist.net/anime/season")));
+        const body = await promiseThrottle.add(request.bind(this, encodeURI(crawlUrl.getUrl(proxy) + "/anime/season")));
         let $ = cheerio.load(body);
 
         const root = $('.seasonal-anime-list.js-seasonal-anime-list.js-seasonal-anime-list-key-1');
@@ -65,7 +66,7 @@ async function scrapSearch(res) {
         console.log(e);
         if (e.statusCode == 429) {  // too many requests error
             // try again
-            scrapSearch(searchStr, null, count);
+            scrapSearch(searchStr, null, count, proxy);
         } else {  // unhandled error
             res.end(JSON.stringify({ error: true, why: e }));
         }

@@ -6,6 +6,7 @@ var sse = require("simple-sse");
 var neo4j = require('./neo4jHelper');
 var pingSelf = require('./pingSelf');
 var redis = require('./redisHelper');
+var refreshCron = require('./refreshCron');
 const path = require('path');
 
 pingSelf.pingHomepage();

@@ -6,20 +6,17 @@ var chrono = require('chrono-node');
 var neo4j = require('./neo4jHelper');
 var redis = require('./redisHelper');
 var transformAnimes = require('./transformAnimes');
+var crawlUrl = require('./crawlUrl');
 var sortAnimesByDate = require('./sortAnimesByDate');
 
-/*
-    related anime links are relative
-*/
-let baseURL;
+
 var promiseThrottle = new PromiseThrottle({
     requestsPerSecond: 1,           // max requests per second
     promiseImplementation: Promise  // the Promise library you are using
 });
 
 // dfs crawl
-async function crawl(malType, malId, res, client){
-    baseURL = 'https://myanimelist.net';
+async function crawl(malType, malId, res, client, proxy=false){
     let pagesVisited = new Set();
     let pagesToVisit = ["/" + malType + "/" + malId];
     let allRelated = []; // array of all related animes
@@ -29,7 +26,7 @@ async function crawl(malType, malId, res, client){
         // New page we haven't visited
         if (!pagesVisited.has(nextPage)) {
             pagesVisited.add(nextPage);
-            await visitPage(nextPage, client, pagesVisited, pagesToVisit, allRelated);
+            await visitPage(nextPage, client, pagesVisited, pagesToVisit, allRelated, proxy);
         }
     }
 
@@ -48,8 +45,8 @@ async function crawl(malType, malId, res, client){
     return preTransform;
 }
 
-async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated){
-    url = baseURL + relLink
+async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy=false){
+    url = crawlUrl.getUrl(proxy) + relLink
     // console.log("Visiting page " + url)
     try {
         const body = await promiseThrottle.add(request.bind(this, encodeURI(url)));
@@ -94,7 +91,7 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
         console.log(e);
         if (e.statusCode == 429) {  // too many requests error
             // try again
-            await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated);
+            await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy);
         }
     }
 };

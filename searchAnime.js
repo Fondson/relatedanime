@@ -3,6 +3,7 @@ var cheerio = require('cheerio');
 var PromiseThrottle = require('promise-throttle');
 var redis = require('./redisHelper');
 var searchSeasonal = require('./searchSeasonal');
+var crawlUrl = require('./crawlUrl');
 
 const MAL_TYPES = new Set(['anime', 'manga'])
 var promiseThrottle = new PromiseThrottle({
@@ -10,16 +11,16 @@ var promiseThrottle = new PromiseThrottle({
     promiseImplementation: Promise  // the Promise library you are using
 });
 
-function searchAnime(searchStr, res, count){
+async function searchAnime(searchStr, res, count, proxy=false){
     if (searchStr === searchSeasonal.SEASONAL_KEY) {
         res.end(JSON.stringify({ error: true, why: 'invalid search string' }));
     }
-    scrapSearch(searchStr, res, count);
+    return await scrapSearch(searchStr, res, count, proxy);
 }
 
-async function scrapSearch(searchStr, res, count) {
+async function scrapSearch(searchStr, res, count, proxy) {
     try {
-        const body = await promiseThrottle.add(request.bind(this, encodeURI("https://myanimelist.net/search/all?q=" + searchStr)));
+        const body = await promiseThrottle.add(request.bind(this, encodeURI(crawlUrl.getUrl(proxy) + "/search/all?q=" + searchStr)));
         let $ = cheerio.load(body);
 
         const root = $('.content-result .content-left .js-scrollfix-bottom-rel');
@@ -61,23 +62,29 @@ async function scrapSearch(searchStr, res, count) {
             ret.push({name: urlsAndNames[i].name, malType: malType, id: id});
         }
         console.log(urlsAndNames);
-        if (ret.length > 1) {
-            redis.searchSet(searchStr, ret);
-        }
         if (res) {
+            if (ret.length > 1) {
+                redis.searchSet(searchStr, ret);
+            }
             res.end( JSON.stringify({ error: false, data: ret}) );
         }
+        return ret;
     }
     catch (e) {
         console.log(e);
         if (e.statusCode == 429) {  // too many requests error
             // try again but send error to client
-            scrapSearch(searchStr, null, count);
-            res.end(JSON.stringify({ error: true, why: e }));
+            if (res) {
+                res.end(JSON.stringify({ error: true, why: e }));
+            }
+            return await scrapSearch(searchStr, null, count, proxy);
         } else {  // unhandled error
-            res.end(JSON.stringify({ error: true, why: e }));
+            if (res) {
+                res.end(JSON.stringify({ error: true, why: e }));
+            }
         }
     }
+    return [];
 }
 
 module.exports = searchAnime;

@@ -6,11 +6,6 @@ var transformAnimes = require('./transformAnimes');
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 let dryrun = false;
-let args = process.argv.slice(2);
-const client = redisHelper.getClient();
-if (client) {
-    console.log('Got redis client!');
-}
 
 /*
 THIS SCRIPT IS MEANT TO BE RUN MANUALLY!
@@ -41,15 +36,12 @@ if we want to change this to run this in production.
 
 // recrawls parent keys to keep cache updated
 async function refreshRedis() {
-    const parentKeys = await getAllParentKeys();
-    for (let i = 0; i < parentKeys.length; ++i) {
-        await refreshASeries(parentKeys[i]);
-    }
+    await refreshAllSeries();
 }
 
-async function getAllParentKeys() {
+async function refreshAllSeries() {
+    const client = redisHelper.getClient();
     let cursor = 0;
-    let parentKeys = []
     while (true) {
         const result = await client.scanAsync(cursor);
         cursor = result[0];
@@ -58,7 +50,7 @@ async function getAllParentKeys() {
             const key = keys[i];
             const value = await client.getAsync(key);
             if (!redisHelper.isKey(value)) {
-                parentKeys.push(key);
+                await refreshASeries(key);
             }
         }
 
@@ -66,7 +58,6 @@ async function getAllParentKeys() {
             break;
         }
     }
-    return parentKeys;
 }
 
 // Recrawls a specific key and update all child keys to point to 
@@ -75,7 +66,7 @@ async function getAllParentKeys() {
 async function refreshASeries(parentKey) {
     console.log('Refreshing ' + parentKey);
     const typeAndIdObj = redisHelper.getMalTypeAndMalIdFromKey(parentKey);
-    let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null);
+    let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null, false);
 
     let postTransform = transformAnimes(preTransform);
     if (!dryrun) {
@@ -89,13 +80,26 @@ async function refreshASeries(parentKey) {
 }
 
 async function main() {
+    let args = process.argv.slice(2);
+
     if (args.length == 1) {
         await refreshASeries(args[0]);
     } else {
         await refreshRedis();
     }
-    console.log('Done!');
+    console.log('Done with primary redis!');
     process.exit()
 }
 
-main();
+async function refresh(parentKey = '') {
+    if (parentKey !== '') {
+        await refreshASeries(parentKey);
+    } else {
+        await refreshRedis();
+    }
+    console.log('Done with primary redis!');
+}
+
+// main();
+
+module.exports = { refresh };
