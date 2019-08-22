@@ -31,4 +31,4 @@ Screenshot generated for **FREE** by [Apercite](https://apercite.fr/en/) - they'
 
 # Feature Roadmap
 - find some way to keep autosuggestions up-to-date automatically without bombarding MAL servers
-
+  - there are too many search queries for autosuggest so can't just refresh
