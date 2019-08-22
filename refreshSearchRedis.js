@@ -65,7 +65,7 @@ async function main() {
 
 async function refresh(key = '') {
     if (key !== '') {
-        await refreshASeries(key);
+        await refreshKey(key);
     } else {
         await refreshRedis();
     }
