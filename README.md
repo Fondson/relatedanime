@@ -1,7 +1,7 @@
 # Related Anime
 <img src="https://aprc.it/api/1200x630/http://relatedanime.com/">
 
-[Visit relatedanime!](relatedanime.com)
+[Visit relatedanime!](http://www.relatedanime.com/)
 
 # Description
 Related Anime is a website used to discover all the different media related to an anime series.
