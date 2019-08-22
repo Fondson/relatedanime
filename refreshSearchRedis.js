@@ -40,7 +40,7 @@ async function refreshAllKeys() {
 // Recrawls a specific key
 async function refreshKey(key) {
     console.log('Refreshing ' + key);
-    let value = await promiseThrottle.add(searchAnime.bind(this, key, null, 5 /*JSON.parse(await redisHelper.getSearchClient().getAsync(key)).length*/, true));
+    let value = await promiseThrottle.add(searchAnime.bind(this, key, null, 5 /*JSON.parse(await redisHelper.getSearchClient().getAsync(key)).length*/, false /*true*/));
 
     if (!dryrun) {
         // set to parent key to crawled result
