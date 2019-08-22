@@ -1,22 +1,29 @@
 # Related Anime
+<img src="https://aprc.it/api/1200x630/http://relatedanime.com/">
 
-<a href="http://relatedanime.com/">Visit the website!</a>
+[Visit relatedanime!](relatedanime.com)
 
 # Description
 Related Anime is a website used to discover all the different media related to an anime series.
-The creation of Related Anime was motivated by the fact that the popular anime reference site <a href='https://myanimelist.net/'>MyAnimeList</a> has information on all the related media of an anime series, but no easy way to see it visually.
+The creation of Related Anime was motivated by the fact that the popular anime reference site [MyAnimeList](https://myanimelist.net/) (MAL) has information on all the related media of an anime series, but no easy way to see it visually.
 
 # Features
-- gets all anime-related information purely by web scraping (that is, this website does not rely on any anime APIs)
-- caches recent searches using [Redis](https://redis.io/)
-- uses a <a href="https://neo4j.com/">Neo4j</a> graph database to store selected longer series for quicker lookup
-  - try searching for the <i>Attack on Titan</i> or <i>Fate</i> anime series for near instant lookup
-- implements an Express API server that scraps information from <a href="https://myanimelist.net/">MyAnimeList</a>
+- gets all anime-related information purely by web scraping (this website does not rely on any anime APIs)
+- lists currently airing seasonal animes
+- autosuggestions in search bar based on MAL suggestions
+- heavily utilizes caching using [Redis](https://redis.io/)
+- uses a [Neo4j](https://neo4j.com/) graph database to store selected longer series for quicker lookup
+- implements an Express API server that scraps information from MAL
   - scraping updates are sent by the server using HTML5 server-sent events
 - front-end is done using React (created by [create-react-app](https://github.com/facebookincubator/create-react-app))
-- uses <a href="https://github.com/cheeriojs/cheerio">Cheerio</a> to parse markup data from <a href="https://myanimelist.net/">MyAnimeList</a> HTTP response
+- uses [Cheerio](https://github.com/cheeriojs/cheerio) to parse markup data from MAL HTTP response
+
+# Screenshots
+<img src="https://aprc.it/api/1200x630/http://www.relatedanime.com/anime/9253"> 
+<img src="https://aprc.it/api/1200x630/http://www.relatedanime.com/anime/527"> 
+
+Screenshot generated for **FREE** by [Apercite](ttps://apercite.fr/en/) - they're awesome!
 
 # Feature Roadmap
-- auto-suggest search bar
-  - this may need to rely on Jikan API as a backup (still fuzzy on how to do this), workaround for searching *all* -> interleave *anime* and *mange* results
-- current seasonal anime on homepage
+- find some way to keep autosuggestions up-to-date automatically without bombarding MAL servers
+
