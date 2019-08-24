@@ -11,6 +11,7 @@ const path = require('path');
 
 pingSelf.pingHomepage();
 pingSelf.pingNeo4j();
+refreshCron.start();
 var app = express();
 
 app.set('port', (process.env.PORT || 3001));
