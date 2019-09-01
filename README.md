@@ -12,7 +12,7 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 - lists currently airing seasonal animes
 - autosuggestions in search bar based on MAL suggestions
 - heavily utilizes caching using [Redis](https://redis.io/)
-  - most of cache is refresh automatically through crons using a proxy
+  - most of cache is automatically refresh periodically through crons using a [proxy](https://github.com/Fondson/relatedanime-proxy)
 - uses a [Neo4j](https://neo4j.com/) graph database to store selected longer series for quicker lookup
 - implements an Express API server that scraps information from MAL
   - scraping updates are sent by the server using HTML5 server-sent events
@@ -31,4 +31,4 @@ Screenshot generated for **FREE** by [Apercite](https://apercite.fr/en/) - they'
 
 # Feature Roadmap
 - find some way to keep autosuggestions up-to-date automatically without bombarding MAL servers
-
+  - there are too many search queries for autosuggest so can't just refresh
