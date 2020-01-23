@@ -81,7 +81,7 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
             type: $('div a[href*="?type="]')[0].children[0].data,
             title: $('span[itemprop=name]')[0].children[0].data,
             link: url,
-            image: image.length < 1 ? null : image[0].attribs.src,
+            image: image.length < 1 ? null : image.attr('src') || image.attr('data-src'),
             startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())
         };
         if (isNaN(newEntry.startDate)) newEntry.startDate = null;
