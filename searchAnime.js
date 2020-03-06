@@ -72,7 +72,7 @@ async function scrapSearch(searchStr, res, count, proxy) {
     }
     catch (e) {
         console.log(e);
-        if (e.statusCode == 429) {  // too many requests error
+        if (e.statusCode == 429 || e.statusCode == 403) {
             // try again but send error to client
             if (res) {
                 res.end(JSON.stringify({ error: true, why: e }));

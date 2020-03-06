@@ -89,9 +89,13 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
         allRelated.push(newEntry);
     } catch(e) {
         console.log(e);
-        if (e.statusCode == 429) {  // too many requests error
+        if (e.statusCode == 429 || e.statusCode == 403) {
             // try again
             await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy);
+        } else {  // unhandled error
+            if (res) {
+                res.end(JSON.stringify({ error: true, why: e }));
+            }
         }
     }
 };
