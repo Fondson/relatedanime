@@ -93,9 +93,8 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
             // try again
             await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy);
         } else {  // unhandled error
-            if (res) {
-                res.end(JSON.stringify({ error: true, why: e }));
-            }
+            // clear array
+            allRelated.splice(0, allRelated.length);
         }
     }
 };

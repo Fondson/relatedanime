@@ -51,12 +51,16 @@ class App extends Component {
         });
       }, 
       (e) => {
-        this.setState({
-          animes : JSON.parse(e.data),
-          searchValue: "",
-          loadingString: "Scraping MAL...",
-          isLoading: false,
-        });
+        if (e.data) {
+          this.setState({
+            animes : JSON.parse(e.data),
+            searchValue: "",
+            loadingString: "Scraping MAL...",
+            isLoading: false,
+          });
+        } else {
+          this._pushError();
+        }
       },
     );
   }
@@ -150,7 +154,7 @@ class App extends Component {
               <Route exact path='/error' render={() => ((
                 <AnimeBackground picNum={errorPicNum}>
                   <div>
-                    <h1 className='center-text'>Sorry.<br/>We could not find that anime.</h1>
+                    <h1 className='center-text'>Sorry.<br/>Sorry, we could not find that anime right now.</h1>
                     <Button bsSize='large' onClick={ () => history.push('/') } active>HOME</Button>
                   </div>
                 </AnimeBackground>))}/>

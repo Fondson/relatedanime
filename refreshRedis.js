@@ -67,6 +67,10 @@ async function refreshASeries(parentKey) {
     console.log('Refreshing ' + parentKey);
     const typeAndIdObj = redisHelper.getMalTypeAndMalIdFromKey(parentKey);
     let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null, false);
+    if (!preTransform.length) {  // empty arry, there was an error
+        console.log('Encountered an error for key ' + parentKey);
+        return;
+    }
 
     let postTransform = transformAnimes(preTransform);
     if (!dryrun) {
