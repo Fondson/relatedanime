@@ -11,7 +11,7 @@ var sortAnimesByDate = require('./sortAnimesByDate');
 
 
 var promiseThrottle = new PromiseThrottle({
-    requestsPerSecond: 1,           // max requests per second
+    requestsPerSecond: 1/3,           // max requests per second
     promiseImplementation: Promise  // the Promise library you are using
 });
 
