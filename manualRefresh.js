@@ -5,7 +5,6 @@ This script is meant to be used to manually refresh anime redis (not the search 
 */
 
 function start() {
-    await refreshRedis.refresh();
-    console.log(`Refresh cron complete!`);
+    refreshRedis.refresh();
 }
 start()
