@@ -93,8 +93,7 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
             // try again
             await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy);
         } else {  // unhandled error
-            // clear array
-            allRelated.splice(0, allRelated.length);
+            // skip entry
         }
     }
 };
