@@ -72,14 +72,13 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
                 });
             }
         });
-
         let image = $('img[itemprop=image]');
         const malTypeAndId = getMalTypeAndId(relLink);
         let newEntry = {
             malType: malTypeAndId.malType,
             malId: malTypeAndId.malId,
             type: $('div a[href*="?type="]')[0].children[0].data,
-            title: $('span[itemprop=name]')[0].children[0].data,
+            title: $('.h1-title').find('.title-name').text() || $('.h1-title').find('span[itemprop=name]').contents()[0].data.trim(),
             link: url,
             image: image.length < 1 ? null : image.attr('src') || image.attr('data-src'),
             startDate: chrono.parseDate($('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim())
@@ -131,5 +130,4 @@ function stripToMalTypeAndId(url) {
 
     return ret;
 }
-
 module.exports = crawl;
