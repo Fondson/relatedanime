@@ -20,7 +20,6 @@
     "cron": "^1.7.1",
     "express": "^4.15.3",
     "fs": "0.0.1-security",
-    "neo4j-driver": "^1.5.0",
     "path": "^0.12.7",
     "promise-throttle": "^1.0.0",
     "redis": "^2.8.0",

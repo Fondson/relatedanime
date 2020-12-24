@@ -3,14 +3,12 @@ var searchAnime = require('./searchAnime');
 var searchSeasonal = require('./searchSeasonal');
 var crawl = require('./crawl');
 var sse = require("simple-sse");
-var neo4j = require('./neo4jHelper');
 var pingSelf = require('./pingSelf');
 var redis = require('./redisHelper');
 var refreshCron = require('./refreshCron');
 const path = require('path');
 
 pingSelf.pingHomepage();
-pingSelf.pingNeo4j();
 refreshCron.start();
 var app = express();
 
@@ -23,16 +21,8 @@ async function _preCrawl(malType, malId, req=null) {
         console.log(malType + ' ' + malId + ' served from redis!')
         return redisResult;
     } 
-    // check db
-    let neo4jResult = await neo4j.getFromDbByMalTypeAndMalId(malType, malId, req);
-    if (neo4jResult !== null) {
-        // explicitly not using await
-        redis.setSeries(malType, malId, neo4jResult);
-        console.log(malType + ' ' + malId + ' served from neo4j!')
-        return neo4jResult;
-    }
 
-    // couldn't find in redis or neo4j
+    // couldn't find in redis
     return null;
 }
 

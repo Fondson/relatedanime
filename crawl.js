@@ -3,7 +3,6 @@ var PromiseThrottle = require('promise-throttle');
 var cheerio = require('cheerio');
 var sse = require("simple-sse");
 var chrono = require('chrono-node');
-var neo4j = require('./neo4jHelper');
 var redis = require('./redisHelper');
 var transformAnimes = require('./transformAnimes');
 var crawlUrl = require('./crawlUrl');
@@ -30,7 +29,6 @@ async function crawl(malType, malId, res, client, proxy=false){
         }
     }
 
-    // neo4j.addToDB(allRelated);
     let preTransform = allRelated
     allRelated = transformAnimes(sortAnimesByDate(allRelated));
     if (client) {
