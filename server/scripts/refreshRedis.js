@@ -1,8 +1,8 @@
 var bluebird = require("bluebird");
 var redis = require("redis");
-var redisHelper = require('./redisHelper');
-var crawl = require('./crawl');
-var transformAnimes = require('./transformAnimes');
+var redisHelper = require('../redis/redisHelper');
+var crawl = require('../crawl');
+var transformAnimes = require('../transformAnimes');
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 let dryrun = false;

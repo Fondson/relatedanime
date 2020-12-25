@@ -1,7 +1,7 @@
 var request = require('request-promise');
 var cheerio = require('cheerio');
 var PromiseThrottle = require('promise-throttle');
-var redis = require('./redisHelper');
+var redis = require('./redis/redisHelper');
 var crawlUrl = require('./crawlUrl');
 
 const SEASONAL_KEY = '$seasonal$';

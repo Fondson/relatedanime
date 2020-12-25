@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Client from './Client';
+import Client from '../Client';
 import Autosuggest from 'react-autosuggest';
 
 var wait = ms => new Promise((r, j)=>setTimeout(r, ms))

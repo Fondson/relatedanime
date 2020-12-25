@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
 import './Autosuggest.css';
-import Client from './Client';
+import Client from '../Client';
 import Section from './Section';
 import SearchForm from './SearchForm';
 import LandingPage from './LandingPage';
-import history from './history';
+import history from '../history';
 import { StickyContainer, Sticky } from 'react-sticky';
 import { Button } from 'react-bootstrap';
 import SectionsContainer from './SectionsContainer';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import Loader from 'react-loader-advanced';
-import kirinoMouse from './media/kirino-mouse.gif';
+import kirinoMouse from '../media/kirino-mouse.gif';
 import {AnimeBackground, numOfPics, getRandomInt} from './AnimeBackground';
 
 const errorPicNum = getRandomInt(0, numOfPics - 1);
@@ -158,7 +158,9 @@ class App extends Component {
                     <Button bsSize='large' onClick={ () => history.push('/') } active>HOME</Button>
                   </div>
                 </AnimeBackground>))}/>
-              <Route exact path='/:malType(anime|manga)/:id([0-9]+)' render={({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>}/>
+              <Route exact path='/:malType(anime|manga)/:id([0-9]+)' render={
+                ({ match }) => <SectionsContainer didMount={this.sectionsDidMount} sections={allSections} match={match}/>
+                }/>
               <Route exact path='/*' render={() => <Redirect to="/error"/>}/>
             </Switch>
 

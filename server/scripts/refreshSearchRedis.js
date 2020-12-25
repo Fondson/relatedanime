@@ -1,8 +1,8 @@
 var bluebird = require("bluebird");
 var redis = require("redis");
-var redisHelper = require('./redisHelper');
-var searchAnime = require('./searchAnime');
-var searchSeasonal = require('./searchSeasonal');
+var redisHelper = require('../redis/redisHelper');
+var searchAnime = require('../searchAnime');
+var searchSeasonal = require('../../searchSeasonal');
 var PromiseThrottle = require('promise-throttle');
 
 var promiseThrottle = new PromiseThrottle({

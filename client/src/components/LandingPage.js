@@ -3,7 +3,7 @@ import {AnimeBackground, numOfPics, getRandomInt} from './AnimeBackground';
 import { Button } from 'react-bootstrap';
 
 
-import Client from './Client';
+import Client from '../Client';
 import Section from './Section';
 import SeasonalSection from './SeasonalSection';
 import SectionsContainer from './SectionsContainer';

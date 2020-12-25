@@ -4,8 +4,8 @@ var searchSeasonal = require('./searchSeasonal');
 var crawl = require('./crawl');
 var sse = require("simple-sse");
 var pingSelf = require('./pingSelf');
-var redis = require('./redisHelper');
-var refreshCron = require('./refreshCron');
+var redis = require('./redis/redisHelper');
+var refreshCron = require('./crons/refreshCron');
 const path = require('path');
 
 pingSelf.pingHomepage();
@@ -88,11 +88,11 @@ app.get('/api/searchSeasonal', async function(req, res){
 });
 
 //if (process.env.NODE_ENV === 'production') {
-   app.use(express.static(path.join(__dirname, 'client/build')));
+   app.use(express.static(path.join(__dirname, '../client/build')));
 //}
 
 app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(app.get('port'), () => {

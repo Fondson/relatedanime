@@ -1,5 +1,5 @@
 const CronJob = require('cron').CronJob;
-var refreshRedis = require('./refreshRedis');
+var refreshRedis = require('../scripts/refreshRedis');
 
 function start() {
     const job = new CronJob('0 0 0 * * 1', async function() {

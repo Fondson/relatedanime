@@ -5,6 +5,8 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 const TYPES = ['anime', 'manga'];
 let primaryClient = null;
 let searchClient = null;
+
+// initialize clients
 getClient();
 getSearchClient();
 
