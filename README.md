@@ -13,7 +13,6 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 - autosuggestions in search bar based on MAL suggestions
 - heavily utilizes caching using [Redis](https://redis.io/)
   - most of cache is automatically refresh periodically through crons using a [proxy](https://github.com/Fondson/relatedanime-proxy)
-- uses a [Neo4j](https://neo4j.com/) graph database to store selected longer series for quicker lookup
 - implements an Express API server that scraps information from MAL
   - scraping updates are sent by the server using HTML5 server-sent events
 - front-end is done using React (created by [create-react-app](https://github.com/facebookincubator/create-react-app))
