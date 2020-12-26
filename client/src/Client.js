@@ -101,4 +101,6 @@ function processResponse(response) {
 // }
 
 const Client = { crawl, search, searchWithoutCb, searchSeasonal };
+
 export default Client;
+export { crawl, search, searchWithoutCb, searchSeasonal };

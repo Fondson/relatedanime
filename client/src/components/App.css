@@ -69,10 +69,6 @@ img.loading{
   padding-bottom: 1em;
 }
 
-.Loader form {
-  z-index: 100;
-}
-
 .row{
   margin-left: 0px!important;
   margin-right: 0px!important;
@@ -115,7 +111,7 @@ hr.star-primary:after {
     background-color: #fff;
 }
 
-.btn{
+.btn {
   background-color: rgba(0, 0, 0, 0.31)!important;
   border-color: #dbdbdb!important;
   color: #f5f5f5!important;
