@@ -8,6 +8,14 @@ var transformAnimes = require('./transformAnimes');
 var crawlUrl = require('./crawlUrl');
 var sortAnimesByDate = require('./sortAnimesByDate');
 
+/*
+    These are (graph) edges that are problematic and can expand the series graph
+    in a way that is unexpected. To deal with it, we remove specific edges to
+    limit the series expansion.
+*/
+const EDGES_EXCLUSION_LIST = {
+    'manga:118865': 'manga:87610'
+};
 
 var promiseThrottle = new PromiseThrottle({
     requestsPerSecond: 1/3,           // max requests per second
@@ -55,9 +63,9 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
             sse.send(client, 'update', $('title').text().trim() );
         }
         
+        const malTypeAndId = getMalTypeAndId(relLink);
         // collect related anime links
         let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass');
-
         relatedTypes.each((typeIndex, type) => {
             const thisType = type.children[0].data.trim();
             // 'Other' and 'Character' types of animes can be really unrelated, we'll discard them
@@ -65,13 +73,26 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
                 let children = type.next.children;
                 children.forEach((element, elementIndex) => {
                     if (element.type === 'tag') {
-                        pagesToVisit.push(stripToMalTypeAndId(element.attribs.href));
+                        const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href);
+
+                        // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
+                        const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':');
+                        const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId;
+                        if (
+                            // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
+                            sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST && EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey
+                            // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
+                            || destMalTypeAndIdKey in EDGES_EXCLUSION_LIST && EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey
+                        ) {
+                            return;
+                        }
+
+                        pagesToVisit.push(destMalTypeAndIdRelLink);
                     }
                 });
             }
         });
         let image = $('img[itemprop=image]');
-        const malTypeAndId = getMalTypeAndId(relLink);
         let newEntry = {
             malType: malTypeAndId.malType,
             malId: malTypeAndId.malId,

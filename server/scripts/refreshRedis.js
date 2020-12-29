@@ -83,18 +83,6 @@ async function refreshASeries(parentKey) {
     }
 }
 
-async function main() {
-    let args = process.argv.slice(2);
-
-    if (args.length == 1) {
-        await refreshASeries(args[0]);
-    } else {
-        await refreshRedis();
-    }
-    console.log('Done with primary redis!');
-    process.exit()
-}
-
 async function refresh(parentKey = '') {
     if (parentKey !== '') {
         await refreshASeries(parentKey);
@@ -103,7 +91,5 @@ async function refresh(parentKey = '') {
     }
     console.log('Done with primary redis!');
 }
-
-// main();
 
 module.exports = { refresh };
