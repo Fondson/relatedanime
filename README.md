@@ -19,7 +19,7 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 - uses [Cheerio](https://github.com/cheeriojs/cheerio) to parse markup data from MAL HTTP response
 
 # Examples
-## Stein's Gate
+## Steins;Gate
 http://www.relatedanime.com/anime/9253
 <img src="https://aprc.it/api/1200x630/http://www.relatedanime.com/anime/9253"> 
 ## Pokemon
