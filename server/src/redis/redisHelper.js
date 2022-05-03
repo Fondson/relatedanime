@@ -32,6 +32,10 @@ function getClient() {
         // reconnect after
         return Math.min(options.attempt * 100, 3000)
       },
+      socket: {
+        tls: true,
+        rejectUnauthorized: false,
+      },
     })
 
     primaryClient.on('error', function (err) {

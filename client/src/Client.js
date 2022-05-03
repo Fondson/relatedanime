@@ -80,29 +80,6 @@ function processResponse(response) {
   throw error
 }
 
-// if (!!window.EventSource) {
-//   var source = new EventSource('/anime/31240')
-
-//   source.addEventListener('message', function(e) {
-//     console.log(JSON.parse(e.data))
-//   }, false)
-
-//   source.addEventListener('open', function(e) {
-//     console.log("Connected")
-//   }, false)
-
-//   source.addEventListener('error', function(e) {
-//     if (e.target.readyState == EventSource.CLOSED) {
-//       console.log("Disconnected")
-//     }
-//     else if (e.target.readyState == EventSource.CONNECTING) {
-//       console.log("Connecting...")
-//     }
-//   }, false)
-// } else {
-//   console.log("Your browser doesn't support SSE")
-// }
-
 const Client = { crawl, search, searchWithoutCb, searchSeasonal }
 
 export default Client

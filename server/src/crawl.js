@@ -15,6 +15,7 @@ var sortAnimesByDate = require('./sortAnimesByDate')
 */
 const EDGES_EXCLUSION_LIST = {
   'manga:118865': 'manga:87610',
+  'manga:13': 'manga:25146',
 }
 
 var promiseThrottle = new PromiseThrottle({

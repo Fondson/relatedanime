@@ -18,7 +18,7 @@ function SectionsContainer({ malType, id }) {
       malType,
       id,
       (e) => {
-        //   console.log(e.data);
+        // console.log(e.data)
         setLoadingString('Found ' + e.data)
       },
       (e) => {

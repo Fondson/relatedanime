@@ -5,24 +5,16 @@ var crawl = require('../crawl')
 var transformAnimes = require('../transformAnimes')
 
 bluebird.promisifyAll(redis.RedisClient.prototype)
-let dryrun = false
 
 /*
-THIS SCRIPT IS MEANT TO BE RUN MANUALLY!
-THIS SCRIPT SHOULD IDEALLY BE RUN ON ANOTHER SERVER SO PRODUCTION DOES NOT
-GET RATE LIMITED WHEN THIS SCRIPT IS RUNNING!
+THIS SCRIPT SHOULD IDEALLY BE RUN ON ANOTHER SERVER IF USED TO PERIODICALLY UPDATE THE ANIME
+(NOT SEARCH) REDIS SO PRODUCTION DOES NOT GET RATE LIMITED WHEN THIS SCRIPT IS RUNNING!
 
 2 modes:
-1. recrawl all parent keys, just call script
-2. recrawl a specific key, call script with key to recrawl
-ex; node refreshRedis.js anime:30831
+1. recrawl all parent keys, just call refresh()
+2. recrawl a specific key, call refresh() with key to recrawl
+ex; refresh('anime:30831')
 
-Steps for running this script:
-1. In redisHelper.js, set the url to the production url
-2. Do a dryrun run to see what keys you will be refreshing and spot check some of
-   them to make sure they are parents keys (connect to redis production using 
-   `redis-cli -u <url>` and run `GET <key>`)
-3. Run script with dryrun=false
 ----------------------------------------------------------------------------------
 Future:
 
@@ -34,11 +26,11 @@ if we want to change this to run this in production.
 */
 
 // recrawls parent keys to keep cache updated
-async function refreshRedis() {
-  await refreshAllSeries()
+async function refreshRedis(dryrun = false) {
+  await refreshAllSeries(dryrun)
 }
 
-async function refreshAllSeries() {
+async function refreshAllSeries(dryrun) {
   const client = redisHelper.getClient()
   let cursor = 0
   while (true) {
@@ -49,7 +41,7 @@ async function refreshAllSeries() {
       const key = keys[i]
       const value = await client.getAsync(key)
       if (!redisHelper.isKey(value)) {
-        await refreshASeries(key)
+        await refreshASeries(key, dryrun)
       }
     }
 
@@ -62,7 +54,7 @@ async function refreshAllSeries() {
 // Recrawls a specific key and update all child keys to point to
 // key. parentKey does not have to be the current parent key, but it will
 // become the new parent key
-async function refreshASeries(parentKey) {
+async function refreshASeries(parentKey, dryrun) {
   console.log('Refreshing ' + parentKey)
   const typeAndIdObj = redisHelper.getMalTypeAndMalIdFromKey(parentKey)
   let preTransform = await crawl(typeAndIdObj.malType, typeAndIdObj.malId, null, null, false)
@@ -83,11 +75,11 @@ async function refreshASeries(parentKey) {
   }
 }
 
-async function refresh(parentKey = '') {
+async function refresh(parentKey = '', dryrun = false) {
   if (parentKey !== '') {
-    await refreshASeries(parentKey)
+    await refreshASeries(parentKey, dryrun)
   } else {
-    await refreshRedis()
+    await refreshRedis(dryrun)
   }
   console.log('Done with primary redis!')
 }

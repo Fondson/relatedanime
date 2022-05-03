@@ -68,8 +68,7 @@ async function main() {
     await refreshRedis()
   }
   console.log('Done with search redis!')
-  Process.exit()
-  const exit = process.exit
+  process.kill(process.pid, 'SIGTERM')
 }
 
 async function refresh(key = '') {

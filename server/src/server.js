@@ -7,12 +7,25 @@ var pingSelf = require('./pingSelf')
 var redis = require('./redis/redisHelper')
 var refreshCron = require('./crons/refreshCron')
 const path = require('path')
+const cors = require('cors')
 
 pingSelf.pingHomepage()
 refreshCron.start()
 var app = express()
 
 app.set('port', process.env.PORT || 3001)
+
+const corsOptions = {
+  origin: (() => {
+    const env = process.env.APP_ENV
+    if (env === 'prod') {
+      return 'https://relatedanime.com'
+    } else {
+      return 'http://localhost:3000'
+    }
+  })(),
+}
+app.use(cors(corsOptions))
 
 async function _preCrawl(malType, malId, req = null) {
   // check redis
@@ -87,13 +100,12 @@ app.get('/api/searchSeasonal', async function (req, res) {
   }
 })
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.APP_ENV === 'prod') {
   app.use(express.static(path.join(__dirname, '../client/build')))
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
+  })
 }
-
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
-})
 
 app.listen(app.get('port'), () => {
   console.log(`Find the server at: http://localhost:${app.get('port')}/`) // eslint-disable-line no-console

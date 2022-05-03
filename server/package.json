@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon -r dotenv/config src/server.js",
     "start": "node src/server.js",
     "lint": "yarn eslint . --fix --max-warnings=0 && yarn prettier . --write --ignore-unknown"
   },
@@ -11,6 +11,7 @@
     "bluebird": "^3.7.2",
     "cheerio": "^0.22.0",
     "chrono-node": "^1.4.8",
+    "cors": "^2.8.5",
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
@@ -29,6 +30,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "nodemon": "^2.0.16",
-    "prettier": "2.4.1"
+    "prettier": "2.4.1",
+    "dotenv": "^16.0.0"
   }
 }
