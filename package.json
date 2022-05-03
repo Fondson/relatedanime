@@ -2,32 +2,24 @@
   "name": "related-anime",
   "version": "1.0.0",
   "description": "",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "babel-node ./server/server.js",
-    "client": "babel-node start-client.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "bluebird": "^3.7.2",
-    "cheerio": "^0.22.0",
-    "chrono-node": "^1.4.8",
-    "cron": "^1.8.2",
-    "express": "^4.17.1",
-    "fs": "0.0.1-security",
-    "path": "^0.12.7",
-    "promise-throttle": "^1.1.2",
-    "redis": "^2.8.0",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6",
-    "simple-sse": "0.0.3",
-    "url-parse": "^1.4.7"
+    "dev": "concurrently --kill-others-on-fail \"yarn workspace @related-anime/server dev\" \"yarn workspace @related-anime/client start\"",
+    "start": "yarn workspace @related-anime/server start",
+    "build": "yarn workspace @related-anime/client build",
+    "lint": "concurrently \"yarn lint:root\" \"yarn lint:server\" \"yarn lint:client\"",
+    "lint:root": "yarn prettier ./*.* --write --ignore-unknown",
+    "lint:server": "yarn workspace @related-anime/server lint",
+    "lint:client": "yarn workspace @related-anime/client lint",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "concurrently": "^3.6.1"
+    "concurrently": "^3.6.1",
+    "husky": "^7.0.0",
+    "prettier": "2.4.1"
   }
 }

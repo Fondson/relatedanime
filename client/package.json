@@ -1,5 +1,5 @@
 {
-  "name": "related-anime-front-end",
+  "name": "@related-anime/client",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:3001/",
@@ -19,12 +19,27 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "react-scripts": "1.0.7"
+    "react-scripts": "5.0.1",
+    "prettier": "2.4.1",
+    "eslint-config-prettier": "^8.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "yarn eslint . --fix --max-warnings=0 && yarn prettier . --write --ignore-unknown"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

@@ -1,8 +1,0 @@
-const BASE_URL = 'https://myanimelist.net';
-const PROXY_URL = 'https://relatedanime-proxy.herokuapp.com/proxy';
-
-function getUrl(proxy) {
-    return proxy ? PROXY_URL : BASE_URL;
-}
-
-module.exports = {getUrl};

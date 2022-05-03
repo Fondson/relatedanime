@@ -1,0 +1,34 @@
+{
+  "name": "@related-anime/server",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "lint": "yarn eslint . --fix --max-warnings=0 && yarn prettier . --write --ignore-unknown"
+  },
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "cheerio": "^0.22.0",
+    "chrono-node": "^1.4.8",
+    "cron": "^1.8.2",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "promise-throttle": "^1.1.2",
+    "redis": "^2.8.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "simple-sse": "0.0.3",
+    "url-parse": "^1.4.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "nodemon": "^2.0.16",
+    "prettier": "2.4.1"
+  }
+}
