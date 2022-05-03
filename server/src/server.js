@@ -101,7 +101,12 @@ app.get('/api/searchSeasonal', async function (req, res) {
 })
 
 if (process.env.APP_ENV === 'prod') {
+  // Serve static files from the React app
   app.use(express.static(path.join(process.cwd(), '../client/build')))
+  // The "catch all" handler: essentially proxies request to the React app
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(process.cwd(), '../client/build', 'index.html'))
+  })
 }
 
 app.listen(app.get('port'), () => {
