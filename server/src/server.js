@@ -101,10 +101,7 @@ app.get('/api/searchSeasonal', async function (req, res) {
 })
 
 if (process.env.APP_ENV === 'prod') {
-  app.use(express.static(path.join(__dirname, '../client/build')))
-  app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
-  })
+  app.use(express.static(path.join(process.cwd(), '../client/build')))
 }
 
 app.listen(app.get('port'), () => {
