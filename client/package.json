@@ -2,7 +2,6 @@
   "name": "@related-anime/client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001/",
   "dependencies": {
     "bootstrap": "^3.4.1",
     "cheerio": "^0.22.0",

@@ -1,8 +1,9 @@
-/* eslint-disable no-undef */
+const API_URL = process.env.REACT_APP_API_URL
+
 function crawl(malType, id, updateListener, eventListener) {
   if (id === 0) id = 1
-  //http://localhost:3001
-  const es = new EventSource(`/api/crawl/${malType}/${id}`)
+
+  const es = new EventSource(new URL(`/api/crawl/${malType}/${id}`, API_URL))
   es.addEventListener('update', updateListener)
   es.addEventListener('full-data', eventListener)
   es.addEventListener('done', (e) => es.close())
@@ -30,7 +31,7 @@ async function searchWithoutCb(query, count) {
 
 async function fetchWithRetries(url, cb, retries = 0) {
   try {
-    let response = await fetch(url, {
+    let response = await fetch(new URL(url, API_URL), {
       accept: 'application/json',
     })
     let obj = await processResponse(response)
@@ -50,7 +51,7 @@ async function fetchWithRetries(url, cb, retries = 0) {
 
 async function fetchWithRetriesWithoutCb(url, retries = 0) {
   try {
-    let response = await fetch(url, {
+    let response = await fetch(new URL(url, API_URL), {
       accept: 'application/json',
     })
     let obj = await processResponse(response)
