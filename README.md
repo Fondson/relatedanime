@@ -40,7 +40,7 @@ Screenshot generated for **FREE** by [Apercite](https://apercite.fr/en/) - they'
 - find some way to keep autosuggestions up-to-date automatically without bombarding MAL servers
   - there are too many search queries for autosuggest so can't just refresh
 
-## Developement
+## Development
 
 This is a monorepo codebase. The server (backend) code is under the `server` directory and the client (frontend) code is under the `client` directory.
 
