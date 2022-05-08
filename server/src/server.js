@@ -36,7 +36,7 @@ app.use(cors(corsOptions))
 async function _preCrawl(malType, malId, req = null) {
   // check redis
   let redisResult = await redis.getSeries(malType, malId)
-  if (redisResult !== null && redisResult !== undefined) {
+  if (redisResult != null) {
     console.log(`${malTypeAndIdToRelLink(malType, malId)} served from redis!`)
     return redisResult
   }
@@ -68,7 +68,7 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   console.log('Received ' + malType + ' ' + malId)
 
   let cachedResult = await _preCrawl(malType, malId, req)
-  if (cachedResult !== null) {
+  if (cachedResult != null) {
     sse.send(client, 'full-data', JSON.stringify(cachedResult))
     sse.send(client, 'done', 'success')
     sse.remove(client)
