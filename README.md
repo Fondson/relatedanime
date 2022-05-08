@@ -2,7 +2,7 @@
 
 <img src="https://aprc.it/api/1200x630/http://relatedanime.com/">
 
-[Visit relatedanime.com!](http://www.relatedanime.com/)
+[Visit relatedanime.com!](http://relatedanime.com/)
 
 ## Description
 
@@ -25,13 +25,13 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 
 ### Steins;Gate
 
-https://www.relatedanime.com/anime/9253
-<img src="https://aprc.it/api/1200x630/https://www.relatedanime.com/anime/9253">
+https://relatedanime.com/anime/9253
+<img src="https://aprc.it/api/1200x630/https://relatedanime.com/anime/9253">
 
 ### Pokemon
 
-https://www.relatedanime.com/anime/527
-<img src="https://aprc.it/api/1200x630/https://www.relatedanime.com/anime/527">
+https://relatedanime.com/anime/527
+<img src="https://aprc.it/api/1200x630/https://relatedanime.com/anime/527">
 
 Screenshot generated for **FREE** by [Apercite](https://apercite.fr/en/) - they're awesome!
 
