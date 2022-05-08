@@ -3,6 +3,7 @@ var cheerio = require('cheerio')
 var PromiseThrottle = require('promise-throttle')
 var redis = require('./redis/redisHelper')
 var crawlUrl = require('./crawlUrl')
+const crawl = require('./crawl')
 
 const SEASONAL_KEY = '$seasonal$'
 // default every day
@@ -20,7 +21,7 @@ function searchSeasonal(res = null, proxy = false) {
 async function scrapSearch(res, proxy) {
   try {
     const body = await promiseThrottle.add(
-      request.bind(this, encodeURI(crawlUrl.getUrl(proxy) + '/anime/season')),
+      request.bind(this, encodeURI(new URL('/anime/season', crawlUrl.getUrl(proxy)).href)),
     )
     let $ = cheerio.load(body)
 
@@ -58,6 +59,13 @@ async function scrapSearch(res, proxy) {
     }
 
     if (ret.length >= 1) {
+      // scrape all seasonal animes if new batch is out
+      if (JSON.stringify(ret) !== JSON.stringify(await redis.searchGet(SEASONAL_KEY))) {
+        ret.forEach(({ malType, id }) => {
+          crawl(malType, id, null, null, false, true)
+        })
+      }
+
       redis.searchSet(SEASONAL_KEY, ret)
     }
     if (res) {

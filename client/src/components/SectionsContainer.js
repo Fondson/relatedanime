@@ -6,9 +6,11 @@ import LoadingPage from './LoadingPage'
 import SearchForm from './SearchForm'
 import Section from './Section'
 
+const defaultLoadingString = 'Scraping MAL...'
+
 function SectionsContainer({ malType, id }) {
   const [isLoading, setIsLoading] = useState(true)
-  const [loadingString, setLoadingString] = useState('Scraping MAL...')
+  const [loadingString, setLoadingString] = useState(defaultLoadingString)
   const [animes, setAnimes] = useState({})
   const [error, setError] = useState(false)
 
@@ -22,6 +24,7 @@ function SectionsContainer({ malType, id }) {
         setLoadingString('Found ' + e.data)
       },
       (e) => {
+        setLoadingString(defaultLoadingString)
         if (e.data) {
           setAnimes(JSON.parse(e.data))
           setIsLoading(false)

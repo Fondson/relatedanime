@@ -7,6 +7,10 @@ var redis = require('./redis/redisHelper')
 var transformAnimes = require('./transformAnimes')
 var crawlUrl = require('./crawlUrl')
 var sortAnimesByDate = require('./sortAnimesByDate')
+const ddb = require('./dynamoDb/dynamoDbHelper')
+const { compressHtml, decompressHtml } = require('./compressHtml')
+const { malTypeAndIdToRelLink } = require('./relLinkHelper')
+const crawlAndCacheMalPage = require('./crawlAndCacheMalPage')
 
 /*
     These are (graph) edges that are problematic and can expand the series graph
@@ -24,9 +28,9 @@ var promiseThrottle = new PromiseThrottle({
 })
 
 // dfs crawl
-async function crawl(malType, malId, res, client, proxy = false) {
+async function crawl(malType, malId, res, client, proxy = false, forceRefresh = false) {
   let pagesVisited = new Set()
-  let pagesToVisit = ['/' + malType + '/' + malId]
+  let pagesToVisit = [malTypeAndIdToRelLink(malType, malId)]
   let allRelated = [] // array of all related animes
 
   while (pagesToVisit.length) {
@@ -34,14 +38,15 @@ async function crawl(malType, malId, res, client, proxy = false) {
     // New page we haven't visited
     if (!pagesVisited.has(nextPage)) {
       pagesVisited.add(nextPage)
-      await visitPage(nextPage, client, pagesVisited, pagesToVisit, allRelated, proxy)
+      await visitPage(nextPage, client, pagesVisited, pagesToVisit, allRelated, proxy, forceRefresh)
     }
   }
 
   let preTransform = allRelated
   allRelated = transformAnimes(sortAnimesByDate(allRelated))
   if (client) {
-    redis.setSeries(malType, malId, allRelated)
+    // TODO: remove on experiment success
+    // redis.setSeries(malType, malId, allRelated)
     sse.send(client, 'full-data', JSON.stringify(allRelated))
     sse.send(client, 'done', 'success')
     sse.remove(client)
@@ -52,16 +57,29 @@ async function crawl(malType, malId, res, client, proxy = false) {
   return preTransform
 }
 
-async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy = false) {
-  url = crawlUrl.getUrl(proxy) + relLink
-  // console.log("Visiting page " + url)
+async function visitPage(
+  relLink,
+  client,
+  pagesVisited,
+  pagesToVisit,
+  allRelated,
+  proxy,
+  forceRefresh,
+) {
+  const url = new URL(relLink, crawlUrl.getUrl(proxy)).href
   try {
-    const body = await promiseThrottle.add(request.bind(this, encodeURI(url)))
+    const body = forceRefresh
+      ? await crawlAndCacheMalPage(relLink, proxy)
+      : await getMalPage(relLink, proxy)
+
     // Parse the document body
     let $ = cheerio.load(body)
-    console.log('Page title:  ' + $('title').text())
+    const title =
+      $('.h1-title').find('.title-name').text().trim() ||
+      $('.h1-title').find('span[itemprop=name]').contents()[0].data.trim()
+    console.log('Page title:  ' + title)
     if (client) {
-      sse.send(client, 'update', $('title').text().trim())
+      sse.send(client, 'update', title)
     }
 
     const malTypeAndId = getMalTypeAndId(relLink)
@@ -100,9 +118,7 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
       malType: malTypeAndId.malType,
       malId: malTypeAndId.malId,
       type: $('div a[href*="?type="]')[0].children[0].data,
-      title:
-        $('.h1-title').find('.title-name').text() ||
-        $('.h1-title').find('span[itemprop=name]').contents()[0].data.trim(),
+      title,
       link: url,
       image: image.length < 1 ? null : image.attr('src') || image.attr('data-src'),
       startDate: chrono.parseDate(
@@ -116,12 +132,47 @@ async function visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated
     console.log(e)
     if (e.statusCode == 429 || e.statusCode == 403) {
       // try again
-      await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy)
+      await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy, forceRefresh)
     } else {
       // unhandled error
       // skip entry
     }
   }
+}
+
+async function getMalPage(relLink, proxy = false) {
+  const url = new URL(relLink, crawlUrl.getUrl(proxy)).href
+
+  let body
+  // Try to load from Redis, then DynamoDB, then scrape
+  const redisCacheResponse = await redis.getMalCachePath(relLink)
+  if (redisCacheResponse != null) {
+    body = await decompressHtml(redisCacheResponse)
+    console.log(`${relLink} loaded from Redis`)
+  } else {
+    const ddbCacheResponse = await ddb.getMalCachePath(relLink)
+
+    if (ddbCacheResponse.Item != null) {
+      body = await decompressHtml(ddbCacheResponse.Item.page.S)
+      console.log(`${relLink} loaded from DynamoDB`)
+
+      // Add to Redis cache
+      await redis.setMalCachePath(relLink, ddbCacheResponse.Item.page.S)
+    } else {
+      const fullBody = await promiseThrottle.add(request.bind(this, encodeURI(url)))
+      const $ = cheerio.load(fullBody)
+      body = $('#contentWrapper').html()
+
+      // put in data stores
+      const compressedBody = await compressHtml(body)
+      await Promise.allSettled([
+        ddb.setMalCachePath(relLink, compressedBody),
+        redis.setMalCachePath(relLink, compressedBody),
+      ])
+    }
+  }
+
+  return body
 }
 
 // assumes url is a relative url following the format '/(anime|manga)/ID/...'
@@ -157,4 +208,5 @@ function stripToMalTypeAndId(url) {
 
   return ret
 }
+
 module.exports = crawl

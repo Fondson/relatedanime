@@ -21,7 +21,10 @@ async function searchAnime(searchStr, res, count, proxy = false) {
 async function scrapSearch(searchStr, res, count, proxy) {
   try {
     const body = await promiseThrottle.add(
-      request.bind(this, encodeURI(crawlUrl.getUrl(proxy) + '/search/all?q=' + searchStr)),
+      request.bind(
+        this,
+        encodeURI(new URL('/search/all?q=' + searchStr, crawlUrl.getUrl(proxy)).href),
+      ),
     )
     let $ = cheerio.load(body)
 

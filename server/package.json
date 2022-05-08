@@ -8,6 +8,7 @@
     "lint": "yarn eslint . --fix --max-warnings=0 && yarn prettier . --write --ignore-unknown"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.85.0",
     "bluebird": "^3.7.2",
     "cheerio": "^0.22.0",
     "chrono-node": "^1.4.8",
@@ -15,6 +16,7 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "node-gzip": "^1.1.2",
     "path": "^0.12.7",
     "promise-throttle": "^1.1.2",
     "redis": "^2.8.0",
@@ -24,13 +26,16 @@
     "url-parse": "^1.4.7"
   },
   "devDependencies": {
+    "dotenv": "^16.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "nodemon": "^2.0.16",
-    "prettier": "2.4.1",
-    "dotenv": "^16.0.0"
+    "prettier": "2.4.1"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }

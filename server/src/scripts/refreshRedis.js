@@ -31,7 +31,7 @@ async function refreshRedis(dryrun = false) {
 }
 
 async function refreshAllSeries(dryrun) {
-  const client = redisHelper.getClient()
+  const client = redisHelper.getMainClient()
   let cursor = 0
   while (true) {
     const result = await client.scanAsync(cursor)

@@ -5,12 +5,16 @@ var crawl = require('./crawl')
 var sse = require('simple-sse')
 var pingSelf = require('./pingSelf')
 var redis = require('./redis/redisHelper')
-var refreshCron = require('./crons/refreshCron')
+// TODO: remove on experiment success
+// var refreshCron = require('./crons/refreshCron')
+const refreshMalCacheCron = require('./crons/refreshMalCacheCron')
 const path = require('path')
 const cors = require('cors')
 
 pingSelf.pingHomepage()
-refreshCron.start()
+// TODO: remove on experiment success
+// refreshCron.start()
+refreshMalCacheCron.start()
 var app = express()
 
 app.set('port', process.env.PORT || 3001)
@@ -27,17 +31,18 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-async function _preCrawl(malType, malId, req = null) {
-  // check redis
-  let redisResult = await redis.getSeries(malType, malId)
-  if (redisResult !== null && redisResult !== undefined) {
-    console.log(malType + ' ' + malId + ' served from redis!')
-    return redisResult
-  }
+// TODO: remove on experiment success
+// async function _preCrawl(malType, malId, req = null) {
+//   // check redis
+//   let redisResult = await redis.getSeries(malType, malId)
+//   if (redisResult !== null && redisResult !== undefined) {
+//     console.log(malType + ' ' + malId + ' served from redis!')
+//     return redisResult
+//   }
 
-  // couldn't find in redis
-  return null
-}
+//   // couldn't find in redis
+//   return null
+// }
 
 async function _preCrawlSearch(query) {
   try {
@@ -61,18 +66,19 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   const malId = req.params.malId || 1
   console.log('Received ' + malType + ' ' + malId)
 
-  let preCrawlResult = await _preCrawl(malType, malId, req)
-  // preCrawl success!
-  if (preCrawlResult !== null) {
-    sse.send(client, 'full-data', JSON.stringify(preCrawlResult))
-    sse.send(client, 'done', 'success')
-    sse.remove(client)
-    res.end()
-    return
-  }
+  // TODO: remove on experiment success
+  // let preCrawlResult = await _preCrawl(malType, malId, req)
+  // // preCrawl success!
+  // if (preCrawlResult !== null) {
+  //   sse.send(client, 'full-data', JSON.stringify(preCrawlResult))
+  //   sse.send(client, 'done', 'success')
+  //   sse.remove(client)
+  //   res.end()
+  //   return
+  // }
 
-  // have to crawl to find data
-  console.log('precrawl failed, crawling...')
+  // // have to crawl to find data
+  // console.log('precrawl failed, crawling...')
   crawl(malType, malId, res, client)
 })
 
