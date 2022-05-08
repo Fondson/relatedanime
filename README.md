@@ -25,12 +25,12 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 
 ### Steins;Gate
 
-http://www.relatedanime.com/anime/9253
+https://www.relatedanime.com/anime/9253
 <img src="https://aprc.it/api/1200x630/https://www.relatedanime.com/anime/9253">
 
 ### Pokemon
 
-http://www.relatedanime.com/anime/527
+https://www.relatedanime.com/anime/527
 <img src="https://aprc.it/api/1200x630/https://www.relatedanime.com/anime/527">
 
 Screenshot generated for **FREE** by [Apercite](https://apercite.fr/en/) - they're awesome!
