@@ -45,8 +45,6 @@ async function crawl(malType, malId, res, client, proxy = false, forceRefresh = 
   let preTransform = allRelated
   allRelated = transformAnimes(sortAnimesByDate(allRelated))
   if (client) {
-    // TODO: remove on experiment success
-    // redis.setSeries(malType, malId, allRelated)
     sse.send(client, 'full-data', JSON.stringify(allRelated))
     sse.send(client, 'done', 'success')
     sse.remove(client)

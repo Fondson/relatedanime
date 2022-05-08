@@ -10,6 +10,8 @@ var redis = require('./redis/redisHelper')
 const refreshMalCacheCron = require('./crons/refreshMalCacheCron')
 const path = require('path')
 const cors = require('cors')
+const { malTypeAndIdToRelLink } = require('./relLinkHelper')
+const transformAnimes = require('./transformAnimes')
 
 pingSelf.pingHomepage()
 // TODO: remove on experiment success
@@ -31,18 +33,17 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-// TODO: remove on experiment success
-// async function _preCrawl(malType, malId, req = null) {
-//   // check redis
-//   let redisResult = await redis.getSeries(malType, malId)
-//   if (redisResult !== null && redisResult !== undefined) {
-//     console.log(malType + ' ' + malId + ' served from redis!')
-//     return redisResult
-//   }
+async function _preCrawl(malType, malId, req = null) {
+  // check redis
+  let redisResult = await redis.getSeries(malType, malId)
+  if (redisResult !== null && redisResult !== undefined) {
+    console.log(`${malTypeAndIdToRelLink(malType, malId)} served from redis!`)
+    return redisResult
+  }
 
-//   // couldn't find in redis
-//   return null
-// }
+  // couldn't find in redis
+  return null
+}
 
 async function _preCrawlSearch(query) {
   try {
@@ -66,20 +67,17 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   const malId = req.params.malId || 1
   console.log('Received ' + malType + ' ' + malId)
 
-  // TODO: remove on experiment success
-  // let preCrawlResult = await _preCrawl(malType, malId, req)
-  // // preCrawl success!
-  // if (preCrawlResult !== null) {
-  //   sse.send(client, 'full-data', JSON.stringify(preCrawlResult))
-  //   sse.send(client, 'done', 'success')
-  //   sse.remove(client)
-  //   res.end()
-  //   return
-  // }
+  let cachedResult = await _preCrawl(malType, malId, req)
+  if (cachedResult !== null) {
+    sse.send(client, 'full-data', JSON.stringify(cachedResult))
+    sse.send(client, 'done', 'success')
+    sse.remove(client)
+    res.end()
+  }
 
-  // // have to crawl to find data
-  // console.log('precrawl failed, crawling...')
-  crawl(malType, malId, res, client)
+  const preTransform = await crawl(malType, malId, res, client)
+  await redis.setSeries(malType, malId, transformAnimes(preTransform))
+  console.log(`Updated cache for ${malTypeAndIdToRelLink(malType, malId)}`)
 })
 
 app.get('/api/search/:searchStr', async function (req, res) {

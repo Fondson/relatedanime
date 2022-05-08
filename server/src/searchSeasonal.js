@@ -60,7 +60,10 @@ async function scrapSearch(res, proxy) {
 
     if (ret.length >= 1) {
       // scrape all seasonal animes if new batch is out
-      if (JSON.stringify(ret) !== JSON.stringify(await redis.searchGet(SEASONAL_KEY))) {
+      if (
+        process.env.APP_ENV !== 'dev' &&
+        JSON.stringify(ret) !== JSON.stringify(await redis.searchGet(SEASONAL_KEY))
+      ) {
         ret.forEach(({ malType, id }) => {
           crawl(malType, id, null, null, false, true)
         })
