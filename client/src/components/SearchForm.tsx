@@ -1,6 +1,7 @@
+// @ts-nocheck
 import './SearchForm.css'
 
-import React, { Component } from 'react'
+import { Component } from 'react'
 import Autosuggest from 'react-autosuggest'
 
 import Client, { search } from '../Client'

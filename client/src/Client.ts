@@ -31,9 +31,7 @@ async function searchWithoutCb(query, count) {
 
 async function fetchWithRetries(url, cb, retries = 0) {
   try {
-    let response = await fetch(new URL(url, API_URL), {
-      accept: 'application/json',
-    })
+    let response = await fetch(new URL(url, API_URL).href)
     let obj = await processResponse(response)
     cb(obj)
   } catch (e) {
@@ -51,9 +49,7 @@ async function fetchWithRetries(url, cb, retries = 0) {
 
 async function fetchWithRetriesWithoutCb(url, retries = 0) {
   try {
-    let response = await fetch(new URL(url, API_URL), {
-      accept: 'application/json',
-    })
+    let response = await fetch(new URL(url, API_URL).href)
     let obj = await processResponse(response)
     return obj
   } catch (e) {
@@ -69,12 +65,14 @@ async function fetchWithRetriesWithoutCb(url, retries = 0) {
   }
 }
 
+type RepsponseError = Error & { response: Response; status: string }
+
 function processResponse(response) {
   if (response.status >= 200 && response.status < 300) {
     const obj = response.json()
     return obj
   }
-  const error = new Error(`HTTP Error ${response.statusText}`)
+  const error = new Error(`HTTP Error ${response.statusText}`) as RepsponseError
   error.status = response.statusText
   error.response = response
   console.log(error) // eslint-disable-line no-console

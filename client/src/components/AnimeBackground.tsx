@@ -4,8 +4,6 @@ import ngnlGeneral from '../media/no-game-no-life-general.jpg'
 import sakaenoGeneral from '../media/sakaeno-general.jpg'
 import steinsGateGeneral from '../media/steins-gate-general.jpg'
 
-import React from 'react'
-
 const numOfPics = 3
 
 function getRandomInt(min, max) {

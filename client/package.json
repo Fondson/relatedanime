@@ -7,10 +7,10 @@
     "cheerio": "^0.22.0",
     "jquery": "^3.4.0",
     "jquery.easing": "^1.4.1",
-    "react": "^16.8.0",
+    "react": "^17.0.2",
     "react-autosuggest": "^9.4.3",
     "react-bootstrap": "^0.31.0",
-    "react-dom": "^16.8.0",
+    "react-dom": "^17.0.2",
     "react-loader-advanced": "^1.6.0",
     "react-router-dom": "^4.3.1",
     "react-spinkit": "^3.0.0",
@@ -18,9 +18,14 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "react-scripts": "5.0.1",
+    "@types/jest": "^27.5.0",
+    "@types/node": "^17.0.31",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.3",
+    "eslint-config-prettier": "^8.3.0",
     "prettier": "2.4.1",
-    "eslint-config-prettier": "^8.3.0"
+    "react-scripts": "5.0.1",
+    "typescript": "^4.6.4"
   },
   "scripts": {
     "start": "react-scripts start",

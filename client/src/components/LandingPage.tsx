@@ -36,6 +36,7 @@ function LandingPage() {
           distanceFromBottom,
           calculatedHeight,
         }) => {
+          // @ts-ignore
           return <SearchForm style={style} topOffset={calculatedHeight} />
         }}
       </Sticky>

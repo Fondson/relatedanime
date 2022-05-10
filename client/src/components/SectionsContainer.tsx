@@ -68,6 +68,7 @@ function SectionsContainer({ malType, id }) {
             distanceFromTop,
             distanceFromBottom,
             calculatedHeight,
+            // @ts-ignore
           }) => <SearchForm style={style} topOffset={calculatedHeight} />}
         </Sticky>
         {allSections}
