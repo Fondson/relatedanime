@@ -1,8 +1,8 @@
-import './AnimeBackground.css'
+import 'components/AnimeBackground.css'
 
-import ngnlGeneral from '../media/no-game-no-life-general.jpg'
-import sakaenoGeneral from '../media/sakaeno-general.jpg'
-import steinsGateGeneral from '../media/steins-gate-general.jpg'
+import ngnlGeneral from 'media/no-game-no-life-general.jpg'
+import sakaenoGeneral from 'media/sakaeno-general.jpg'
+import steinsGateGeneral from 'media/steins-gate-general.jpg'
 
 const numOfPics = 3
 

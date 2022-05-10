@@ -1,8 +1,7 @@
-import React from 'react'
 import { Table } from 'react-bootstrap'
-import SeasonalEntry from './SeasonalEntry'
-import './SeasonalSection.css'
-import './Section.css'
+import SeasonalEntry from 'components/SeasonalEntry'
+import 'components/SeasonalSection.css'
+import 'components/Section.css'
 
 function SeasonalSection({ animes }) {
   return (

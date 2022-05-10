@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StickyContainer, Sticky } from 'react-sticky'
-import { crawl } from '../Client'
-import ErrorPage from './ErrorPage'
-import LoadingPage from './LoadingPage'
-import SearchForm from './SearchForm'
-import Section from './Section'
+import { crawl } from 'Client'
+import ErrorPage from 'pages/ErrorPage'
+import LoadingPage from 'pages/LoadingPage'
+import SearchForm from 'components/SearchForm'
+import Section from 'components/Section'
 
 const defaultLoadingString = 'Scraping MAL...'
 

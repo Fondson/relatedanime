@@ -1,6 +1,4 @@
-import React from 'react'
-
-import './Entry.css'
+import 'components/Entry.css'
 
 function Entry({ data }) {
   const { title, link, image, startDate } = data

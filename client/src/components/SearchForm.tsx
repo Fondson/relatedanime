@@ -1,11 +1,11 @@
 // @ts-nocheck
-import './SearchForm.css'
+import 'components/SearchForm.css'
 
 import { Component } from 'react'
 import Autosuggest from 'react-autosuggest'
 
-import Client, { search } from '../Client'
-import history from '../history'
+import Client, { search } from 'Client'
+import history from 'browserHistory'
 
 var wait = (ms) => new Promise((r, j) => setTimeout(r, ms))
 

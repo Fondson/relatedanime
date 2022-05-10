@@ -1,6 +1,4 @@
-import kirinoMouse from '../media/kirino-mouse.gif'
-
-import React from 'react'
+import kirinoMouse from 'media/kirino-mouse.gif'
 
 function LoadingPage({ loadingString }) {
   return (

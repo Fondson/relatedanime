@@ -1,13 +1,13 @@
 import './LandingPage.css'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'react-bootstrap'
 import { StickyContainer, Sticky } from 'react-sticky'
 
-import { AnimeBackground, numOfPics, getRandomInt } from './AnimeBackground'
-import Client from '../Client'
-import SearchForm from './SearchForm'
-import SeasonalSection from './SeasonalSection'
+import { AnimeBackground, numOfPics, getRandomInt } from 'components/AnimeBackground'
+import Client from 'Client'
+import SearchForm from 'components/SearchForm'
+import SeasonalSection from 'components/SeasonalSection'
 
 let firstPicNum = getRandomInt(0, numOfPics - 1)
 let secondPicNum = (firstPicNum + 1) % numOfPics

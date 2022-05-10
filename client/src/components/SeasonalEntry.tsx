@@ -1,7 +1,5 @@
-import React from 'react'
-
-import './Entry.css'
-import './SeasonalEntry.css'
+import 'components/Entry.css'
+import 'components/SeasonalEntry.css'
 
 function SeasonalEntry({ data }) {
   const { img, title, malType, id } = data

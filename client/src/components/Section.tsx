@@ -1,7 +1,6 @@
-import React from 'react'
 import { Table } from 'react-bootstrap'
-import Entry from './Entry'
-import './Section.css'
+import Entry from 'components/Entry'
+import 'components/Section.css'
 
 function Section({ data }) {
   return (

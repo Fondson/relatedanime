@@ -1,12 +1,11 @@
-import './App.css'
+import 'App.css'
 
-import React from 'react'
 import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
-import ErrorPage from './ErrorPage'
-import history from '../history'
-import LandingPage from './LandingPage'
-import SectionsContainer from './SectionsContainer'
+import ErrorPage from 'pages/ErrorPage'
+import history from 'browserHistory'
+import LandingPage from 'pages/LandingPage'
+import SectionsContainer from 'pages/SectionsContainer'
 
 function App() {
   return (
@@ -14,7 +13,7 @@ function App() {
       <div className="App">
         <Switch>
           <Route exact path="/" render={() => <LandingPage />} />
-          <Route exact path="/index.html" render={() => <Redirect to="/" />} />{' '}
+          <Route exact path="/index.html" render={() => <Redirect to="/" />} />
           {/*this is to handle the service worker*/}
           <Route exact path="/error" render={() => <ErrorPage />} />
           <Route

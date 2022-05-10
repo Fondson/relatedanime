@@ -1,8 +1,7 @@
-import React from 'react'
 import { Button } from 'react-bootstrap'
 
-import { AnimeBackground, numOfPics, getRandomInt } from './AnimeBackground'
-import history from '../history'
+import { AnimeBackground, numOfPics, getRandomInt } from 'components/AnimeBackground'
+import history from 'browserHistory'
 
 const errorPicNum = getRandomInt(0, numOfPics - 1)
 
