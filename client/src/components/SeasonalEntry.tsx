@@ -1,20 +1,14 @@
-import 'components/Entry.css'
-import 'components/SeasonalEntry.css'
+import { Link } from 'react-router-dom'
 
 function SeasonalEntry({ data }) {
   const { img, title, malType, id } = data
-  const link = malType + '/' + id
   return (
-    <td>
-      <div className="entry seasonal-entry">
-        <a href={link} rel="noopener noreferrer">
-          <img src={img} alt={title} />
-          <div className="wrap-text">
-            <div className="seasonal-title">{title}</div>
-          </div>
-        </a>
+    <Link className="block w-44 transition hover:scale-110" to={`${malType}/${id}`}>
+      <div className="aspect-[225/350] w-full">
+        <img className="h-full w-full rounded-md object-cover" src={img} alt={title} />
       </div>
-    </td>
+      <div className="line-clamp-2">{title}</div>
+    </Link>
   )
 }
 

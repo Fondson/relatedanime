@@ -1,32 +1,19 @@
-import 'App.css'
-
-import { Router, Route, Redirect, Switch } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 
 import ErrorPage from 'pages/ErrorPage'
-import history from 'browserHistory'
 import LandingPage from 'pages/LandingPage'
-import SectionsContainer from 'pages/SectionsContainer'
+import ResourcePage from 'pages/ResourcePage'
 
 function App() {
   return (
-    <Router history={history}>
-      <div className="App">
-        <Switch>
-          <Route exact path="/" render={() => <LandingPage />} />
-          <Route exact path="/index.html" render={() => <Redirect to="/" />} />
-          {/*this is to handle the service worker*/}
-          <Route exact path="/error" render={() => <ErrorPage />} />
-          <Route
-            exact
-            path="/:malType(anime|manga)/:id([0-9]+)"
-            render={({ match }) => (
-              <SectionsContainer malType={match.params.malType} id={match.params.id} />
-            )}
-          />
-          <Route exact path="/*" render={() => <Redirect to="/error" />} />
-        </Switch>
-      </div>
-    </Router>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/index.html" element={<Navigate to="/" replace />} />
+      <Route path="/anime/:malId" element={<ResourcePage malType="anime" />} />
+      <Route path="/manga/:malId" element={<ResourcePage malType="manga" />} />
+      <Route path="/error" element={<ErrorPage />} />
+      <Route path="*" element={<Navigate to="/error" replace />} />
+    </Routes>
   )
 }
 

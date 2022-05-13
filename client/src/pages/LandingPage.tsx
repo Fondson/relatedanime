@@ -1,18 +1,13 @@
-import './LandingPage.css'
-
 import { useEffect, useState } from 'react'
-import { Button } from 'react-bootstrap'
-import { StickyContainer, Sticky } from 'react-sticky'
 
 import { AnimeBackground, numOfPics, getRandomInt } from 'components/AnimeBackground'
 import Client from 'Client'
-import SearchForm from 'components/SearchForm'
 import SeasonalSection from 'components/SeasonalSection'
+import AnimeSeriesAutoSuggestInput from 'components/AnimeSeriesAutoSuggestInput'
 
-let firstPicNum = getRandomInt(0, numOfPics - 1)
-let secondPicNum = (firstPicNum + 1) % numOfPics
+const backgroundPic = getRandomInt(0, numOfPics - 1)
 
-function LandingPage() {
+const LandingPage = () => {
   const [animes, setAnimes] = useState([])
 
   useEffect(() => {
@@ -26,55 +21,27 @@ function LandingPage() {
   }, [])
 
   return (
-    <StickyContainer>
-      <Sticky>
-        {({
-          isSticky,
-          wasSticky,
-          style,
-          distanceFromTop,
-          distanceFromBottom,
-          calculatedHeight,
-        }) => {
-          // @ts-ignore
-          return <SearchForm style={style} topOffset={calculatedHeight} />
-        }}
-      </Sticky>
-      <AnimeBackground id="home" picNum={firstPicNum}>
-        <div className="page-scroll">
-          <h1 className="title">Related Anime</h1>
-          <hr className="star-light" />
-          <h2>
-            Welcome.
-            <br />
-            Start by searching an anime series.
-          </h2>
-          <Button bsSize="large" href="#about" active>
-            ABOUT
-          </Button>
-          {animes.length > 0 ? (
-            <div className="seasonal-table" key={'seasonal'}>
-              <SeasonalSection animes={animes} />
+    <div className="h-screen w-screen overflow-hidden">
+      <AnimeBackground picNum={backgroundPic}>
+        <div className="flex h-full w-full items-center justify-center overflow-visible bg-black bg-opacity-40">
+          <div className="mx-4 min-w-0">
+            <h1 className="text-center text-6xl font-bold tracking-wide">Related Anime</h1>
+            <h2 className="mx-auto mt-6 mb-4 text-center text-2xl font-medium md:w-1/3">
+              Discover an anime series' source material, sequels, specials, and more, all on one
+              page!
+            </h2>
+            <div className="mx-auto flex justify-center md:w-1/2">
+              <AnimeSeriesAutoSuggestInput />
             </div>
-          ) : null}
+            {animes.length > 0 && (
+              <div className="mt-4 md:px-6">
+                <SeasonalSection animes={animes} />
+              </div>
+            )}
+          </div>
         </div>
       </AnimeBackground>
-      <AnimeBackground id="about" picNum={secondPicNum}>
-        <div className="page-scroll">
-          <h1 className="title">About</h1>
-          <hr className="star-light" />
-          <h3 className="horizontal-center">
-            Discover an anime series' source material, sequels, specials, and more all on one page!
-          </h3>
-          <h3 className="horizontal-center">
-            Search for an anime series using the search bar up top to get started.
-          </h3>
-          <Button bsSize="large" href="#home" active>
-            HOME
-          </Button>
-        </div>
-      </AnimeBackground>
-    </StickyContainer>
+    </div>
   )
 }
 

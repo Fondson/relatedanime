@@ -1,19 +1,19 @@
-import 'components/Entry.css'
+import { AnimeItem } from 'types/common'
 
-function Entry({ data }) {
-  const { title, link, image, startDate } = data
+type EntryProps = {
+  data: AnimeItem
+}
+
+function Entry({ data }: EntryProps) {
+  const { image, title, link, startDate } = data
   return (
-    <td>
-      <div className="entry">
-        <a href={link} rel="noopener noreferrer" target="_blank">
-          <img src={image} alt={title} />
-          <div className="wrap-text">
-            <span>{title}</span>
-          </div>
-          <p>{startDate}</p>
-        </a>
+    <a className="block transition hover:scale-110" href={link}>
+      <div className="aspect-[225/350] w-full">
+        <img className="h-full w-full rounded-md object-cover" src={image} alt={title} />
       </div>
-    </td>
+      <div className="line-clamp-2">{title}</div>
+      <div className="italic text-gray-200">{startDate}</div>
+    </a>
   )
 }
 

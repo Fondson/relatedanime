@@ -2,13 +2,9 @@ import kirinoMouse from 'media/kirino-mouse.gif'
 
 function LoadingPage({ loadingString }) {
   return (
-    <div className="loading-container">
-      <span>
-        <img className="loading" src={kirinoMouse} alt="Loading..." />
-        <p style={{ paddingRight: '1.5em', paddingLeft: '1.5em', textAlign: 'center' }}>
-          {loadingString}
-        </p>
-      </span>
+    <div className="mx-auto mt-10 w-8/12">
+      <img className="mx-auto rounded-xl pb-2" src={kirinoMouse} alt="Loading..." />
+      <p className="px-6 text-center">{loadingString}</p>
     </div>
   )
 }

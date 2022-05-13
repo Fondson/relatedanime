@@ -1,20 +1,28 @@
-import { Table } from 'react-bootstrap'
 import Entry from 'components/Entry'
-import 'components/Section.css'
+import { AnimeItem } from 'types/common'
 
-function Section({ data }) {
+type SectionProps = {
+  data: { animes: AnimeItem[]; header: string }
+}
+
+function Section({ data }: SectionProps) {
   return (
-    <div>
-      <h1>{data.header}</h1>
-      <Table bsClass="table" responsive>
-        <tbody>
-          <tr>
-            {data.animes.map((anime) => {
-              return <Entry data={anime} key={anime.type + anime.title} />
-            })}
-          </tr>
-        </tbody>
-      </Table>
+    <div className="py-2">
+      <h3 className="mt-4 text-2xl font-medium uppercase">{data.header}</h3>
+      <div
+        className="grid justify-center gap-x-6 px-2"
+        style={{
+          gridTemplateColumns: 'repeat(auto-fill, minmax(11rem, 1fr))',
+        }}
+      >
+        {data.animes.map((anime) => {
+          return (
+            <div key={anime.link} className="my-5">
+              <Entry data={anime} />
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

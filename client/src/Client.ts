@@ -1,3 +1,5 @@
+import { MalType } from 'types/common'
+
 const API_URL = process.env.REACT_APP_API_URL
 
 function crawl(malType, id, updateListener, eventListener) {
@@ -9,7 +11,6 @@ function crawl(malType, id, updateListener, eventListener) {
   es.addEventListener('done', (e) => es.close())
 }
 
-/* eslint-disable no-undef */
 function search(query, cb, count = 1) {
   fetchWithRetries(`/api/search/${encodeURIComponent(query)}?count=${count}`, cb)
 }
@@ -18,7 +19,10 @@ function searchSeasonal(cb) {
   fetchWithRetries('/api/searchSeasonal', cb)
 }
 
-async function searchWithoutCb(query, count) {
+async function searchWithoutCb(
+  query: string,
+  count: number,
+): Promise<Array<{ name: string; malType: MalType; id: string }>> {
   let obj = await fetchWithRetriesWithoutCb(
     `/api/search/${encodeURIComponent(query)}?count=${count}`,
     3,
