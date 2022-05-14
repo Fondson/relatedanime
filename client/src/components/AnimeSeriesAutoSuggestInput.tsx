@@ -12,7 +12,6 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
 
   return (
     <AutoSuggestInput<MalIdentifier>
-      autoFocus
       className={`w-full rounded-md py-2 outline-none ${className}`}
       onSuggestionSelect={({ malType, malId }) => navigate(`/${malType}/${malId}`)}
       onFetch={async (str) => {

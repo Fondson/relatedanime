@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  @apply text-[14px] md:text-[16px];
+}
+
 body {
   margin: 0;
   padding: 0;

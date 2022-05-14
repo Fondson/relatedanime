@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { Navigate, useParams } from 'react-router-dom'
 import { AnimeItem, MalType } from 'types/common'
 import { ReactComponent as HomeIcon } from 'icons/home.svg'
+import useCheckMobile from 'hooks/checkMobile'
 
 const defaultLoadingString = 'Scraping MAL...'
 
@@ -20,6 +21,8 @@ type ResourcePageProps = {
 }
 
 const ResourcePage = ({ malType }: ResourcePageProps) => {
+  const isMobile = useCheckMobile()
+
   const [isLoading, setIsLoading] = useState(true)
   const [loadingString, setLoadingString] = useState(defaultLoadingString)
   const [animes, setAnimes] = useState<AnimeItemsByType>({})
@@ -60,7 +63,7 @@ const ResourcePage = ({ malType }: ResourcePageProps) => {
   }
 
   return (
-    <FancyScrollbarContainer className="h-screen overflow-y-auto">
+    <FancyScrollbarContainer className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
       <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
         <div className="min-h-10 mb-4 flex">
           <Link to="/" className="flex-none pr-5">
