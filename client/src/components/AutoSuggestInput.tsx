@@ -61,8 +61,8 @@ export default function AutoSuggestInput<T>({
     listOptionsDivRef.current.scrollTop = 0
   }, [searchStr])
 
-  const setSelected = () => {
-    onSuggestionSelect(suggestions[highlight])
+  const setSelected = (highlightOverride?: number) => {
+    onSuggestionSelect(suggestions[highlightOverride ?? highlight])
     setSearchStr('')
     setSuggestions([])
     setHighlight(null)
@@ -158,7 +158,7 @@ function computeSuggestionButtons<T>(
   suggestionButtonsRefs: React.RefObject<HTMLButtonElement>[],
   highlight: number,
   setHighlight: (highlight: number) => void,
-  setSelected: () => void,
+  setSelected: (highlight?: number) => void,
 ) {
   return suggestions.map(({ suggestion }, i) => (
     <button
@@ -166,10 +166,8 @@ function computeSuggestionButtons<T>(
       ref={suggestionButtonsRefs[i]}
       className={`block w-full focus:outline-none ${highlight === i ? 'bg-gray-300' : ''}`}
       onMouseDown={(e) => e.preventDefault()} /* https://stackoverflow.com/a/57630197 */
-      onClick={setSelected}
-      onMouseMove={() => {
-        setHighlight(i)
-      }}
+      onClick={() => setSelected(i)}
+      onMouseMove={() => setHighlight(i)}
       type="button"
     >
       <div className="border-b border-gray-200 py-2 px-4 pr-2 text-left">{suggestion}</div>
