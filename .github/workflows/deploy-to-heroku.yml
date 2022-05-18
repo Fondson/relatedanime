@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - server/**
+      - .github/workflows/deploy-to-heroku.yml
 
 jobs:
   deploy-to-heroku:
