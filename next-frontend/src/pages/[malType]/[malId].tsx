@@ -65,10 +65,6 @@ const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
     )
   }, [malType, malId, error, router])
 
-  if (isLoading) {
-    return <LoadingPage loadingString={loadingString} />
-  }
-
   const seoData = {
     title,
     description: `Discover everything related to ${title} on Related Anime!`,
@@ -93,17 +89,21 @@ const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
         }}
       />
 
-      <FancyScrollbarContainer className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
-        <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
-          <div className="min-h-10 mb-4 flex">
-            <HomeButton />
-            <div className="flex-grow">
-              <AnimeSeriesAutoSuggestInput />
+      {isLoading ? (
+        <LoadingPage loadingString={loadingString} />
+      ) : (
+        <FancyScrollbarContainer className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
+          <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
+            <div className="min-h-10 mb-4 flex">
+              <HomeButton />
+              <div className="flex-grow">
+                <AnimeSeriesAutoSuggestInput />
+              </div>
             </div>
+            <SectionsContainer animes={animes} />
           </div>
-          <SectionsContainer animes={animes} />
-        </div>
-      </FancyScrollbarContainer>
+        </FancyScrollbarContainer>
+      )}
     </>
   )
 }
@@ -111,7 +111,6 @@ const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
 const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { malType, malId } = params as { malType: MalType; malId: string }
   try {
-    console.log(malType, malId)
     const { data } = await Client.getResourcePageSeoData(malType, malId)
     return { props: { ...data } }
   } catch (e) {

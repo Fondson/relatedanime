@@ -12,7 +12,7 @@ function Entry({ data }: EntryProps) {
     <a className="block transition hover:scale-110" href={link}>
       <div className="relative aspect-[225/350] w-full">
         {!isEmpty(image) ? (
-          <Image className="object-cover" src={image} alt={title} layout="fill" />
+          <Image className="rounded-md object-cover" src={image} alt={title} layout="fill" />
         ) : (
           <div className="rounded-md bg-gray-400 w-full h-full" />
         )}
