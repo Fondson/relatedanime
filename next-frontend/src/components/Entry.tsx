@@ -1,5 +1,4 @@
-import { isEmpty } from 'lodash'
-import Image from 'next/image'
+import EntryImage from 'components/EntryImage'
 import { AnimeItem } from 'types/common'
 
 type EntryProps = {
@@ -11,11 +10,7 @@ function Entry({ data }: EntryProps) {
   return (
     <a className="block transition hover:scale-110" href={link}>
       <div className="relative aspect-[225/350] w-full">
-        {!isEmpty(image) ? (
-          <Image className="rounded-md object-cover" src={image} alt={title} layout="fill" />
-        ) : (
-          <div className="rounded-md bg-gray-400 w-full h-full" />
-        )}
+        <EntryImage src={image} alt={title} />
       </div>
       <div className="line-clamp-2">{title}</div>
       <div className="italic text-gray-200">{startDate}</div>

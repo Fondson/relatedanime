@@ -1,5 +1,4 @@
-import { isEmpty } from 'lodash'
-import Image from 'next/image'
+import EntryImage from 'components/EntryImage'
 import Link from 'next/link'
 import { SeasonalAnimeItem } from 'types/common'
 
@@ -13,16 +12,7 @@ function SeasonalEntry({ data }: SeasonalEntryProps) {
     <Link href={`/${malType}/${id}`}>
       <a className="block w-28 transition hover:scale-110 md:w-44">
         <div className="relative aspect-[225/350] w-full">
-          {!isEmpty(img) ? (
-            <Image
-              className="h-full w-full rounded-md object-cover"
-              layout="fill"
-              src={img}
-              alt={title}
-            />
-          ) : (
-            <div className="rounded-md bg-gray-400 w-full h-full" />
-          )}
+          <EntryImage src={img} alt={title} />
         </div>
         <div className="line-clamp-2">{title}</div>
       </a>
