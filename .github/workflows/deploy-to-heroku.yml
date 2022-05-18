@@ -1,11 +1,13 @@
-name: Deploy
+name: Deploy to Heroku
 on:
   push:
     branches:
       - main
+    paths:
+      - server/**
 
 jobs:
-  deploy:
+  deploy-to-heroku:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository

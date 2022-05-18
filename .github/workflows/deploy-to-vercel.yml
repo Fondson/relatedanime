@@ -1,0 +1,34 @@
+name: Deploy to Vercel
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - next-frontend/**
+jobs:
+  deploy-to-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to vercel
+        id: deploy-vercel
+
+        # Temp workaround for issue: https://github.com/amondnet/vercel-action/issues/78#issuecomment-940843410
+        uses: andyrichardson/vercel-action@v21
+
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Clean up stale vercel deployments
+        env:
+          VERCEL_PROJECT_NAME: ${{ secrets.VERCEL_PROJECT_NAME }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_SCOPE: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel remove ${VERCEL_PROJECT_NAME} --scope=${VERCEL_SCOPE} --token=${VERCEL_TOKEN} --safe --yes

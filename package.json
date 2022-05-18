@@ -4,18 +4,16 @@
   "description": "",
   "private": true,
   "workspaces": [
-    "client",
     "next-frontend",
     "server"
   ],
   "scripts": {
     "dev": "concurrently --kill-others-on-fail \"yarn workspace @related-anime/server dev\" \"yarn workspace @related-anime/next-frontend dev\"",
     "start": "yarn workspace @related-anime/server start",
-    "build": "yarn workspace @related-anime/client build",
-    "lint": "concurrently \"yarn lint:root\" \"yarn lint:server\" \"yarn lint:client\"",
+    "lint": "concurrently \"yarn lint:root\" \"yarn lint:server\" \"yarn lint:next\"",
     "lint:root": "yarn prettier ./*.* --write --ignore-unknown",
     "lint:server": "yarn workspace @related-anime/server lint",
-    "lint:client": "yarn workspace @related-anime/client lint",
+    "lint:next": "yarn workspace @related-anime/next-frontend lint",
     "prepare": "husky install",
     "setup": "./setup.sh"
   },
