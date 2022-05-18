@@ -12,6 +12,8 @@ function App({ Component, pageProps }: AppProps) {
           site_name: 'Related Anime',
         }}
       />
+
+      <base target="_blank" />
       <Component {...pageProps} />
     </>
   )
