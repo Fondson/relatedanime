@@ -8,13 +8,17 @@ type EntryImageProps = {
 }
 
 const EntryImage = ({ src, alt }: EntryImageProps) => {
-  return !isEmpty(src) ? (
-    <Image className="rounded-md object-cover" src={src} alt={alt} layout="fill" />
-  ) : (
-    <div className="rounded-md w-full h-full border border-gray-400">
-      <div className="w-1/2 relative h-full mx-auto">
-        <Image src={ImageIcon} alt={alt} layout="fill" />
-      </div>
+  return (
+    <div className="relative aspect-[225/350] w-full">
+      {!isEmpty(src) ? (
+        <Image className="rounded-md object-cover" src={src} alt={alt} layout="fill" />
+      ) : (
+        <div className="rounded-md w-full h-full border border-gray-400">
+          <div className="w-1/2 relative h-full mx-auto">
+            <Image src={ImageIcon} alt={alt} layout="fill" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -9,10 +9,8 @@ function Entry({ data }: EntryProps) {
   const { image, title, link, startDate } = data
   return (
     <a className="block transition hover:scale-110" href={link}>
-      <div className="relative aspect-[225/350] w-full">
-        <EntryImage src={image} alt={title} />
-      </div>
-      <div className="line-clamp-2">{title}</div>
+      <EntryImage src={image} alt={title} />
+      <div className="line-clamp-2 pt-2">{title}</div>
       <div className="italic text-gray-200">{startDate}</div>
     </a>
   )

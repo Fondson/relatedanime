@@ -11,10 +11,8 @@ function SeasonalEntry({ data }: SeasonalEntryProps) {
   return (
     <Link href={`/${malType}/${id}`}>
       <a className="block w-28 transition hover:scale-110 md:w-44">
-        <div className="relative aspect-[225/350] w-full">
-          <EntryImage src={img} alt={title} />
-        </div>
-        <div className="line-clamp-2">{title}</div>
+        <EntryImage src={img} alt={title} />
+        <div className="line-clamp-2 pt-2">{title}</div>
       </a>
     </Link>
   )
