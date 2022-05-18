@@ -1,16 +1,12 @@
-var request = require('request-promise')
-var PromiseThrottle = require('promise-throttle')
 var cheerio = require('cheerio')
 var sse = require('simple-sse')
 var chrono = require('chrono-node')
-var redis = require('./redis/redisHelper')
 var transformAnimes = require('./transformAnimes')
 var crawlUrl = require('./crawlUrl')
 var sortAnimesByDate = require('./sortAnimesByDate')
-const ddb = require('./dynamoDb/dynamoDbHelper')
-const { compressHtml, decompressHtml } = require('./compressHtml')
 const { malTypeAndIdToRelLink } = require('./relLinkHelper')
 const crawlAndCacheMalPage = require('./crawlAndCacheMalPage')
+const getMalPage = require('./getMalPage')
 
 /*
     These are (graph) edges that are problematic and can expand the series graph
@@ -21,11 +17,6 @@ const EDGES_EXCLUSION_LIST = {
   'manga:118865': 'manga:87610',
   'manga:13': 'manga:25146',
 }
-
-var promiseThrottle = new PromiseThrottle({
-  requestsPerSecond: 1 / 3, // max requests per second
-  promiseImplementation: Promise, // the Promise library you are using
-})
 
 // dfs crawl
 async function crawl(malType, malId, res, client, proxy = false, forceRefresh = false) {
@@ -136,41 +127,6 @@ async function visitPage(
       // skip entry
     }
   }
-}
-
-async function getMalPage(relLink, proxy = false) {
-  const url = new URL(relLink, crawlUrl.getUrl(proxy)).href
-
-  let body
-  // Try to load from Redis, then DynamoDB, then scrape
-  const redisCacheResponse = await redis.getMalCachePath(relLink)
-  if (redisCacheResponse != null) {
-    body = await decompressHtml(redisCacheResponse)
-    console.log(`${relLink} loaded from Redis`)
-  } else {
-    const ddbCacheResponse = await ddb.getMalCachePath(relLink)
-
-    if (ddbCacheResponse.Item != null) {
-      body = await decompressHtml(ddbCacheResponse.Item.page.S)
-      console.log(`${relLink} loaded from DynamoDB`)
-
-      // Add to Redis cache
-      await redis.setMalCachePath(relLink, ddbCacheResponse.Item.page.S)
-    } else {
-      const fullBody = await promiseThrottle.add(request.bind(this, encodeURI(url)))
-      const $ = cheerio.load(fullBody)
-      body = $('#contentWrapper').html()
-
-      // put in data stores
-      const compressedBody = await compressHtml(body)
-      await Promise.allSettled([
-        ddb.setMalCachePath(relLink, compressedBody),
-        redis.setMalCachePath(relLink, compressedBody),
-      ])
-    }
-  }
-
-  return body
 }
 
 // assumes url is a relative url following the format '/(anime|manga)/ID/...'

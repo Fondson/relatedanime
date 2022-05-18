@@ -5,10 +5,11 @@
   "private": true,
   "workspaces": [
     "client",
+    "next-frontend",
     "server"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"yarn workspace @related-anime/server dev\" \"yarn workspace @related-anime/client start\"",
+    "dev": "concurrently --kill-others-on-fail \"yarn workspace @related-anime/server dev\" \"yarn workspace @related-anime/next-frontend dev\"",
     "start": "yarn workspace @related-anime/server start",
     "build": "yarn workspace @related-anime/client build",
     "lint": "concurrently \"yarn lint:root\" \"yarn lint:server\" \"yarn lint:client\"",

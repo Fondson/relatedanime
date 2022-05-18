@@ -12,6 +12,7 @@ const path = require('path')
 const cors = require('cors')
 const { malTypeAndIdToRelLink } = require('./relLinkHelper')
 const transformAnimes = require('./transformAnimes')
+const getSeoData = require('./getSeoData')
 
 pingSelf.pingHomepage()
 // TODO: remove on experiment success
@@ -22,14 +23,14 @@ var app = express()
 app.set('port', process.env.PORT || 3001)
 
 const corsOptions = {
-  origin: (() => {
-    const env = process.env.APP_ENV
-    if (env === 'prod') {
-      return 'https://relatedanime.com'
-    } else {
-      return 'http://localhost:3000'
-    }
-  })(),
+  // origin: (() => {
+  //   const env = process.env.APP_ENV
+  //   if (env === 'prod') {
+  //     return 'https://relatedanime.com'
+  //   } else {
+  //     return 'http://localhost:3000'
+  //   }
+  // })(),
 }
 app.use(cors(corsOptions))
 
@@ -83,6 +84,14 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   console.log(`Updated cache for ${malTypeAndIdToRelLink(malType, malId)}`)
 })
 
+app.get('/api/mal-page-seo/:malType(anime|manga)/:malId([0-9]+)', async function (req, res) {
+  const { malType, malId } = req.params
+  const relLink = malTypeAndIdToRelLink(malType, malId)
+  const seoData = await getSeoData(relLink)
+
+  res.end(JSON.stringify({ data: seoData }))
+})
+
 app.get('/api/search/:searchStr', async function (req, res) {
   const searchStr = req.params.searchStr
   let count = 1
@@ -101,7 +110,7 @@ app.get('/api/search/:searchStr', async function (req, res) {
 app.get('/api/searchSeasonal', async function (req, res) {
   let redisResult = await _preCrawlSearch(searchSeasonal.SEASONAL_KEY)
   if (redisResult !== null) {
-    res.end(JSON.stringify({ error: false, data: redisResult }))
+    res.end(JSON.stringify({ data: redisResult }))
   } else {
     searchSeasonal.searchSeasonal(res)
   }

@@ -16,6 +16,7 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "lodash": "^4.17.21",
     "node-gzip": "^1.1.2",
     "path": "^0.12.7",
     "promise-throttle": "^1.1.2",
