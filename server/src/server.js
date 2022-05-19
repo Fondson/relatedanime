@@ -23,14 +23,14 @@ var app = express()
 app.set('port', process.env.PORT || 3001)
 
 const corsOptions = {
-  // origin: (() => {
-  //   const env = process.env.APP_ENV
-  //   if (env === 'prod') {
-  //     return 'https://relatedanime.com'
-  //   } else {
-  //     return 'http://localhost:3000'
-  //   }
-  // })(),
+  origin: (() => {
+    const env = process.env.APP_ENV
+    if (env === 'prod') {
+      return 'https://relatedanime.com'
+    } else {
+      return 'http://localhost:3000'
+    }
+  })(),
 }
 app.use(cors(corsOptions))
 
