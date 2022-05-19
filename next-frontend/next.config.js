@@ -10,6 +10,10 @@ const nextConfig = withPWA({
   images: {
     domains: ['cdn.myanimelist.net'],
   },
+  i18n: {
+    locales: ['en'],
+    defaultLocale: 'en',
+  },
 })
 
 module.exports = nextConfig
