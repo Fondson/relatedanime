@@ -1,6 +1,6 @@
 # Related Anime
 
-<img src="https://shot.screenshotapi.net/screenshot?&url=https%3A%2F%2Frelatedanime.com%2F&output=image&file_type=png&wait_for_event=load/">
+<img src="https://image.thum.io/get/http://www.relatedanime.com/">
 
 [Visit relatedanime.com!](http://relatedanime.com/)
 
@@ -26,14 +26,12 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 ### Steins;Gate
 
 https://relatedanime.com/anime/9253
-<img src="https://screenshotapi-dot-net.storage.googleapis.com/relatedanime_com_anime_92_068c89df1254.png">
+<img src="https://image.thum.io/get/http://www.relatedanime.com/anime/9253/">
 
-### Pokemon
+### Love Live
 
-https://relatedanime.com/anime/527
-<img src="https://shot.screenshotapi.net/screenshot?&url=https%3A%2F%2Frelatedanime.com%2Fanime%2F527&output=image&file_type=png&wait_for_event=load">
-
-Screenshot generated for **FREE** by [Screenshot API](https://www.screenshotapi.net/) - they're awesome!
+https://relatedanime.com/anime/15051
+<img src="https://image.thum.io/get/http://www.relatedanime.com/anime/15051/">
 
 ## Development
 
