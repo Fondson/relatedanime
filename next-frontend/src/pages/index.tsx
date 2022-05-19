@@ -57,15 +57,18 @@ const LandingPage: NextPage<LandingPageProps> = ({ animes }) => {
   )
 }
 
-const getServerSideProps = async () => {
+const getStaticProps = async () => {
   try {
     const { data } = await Client.searchSeasonal()
     return { props: { animes: data } }
   } catch (e) {
     console.log(e)
-    return { props: { animes: [] } }
+    return {
+      props: { animes: [] },
+      revalidate: 60 * 60, // 1 hour
+    }
   }
 }
 
-export { getServerSideProps }
+export { getStaticProps }
 export default LandingPage

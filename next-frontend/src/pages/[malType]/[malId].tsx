@@ -6,7 +6,7 @@ import LoadingPage from 'components/LoadingPage'
 import SectionsContainer from 'components/SectionsContainer'
 import useCheckMobile from 'hooks/checkMobile'
 import { isEmpty } from 'lodash'
-import { GetServerSideProps, NextPage } from 'next'
+import { GetStaticProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
@@ -108,11 +108,14 @@ const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
   )
 }
 
-const getServerSideProps: GetServerSideProps = async ({ params }) => {
+const getStaticProps: GetStaticProps = async ({ params }) => {
   const { malType, malId } = params as { malType: MalType; malId: string }
   try {
     const { data } = await Client.getResourcePageSeoData(malType, malId)
-    return { props: { ...data } }
+    return {
+      props: { ...data },
+      revalidate: 60 * 60, // 1 hour
+    }
   } catch (e) {
     console.error(e)
     return {
@@ -124,5 +127,9 @@ const getServerSideProps: GetServerSideProps = async ({ params }) => {
   }
 }
 
-export { getServerSideProps }
+const getStaticPaths = async () => {
+  return { paths: [], fallback: 'blocking' }
+}
+
+export { getStaticPaths, getStaticProps }
 export default ResourcePage
