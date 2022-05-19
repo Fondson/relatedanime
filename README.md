@@ -1,6 +1,6 @@
 # Related Anime
 
-<img src="https://aprc.it/api/1200x630/http://relatedanime.com/">
+<img src="https://shot.screenshotapi.net/screenshot?&url=https%3A%2F%2Frelatedanime.com%2F&output=image&file_type=png&wait_for_event=load/">
 
 [Visit relatedanime.com!](http://relatedanime.com/)
 
@@ -19,20 +19,21 @@ The creation of Related Anime was motivated by the fact that the popular anime r
   - Scraping updates are sent by the server using HTML5 server-sent events
   - Uses [Cheerio](https://github.com/cheeriojs/cheerio) to parse MAL pages
 - Frontend is done using [Next.js](https://nextjs.org/)
+- Progressive Web App (PWA) functionality using [next-pwa](https://github.com/shadowwalker/next-pwa)
 
 ## Examples
 
 ### Steins;Gate
 
 https://relatedanime.com/anime/9253
-<img src="https://aprc.it/api/1200x630/https://relatedanime.com/anime/9253">
+<img src="https://screenshotapi-dot-net.storage.googleapis.com/relatedanime_com_anime_92_068c89df1254.png">
 
 ### Pokemon
 
 https://relatedanime.com/anime/527
-<img src="https://aprc.it/api/1200x630/https://relatedanime.com/anime/527">
+<img src="https://shot.screenshotapi.net/screenshot?&url=https%3A%2F%2Frelatedanime.com%2Fanime%2F527&output=image&file_type=png&wait_for_event=load">
 
-Screenshot generated for **FREE** by [Apercite](https://apercite.fr/en/) - they're awesome!
+Screenshot generated for **FREE** by [Screenshot API](https://www.screenshotapi.net/) - they're awesome!
 
 ## Development
 
