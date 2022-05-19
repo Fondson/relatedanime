@@ -2,7 +2,7 @@
 
 echo "Copying env vars..."
 cp server/.env.example server/.env
-cp client/.env.example client/.env
+cp next-frontend/.env.example next-frontend/.env.local
 
 echo "Installing dependencies..."
 yarn install
