@@ -6,7 +6,7 @@ import LoadingPage from 'components/LoadingPage'
 import SectionsContainer from 'components/SectionsContainer'
 import useCheckMobile from 'hooks/checkMobile'
 import { isEmpty } from 'lodash'
-import { GetStaticProps, NextPage } from 'next'
+import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
@@ -108,7 +108,7 @@ const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
   )
 }
 
-const getStaticProps: GetStaticProps = async ({ params }) => {
+const getStaticProps: GetStaticProps<ResourcePageProps> = async ({ params }) => {
   const { malType, malId } = params as { malType: MalType; malId: string }
   try {
     const { data } = await Client.getResourcePageSeoData(malType, malId)
@@ -127,7 +127,7 @@ const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
-const getStaticPaths = async () => {
+const getStaticPaths: GetStaticPaths = async () => {
   return { paths: [], fallback: 'blocking' }
 }
 

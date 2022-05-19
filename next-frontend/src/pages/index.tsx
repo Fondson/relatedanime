@@ -2,7 +2,7 @@ import Client from 'Client'
 import AnimeBackground from 'components/AnimeBackground'
 import AnimeSeriesAutoSuggestInput from 'components/AnimeSeriesAutoSuggestInput'
 import SeasonalSection from 'components/SeasonalSection'
-import { NextPage } from 'next'
+import { GetStaticProps, NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import { SeasonalAnimeItem } from 'types/common'
 
@@ -57,7 +57,7 @@ const LandingPage: NextPage<LandingPageProps> = ({ animes }) => {
   )
 }
 
-const getStaticProps = async () => {
+const getStaticProps: GetStaticProps<LandingPageProps> = async () => {
   try {
     const { data } = await Client.searchSeasonal()
     return { props: { animes: data } }
