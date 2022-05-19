@@ -3,7 +3,11 @@ import AnimeSeriesAutoSuggestInput from 'components/AnimeSeriesAutoSuggestInput'
 import HomeButton from 'components/HomeButton'
 import { NextPage } from 'next'
 
-const ErrorPage: NextPage = () => {
+type ErrorPageProps = {
+  message?: string
+}
+
+const ErrorPage: NextPage<ErrorPageProps> = ({ message }) => {
   return (
     <div className="h-screen w-screen overflow-hidden">
       <AnimeBackground>
@@ -16,7 +20,7 @@ const ErrorPage: NextPage = () => {
               </div>
             </div>
             <h2 className="mx-auto mt-6 mb-4 text-center text-2xl font-medium">
-              Sorry, we couldn&apos;t find the anime you were looking for.
+              {message ?? "How did you get here? It doesn't look like that anime exists."}
             </h2>
           </div>
         </div>
