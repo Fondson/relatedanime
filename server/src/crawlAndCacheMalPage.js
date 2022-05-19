@@ -14,7 +14,7 @@ const promiseThrottle = new PromiseThrottle({
 const crawlAndCacheMalPage = async (relLink, proxy = false) => {
   // Crawl MAL page
   const url = new URL(relLink, getUrl(proxy)).href
-  const fullBody = await promiseThrottle.add(request.bind(this, encodeURI(url)))
+  const fullBody = await promiseThrottle.add(request.bind(this, url))
 
   // Parse and store
   const $ = cheerio.load(fullBody)

@@ -11,19 +11,19 @@ var promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise, // the Promise library you are using
 })
 
-async function searchAnime(searchStr, res, count, proxy = false) {
+async function searchAnime(searchStr, count, proxy = false) {
   if (searchStr === searchSeasonal.SEASONAL_KEY) {
-    res.end(JSON.stringify({ error: true, why: 'invalid search string' }))
+    throw new Error('invalid search string')
   }
-  return await scrapSearch(searchStr, res, count, proxy)
+  return await scrapSearch(searchStr, count, proxy)
 }
 
-async function scrapSearch(searchStr, res, count, proxy) {
+async function scrapSearch(searchStr, count, proxy) {
   try {
     const body = await promiseThrottle.add(
       request.bind(
         this,
-        encodeURI(new URL('/search/all?q=' + searchStr, crawlUrl.getUrl(proxy)).href),
+        new URL(`/search/all?q=${encodeURIComponent(searchStr)}`, crawlUrl.getUrl(proxy)).href,
       ),
     )
     let $ = cheerio.load(body)
@@ -70,29 +70,18 @@ async function scrapSearch(searchStr, res, count, proxy) {
       ret.push({ name: urlsAndNames[i].name, malType: malType, id: id })
     }
     console.log(urlsAndNames)
-    if (res) {
-      if (ret.length > 1) {
-        redis.searchSet(searchStr, ret)
-      }
-      res.end(JSON.stringify({ error: false, data: ret }))
+    if (ret.length > 0) {
+      redis.searchSet(searchStr, ret)
+      return ret
     }
-    return ret
+    throw new Error('no results')
   } catch (e) {
-    console.log(e)
     if (e.statusCode == 429 || e.statusCode == 403) {
-      // try again but send error to client
-      if (res) {
-        res.end(JSON.stringify({ error: true, why: e }))
-      }
+      // try again
       return await scrapSearch(searchStr, null, count, proxy)
-    } else {
-      // unhandled error
-      if (res) {
-        res.end(JSON.stringify({ error: true, why: e }))
-      }
     }
+    throw e
   }
-  return []
 }
 
 module.exports = searchAnime

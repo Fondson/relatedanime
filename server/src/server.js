@@ -90,16 +90,25 @@ app.get('/api/mal-page-seo/:malType(anime|manga)/:malId([0-9]+)', async function
 
 app.get('/api/search/:searchStr', async function (req, res) {
   const searchStr = req.params.searchStr
-  let count = 1
-  if (req.query.count > 1) {
-    count = req.query.count
-  }
+  let count = Math.max(5, req.query.count)
 
   let redisResult = await _preCrawlSearch(searchStr)
   if (redisResult !== null) {
     res.end(JSON.stringify({ error: false, data: redisResult.slice(0, count) }))
+
+    // update redis result if result is older than 1 week
+    const lastUpdated = await redis.searchLastUpdated(searchStr)
+    if (lastUpdated == null || lastUpdated + 60 * 60 * 24 * 7 < Math.floor(Date.now() / 1000)) {
+      searchAnime(searchStr, count)
+    }
   } else {
-    searchAnime(searchStr, res, count)
+    try {
+      const crawlResult = await searchAnime(searchStr, count)
+      res.end(JSON.stringify({ error: false, data: crawlResult }))
+    } catch (e) {
+      console.log(e)
+      res.end(JSON.stringify({ error: true, why: e }))
+    }
   }
 })
 

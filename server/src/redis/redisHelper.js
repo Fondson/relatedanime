@@ -167,6 +167,7 @@ async function searchSet(key, value) {
   console.log(value)
   try {
     await client.setAsync(key, JSON.stringify(value))
+    await client.setAsync(`${key}:last-updated`, Math.floor(Date.now() / 1000))
   } catch (e) {
     console.log('Redis error:')
     console.log(e)
@@ -178,6 +179,18 @@ async function searchGet(key) {
     const client = getSearchClient()
     const value = await client.getAsync(key)
     return JSON.parse(value)
+  } catch (e) {
+    console.log('Redis error:')
+    console.log(e)
+    return null
+  }
+}
+
+async function searchLastUpdated(key) {
+  try {
+    const client = getSearchClient()
+    const value = await client.getAsync(`${key}:last-updated`)
+    return value
   } catch (e) {
     console.log('Redis error:')
     console.log(e)
@@ -221,6 +234,7 @@ module.exports = {
   getMalTypeAndMalIdFromKey,
   searchSet,
   searchGet,
+  searchLastUpdated,
   setMalCachePath,
   getMalCachePath,
 }

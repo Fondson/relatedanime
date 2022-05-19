@@ -21,7 +21,7 @@ function searchSeasonal(res = null, proxy = false) {
 async function scrapSearch(res, proxy) {
   try {
     const body = await promiseThrottle.add(
-      request.bind(this, encodeURI(new URL('/anime/season', crawlUrl.getUrl(proxy)).href)),
+      request.bind(this, new URL('/anime/season', crawlUrl.getUrl(proxy)).href),
     )
     let $ = cheerio.load(body)
 
