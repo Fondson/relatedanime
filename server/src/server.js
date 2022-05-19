@@ -22,16 +22,12 @@ var app = express()
 
 app.set('port', process.env.PORT || 3001)
 
-const corsOptions = {
-  origin: (() => {
-    const env = process.env.APP_ENV
-    if (env === 'prod') {
-      return 'https://relatedanime.com'
-    } else {
-      return 'http://localhost:3000'
-    }
-  })(),
-}
+const corsOptions =
+  process.env.APP_ENV === 'prod'
+    ? {
+        origin: 'https://relatedanime.com',
+      }
+    : {}
 app.use(cors(corsOptions))
 
 async function _preCrawl(malType, malId, req = null) {
