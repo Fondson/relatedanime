@@ -6,10 +6,12 @@ const PwaTags = () => {
     <>
       <meta charSet="utf-8" />
       <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-      <meta
+      {/* Disabling zooming makes sense for PWA but this harms Lighthouse accessibility score.
+          https://web.dev/meta-viewport/ */}
+      {/* <meta
         name="viewport"
         content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"
-      />
+      /> */}
 
       <link rel="manifest" href="/manifest.json" />
       <link rel="icon" href="/pwa/apple-icon-180.png" type="image/png" />
