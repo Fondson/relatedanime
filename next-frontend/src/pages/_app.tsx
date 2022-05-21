@@ -10,16 +10,19 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <DefaultSeo
-          openGraph={{
-            type: 'website',
-            site_name: 'Related Anime',
-          }}
-        />
         <PwaTags />
-        <GoogleAnaytics />
         <base target="_blank" />
       </Head>
+
+      {/* These only work if they're OUTSIDE the Head component */}
+      <DefaultSeo
+        openGraph={{
+          type: 'website',
+          site_name: 'Related Anime',
+        }}
+      />
+      <GoogleAnaytics />
+
       <Component {...pageProps} />
     </>
   )
