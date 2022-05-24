@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import getRandomInt from 'utils/getRandomInt'
 
 const pics = [
-  '/images/no-game-no-life-general.jpg',
-  '/images/sakaeno-general.jpg',
-  '/images/steins-gate-general.jpg',
+  '/images/no-game-no-life-general.webp',
+  '/images/sakaeno-general.webp',
+  '/images/steins-gate-general.webp',
 ]
 const numOfPics = pics.length
 

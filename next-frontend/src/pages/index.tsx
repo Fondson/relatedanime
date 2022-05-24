@@ -26,7 +26,7 @@ const LandingPage: NextPage<LandingPageProps> = ({ animes }) => {
           description,
           images: [
             {
-              url: new URL('/images/sakaeno-general.jpg', process.env.NEXT_PUBLIC_CANONICAL_URL)
+              url: new URL('/images/sakaeno-general.webp', process.env.NEXT_PUBLIC_CANONICAL_URL)
                 .href,
             },
           ],
