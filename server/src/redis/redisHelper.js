@@ -78,7 +78,7 @@ async function setSeries(malType, malId, value) {
   }
 }
 
-// For parent anime:1 with child anime:2, set anime:2 to anime:1.
+// For parent anime:1 with child anime:2, set key anime:2 to value anime:1.
 // Note that parent is set to to the full series object.
 async function _linkChildrenToParent(parentKey, parentSeries) {
   const client = getMainClient()
@@ -87,6 +87,9 @@ async function _linkChildrenToParent(parentKey, parentSeries) {
     const children = types[i]
     for (let j = 0; j < children.length; ++j) {
       const child = children[j]
+      // don't link maybeRelated to parent
+      if (child.maybeRelated) continue
+
       const childKey = createKey(child.malType, child.malId)
       // do the link
       if (childKey !== parentKey) {

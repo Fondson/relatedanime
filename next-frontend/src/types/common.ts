@@ -13,6 +13,7 @@ export type AnimeItem = {
   image: string
   startDate: string
   type: string
+  maybeRelated: boolean
 }
 
 export type SeasonalAnimeItem = {

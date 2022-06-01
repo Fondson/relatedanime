@@ -92,7 +92,10 @@ const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
       {isLoading ? (
         <LoadingPage loadingString={loadingString} />
       ) : (
-        <FancyScrollbarContainer className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
+        <FancyScrollbarContainer
+          className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}
+          hide={false}
+        >
           <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
             <div className="min-h-10 mb-4 flex">
               <HomeButton />

@@ -21,15 +21,24 @@ const EDGES_EXCLUSION_LIST = {
 // dfs crawl
 async function crawl(malType, malId, res, client, proxy = false, forceRefresh = false) {
   let pagesVisited = new Set()
-  let pagesToVisit = [malTypeAndIdToRelLink(malType, malId)]
+  let pagesToVisit = [{ relLink: malTypeAndIdToRelLink(malType, malId) }]
   let allRelated = [] // array of all related animes
 
   while (pagesToVisit.length) {
-    const nextPage = pagesToVisit.pop()
+    const { relLink: nextPage, skipRelated = false } = pagesToVisit.pop()
     // New page we haven't visited
     if (!pagesVisited.has(nextPage)) {
       pagesVisited.add(nextPage)
-      await visitPage(nextPage, client, pagesVisited, pagesToVisit, allRelated, proxy, forceRefresh)
+      await visitPage(
+        nextPage,
+        client,
+        pagesVisited,
+        pagesToVisit,
+        allRelated,
+        proxy,
+        forceRefresh,
+        skipRelated,
+      )
     }
   }
 
@@ -54,6 +63,7 @@ async function visitPage(
   allRelated,
   proxy,
   forceRefresh,
+  skipRelated = false,
 ) {
   const url = new URL(relLink, crawlUrl.getUrl(proxy)).href
   try {
@@ -73,35 +83,42 @@ async function visitPage(
 
     const malTypeAndId = getMalTypeAndId(relLink)
     // collect related anime links
-    let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass')
-    relatedTypes.each((typeIndex, type) => {
-      const thisType = type.children[0].data.trim()
-      // 'Other' and 'Character' types of animes can be really unrelated, we'll discard them
-      if (thisType != 'Other:' && thisType != 'Character:') {
-        let children = type.next.children
-        children.forEach((element, elementIndex) => {
-          if (element.type === 'tag') {
-            const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
+    if (!skipRelated) {
+      let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass')
+      relatedTypes.each((typeIndex, type) => {
+        const thisType = type.children[0].data.trim()
+        // 'Character' type can be really unrelated, we'll discard them
+        if (thisType != 'Character:') {
+          let children = type.next.children
+          children.forEach((element, elementIndex) => {
+            if (element.type === 'tag') {
+              const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
 
-            // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
-            const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':')
-            const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId
-            if (
-              // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
-              (sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
-                EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey) ||
-              // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
-              (destMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
-                EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey)
-            ) {
-              return
+              // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
+              const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':')
+              const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId
+              if (
+                // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
+                (sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
+                  EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey) ||
+                // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
+                (destMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
+                  EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey)
+              ) {
+                return
+              }
+
+              pagesToVisit.push({
+                relLink: destMalTypeAndIdRelLink,
+                // instead of outright skipping "Other" pages, we'll traverse them only down to a depth of one
+                skipRelated: thisType === 'Other:',
+              })
             }
+          })
+        }
+      })
+    }
 
-            pagesToVisit.push(destMalTypeAndIdRelLink)
-          }
-        })
-      }
-    })
     let image = $('img[itemprop=image]')
     let newEntry = {
       malType: malTypeAndId.malType,
@@ -113,6 +130,8 @@ async function visitPage(
       startDate: chrono.parseDate(
         $('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim(),
       ),
+      // mark "Other" pages as maybeRelated
+      maybeRelated: skipRelated,
     }
     if (isNaN(newEntry.startDate)) newEntry.startDate = null
 

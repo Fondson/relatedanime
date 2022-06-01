@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from 'react'
 type FancyScrollbarContainerProps = Partial<React.HTMLAttributes<HTMLDivElement>> & {
   children: React.ReactNode
   passRef?: React.MutableRefObject<HTMLDivElement>
+  hide?: boolean
 }
 
 const FancyScrollbarContainer = ({
@@ -14,6 +15,7 @@ const FancyScrollbarContainer = ({
   onScroll = () => {
     return
   },
+  hide = true,
   ...rest
 }: FancyScrollbarContainerProps) => {
   const ref = useRef<HTMLDivElement>() as React.MutableRefObject<HTMLDivElement>
@@ -22,7 +24,7 @@ const FancyScrollbarContainer = ({
     ref.current = passRef.current
   }, [passRef])
   const debouncedHideScrollbar = useMemo(
-    () => debounce(() => ref.current.classList.remove(styles['show-scrollbar']), 500),
+    () => debounce(() => ref.current.classList.remove(styles['show-scrollbar']), 750),
     [ref],
   )
 
@@ -35,7 +37,7 @@ const FancyScrollbarContainer = ({
 
         // inspired by https://stackoverflow.com/a/68416028
         ref.current.classList.add(styles['show-scrollbar'])
-        debouncedHideScrollbar()
+        if (hide) debouncedHideScrollbar()
       }}
       {...rest}
     >
