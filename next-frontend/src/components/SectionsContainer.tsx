@@ -17,6 +17,11 @@ function SectionsContainer({ animes }: SectionsContainerProps) {
     return index === -1 ? topOrder.length : index
   }, [])
 
+  const relatedSeries = Object.values(animes)
+    .flat()
+    .filter(({ maybeRelated }) => maybeRelated)
+    .map((anime) => ({ ...anime, link: `/${anime.link.split('/').slice(-2).join('/')}` }))
+
   return (
     <>
       {Object.entries(animes)
@@ -30,15 +35,14 @@ function SectionsContainer({ animes }: SectionsContainerProps) {
           return <Section key={key} data={{ header: key, animes }} />
         })}
 
-      <Section
-        data={{
-          header: 'Related series',
-          animes: Object.values(animes)
-            .flat()
-            .filter(({ maybeRelated }) => maybeRelated)
-            .map((anime) => ({ ...anime, link: `/${anime.link.split('/').slice(-2).join('/')}` })),
-        }}
-      />
+      {relatedSeries.length > 0 && (
+        <Section
+          data={{
+            header: 'Related series',
+            animes: relatedSeries,
+          }}
+        />
+      )}
     </>
   )
 }
