@@ -8,7 +8,7 @@ type SectionProps = {
 function Section({ data }: SectionProps) {
   return (
     <div className="py-3">
-      <h2 className="my-5 text-3xl font-medium uppercase">{data.header}</h2>
+      <h2 className="my-5 text-2xl font-medium uppercase">{data.header}</h2>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] justify-center gap-x-6 px-2 md:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))]">
         {data.animes.map((anime) => {
           return (
