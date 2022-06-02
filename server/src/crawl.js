@@ -85,38 +85,40 @@ async function visitPage(
     // collect related anime links
     if (!skipRelated) {
       let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass')
-      relatedTypes.each((typeIndex, type) => {
-        const thisType = type.children[0].data.trim()
-        // 'Character' type can be really unrelated, we'll discard them
-        if (thisType != 'Character:') {
-          let children = type.next.children
-          children.forEach((element, elementIndex) => {
-            if (element.type === 'tag') {
-              const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
+      Array.from(relatedTypes)
+        .reverse()
+        .forEach((type) => {
+          const thisType = type.children[0].data.trim()
+          // 'Character' type can be really unrelated, we'll discard them
+          if (thisType != 'Character:') {
+            let children = type.next.children
+            children.forEach((element, elementIndex) => {
+              if (element.type === 'tag') {
+                const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
 
-              // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
-              const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':')
-              const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId
-              if (
-                // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
-                (sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
-                  EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey) ||
-                // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
-                (destMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
-                  EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey)
-              ) {
-                return
+                // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
+                const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':')
+                const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId
+                if (
+                  // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
+                  (sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
+                    EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey) ||
+                  // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
+                  (destMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
+                    EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey)
+                ) {
+                  return
+                }
+
+                pagesToVisit.push({
+                  relLink: destMalTypeAndIdRelLink,
+                  // instead of outright skipping "Other" pages, we'll traverse them only down to a depth of one
+                  skipRelated: thisType === 'Other:',
+                })
               }
-
-              pagesToVisit.push({
-                relLink: destMalTypeAndIdRelLink,
-                // instead of outright skipping "Other" pages, we'll traverse them only down to a depth of one
-                skipRelated: thisType === 'Other:',
-              })
-            }
-          })
-        }
-      })
+            })
+          }
+        })
     }
 
     let image = $('img[itemprop=image]')

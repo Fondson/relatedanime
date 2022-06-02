@@ -12,7 +12,7 @@ function crawl(malType: string, id: string | number, updateListener, eventListen
   es.addEventListener('done', () => es.close())
 }
 
-function search(query: string, cb, count = 1) {
+function search(query: string, cb, count = 10) {
   fetchWithRetries(`/api/search/${encodeURIComponent(query)}?count=${count}`, cb)
 }
 

@@ -15,7 +15,7 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
       className={`w-full rounded-md py-2 outline-none ${className}`}
       onSuggestionSelect={({ malType, malId }) => router.push(`/${malType}/${malId}`)}
       onFetch={async (str) => {
-        const result = await Client.searchWithoutCb(str, 5)
+        const result = await Client.searchWithoutCb(str, 10)
         return result.map(({ name, malType, id }) => ({
           suggestion: name,
           malType,
