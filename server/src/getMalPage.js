@@ -21,7 +21,7 @@ async function getMalPage(relLink, proxy = false) {
   } else {
     const ddbCacheResponse = await ddb.getMalCachePath(relLink)
 
-    if (ddbCacheResponse.Item != null) {
+    if (ddbCacheResponse?.Item != null) {
       body = await decompressHtml(ddbCacheResponse.Item.page.S)
       console.log(`${relLink} loaded from DynamoDB`)
 

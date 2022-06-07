@@ -1,10 +1,6 @@
-var bluebird = require('bluebird')
-var redis = require('redis')
 var redisHelper = require('../redis/redisHelper')
 var crawl = require('../crawl')
 var transformAnimes = require('../transformAnimes')
-
-bluebird.promisifyAll(redis.RedisClient.prototype)
 
 /*
 THIS SCRIPT SHOULD IDEALLY BE RUN ON ANOTHER SERVER IF USED TO PERIODICALLY UPDATE THE ANIME

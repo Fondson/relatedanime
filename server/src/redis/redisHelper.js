@@ -1,36 +1,17 @@
-var bluebird = require('bluebird')
-var redis = require('redis')
+const Redis = require('ioredis')
 
-bluebird.promisifyAll(redis.RedisClient.prototype)
 const TYPES = ['anime', 'manga']
 let primaryClient = null
 let searchClient = null
 let malCacheClient = null
 
 const createClient = (url) => {
-  return redis.createClient({
-    url,
-    retry_strategy: function (options) {
-      if (options.error && options.error.code === 'ECONNREFUSED') {
-        // End reconnecting on a specific error and flush all commands with
-        // a individual error
-        return new Error('The server refused the connection')
+  return new Redis(url, {
+    retryStrategy: function (times) {
+      if (times > 10) {
+        return false
       }
-      if (options.total_retry_time > 1000 * 60 * 60) {
-        // End reconnecting after a specific timeout and flush all commands
-        // with a individual error
-        return new Error('Retry time exhausted')
-      }
-      if (options.attempt > 10) {
-        // End reconnecting with built in error
-        return undefined
-      }
-      // reconnect after
-      return Math.min(options.attempt * 100, 3000)
-    },
-    socket: {
-      tls: true,
-      rejectUnauthorized: false,
+      return Math.min(times * 50, 2000)
     },
   })
 }
@@ -70,7 +51,7 @@ async function setSeries(malType, malId, value) {
   const parentKey = createKey(malType, malId)
   console.log('Redis setting ' + parentKey)
   try {
-    await client.setAsync(parentKey, JSON.stringify(value))
+    await client.set(parentKey, JSON.stringify(value))
     await _linkChildrenToParent(parentKey, value)
   } catch (e) {
     console.log('Redis error:')
@@ -94,7 +75,7 @@ async function _linkChildrenToParent(parentKey, parentSeries) {
       // do the link
       if (childKey !== parentKey) {
         console.log('Setting child ' + childKey + ' to parent ' + parentKey)
-        await client.setAsync(childKey, parentKey)
+        await client.set(childKey, parentKey)
       }
     }
   }
@@ -108,7 +89,7 @@ async function getSeries(malType, malId) {
       return null
     }
 
-    const value = await client.getAsync(parentKey)
+    const value = await client.get(parentKey)
     return JSON.parse(value)
   } catch (e) {
     console.log('Redis error:')
@@ -148,9 +129,9 @@ function getMalTypeAndMalIdFromKey(key) {
 async function getParentKey(key) {
   const client = getMainClient()
   let ret = key
-  const value = await client.getAsync(key)
+  const value = await client.get(key)
   if (isKey(value)) {
-    const nextValue = await client.getAsync(value)
+    const nextValue = await client.get(value)
     // This means we had anime:1 points to anime:2 and anime:2 points to anime:x instead of a series obj.
     // We're in a bad state (probably due to concurrent updates), just return null
     if (isKey(nextValue)) {
@@ -169,8 +150,8 @@ async function searchSet(key, value) {
   console.log('Redis setting ' + key + ' to:')
   console.log(value)
   try {
-    await client.setAsync(key, JSON.stringify(value))
-    await client.setAsync(`${key}:last-updated`, Math.floor(Date.now() / 1000))
+    await client.set(key, JSON.stringify(value))
+    await client.set(`${key}:last-updated`, Math.floor(Date.now() / 1000))
   } catch (e) {
     console.log('Redis error:')
     console.log(e)
@@ -180,7 +161,7 @@ async function searchSet(key, value) {
 async function searchGet(key) {
   try {
     const client = getSearchClient()
-    const value = await client.getAsync(key)
+    const value = await client.get(key)
     return JSON.parse(value)
   } catch (e) {
     console.log('Redis error:')
@@ -192,7 +173,7 @@ async function searchGet(key) {
 async function searchLastUpdated(key) {
   try {
     const client = getSearchClient()
-    const value = await client.getAsync(`${key}:last-updated`)
+    const value = await client.get(`${key}:last-updated`)
     return value
   } catch (e) {
     console.log('Redis error:')
@@ -205,7 +186,7 @@ const setMalCachePath = async (path, value) => {
   const client = getMalCacheClient()
   console.log('MAL cache redis setting ' + path)
   try {
-    await client.setAsync(path, value)
+    await client.set(path, value)
   } catch (e) {
     console.error('MAL cache redis error:', e)
   }
@@ -214,7 +195,7 @@ const setMalCachePath = async (path, value) => {
 const getMalCachePath = async (path) => {
   try {
     const client = getMalCacheClient()
-    const value = await client.getAsync(path)
+    const value = await client.get(path)
     return value
   } catch (e) {
     console.error('MAL cache redis error:', e)

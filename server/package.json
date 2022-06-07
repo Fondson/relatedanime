@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon -r dotenv/config src/server.js",
-    "start": "node src/server.js",
+    "dev": "PM2_ENV=dev pm2-runtime start ecosystem.config.js",
+    "start": "pm2-runtime start ecosystem.config.js",
     "lint": "yarn eslint . --fix --max-warnings=0 && yarn prettier . --write --ignore-unknown"
   },
   "dependencies": {
@@ -16,11 +16,12 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "ioredis": "^5.0.6",
     "lodash": "^4.17.21",
     "node-gzip": "^1.1.2",
     "path": "^0.12.7",
+    "pm2": "^5.2.0",
     "promise-throttle": "^1.1.2",
-    "redis": "^3.1.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "simple-sse": "0.0.3",
@@ -33,7 +34,6 @@
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
-    "nodemon": "^2.0.16",
     "prettier": "2.4.1"
   },
   "engines": {

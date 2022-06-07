@@ -1,5 +1,3 @@
-var bluebird = require('bluebird')
-var redis = require('redis')
 var redisHelper = require('../redis/redisHelper')
 var searchAnime = require('../searchAnime')
 var searchSeasonal = require('../searchSeasonal')
@@ -9,7 +7,6 @@ var promiseThrottle = new PromiseThrottle({
   requestsPerSecond: 1, // max requests per second
   promiseImplementation: Promise, // the Promise library you are using
 })
-bluebird.promisifyAll(redis.RedisClient.prototype)
 let dryrun = false
 
 // recrawls search keys to keep cache updated
