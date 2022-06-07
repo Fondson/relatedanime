@@ -7,20 +7,14 @@ function start() {
     '0 0 0 * * 1',
     async () => {
       const lock = await redis.acquireLock('refreshMalCache', 5 * 60 * 1000)
-      try {
-        if (lock == null) {
-          console.log('Refresh cron lock is unavailable!')
-          return
-        }
-
-        console.log('Starting refresh cron!')
-        await refreshMalCache()
-        console.log(`Refresh cron complete!`)
-      } finally {
-        if (lock) {
-          await lock.release()
-        }
+      if (lock == null) {
+        console.log('Refresh cron lock is unavailable! Aborting refresh cron run...')
+        return
       }
+
+      console.log('Starting refresh cron!')
+      await refreshMalCache()
+      console.log(`Refresh cron complete!`)
     },
     undefined,
     true,
