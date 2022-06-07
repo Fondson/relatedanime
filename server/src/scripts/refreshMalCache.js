@@ -1,4 +1,3 @@
-const redisHelper = require('../redis/redisHelper')
 const { relLinkToMalTypeAndId } = require('../relLinkHelper')
 const crawl = require('../crawl')
 const dynamoDbHelper = require('../dynamoDb/dynamoDbHelper')

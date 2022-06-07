@@ -1,13 +1,26 @@
 const { CronJob } = require('cron')
 const { refreshMalCache } = require('../scripts/refreshMalCache')
+const redis = require('../redis/redisHelper')
 
 function start() {
   const job = new CronJob(
     '0 0 0 * * 1',
-    async function () {
-      console.log('Starting refresh cron!')
-      await refreshMalCache()
-      console.log(`Refresh cron complete!`)
+    async () => {
+      const lock = await redis.acquireLock('refreshMalCache', 5 * 60 * 1000)
+      try {
+        if (lock == null) {
+          console.log('Refresh cron lock is unavailable!')
+          return
+        }
+
+        console.log('Starting refresh cron!')
+        await refreshMalCache()
+        console.log(`Refresh cron complete!`)
+      } finally {
+        if (lock) {
+          await lock.release()
+        }
+      }
     },
     undefined,
     true,

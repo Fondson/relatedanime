@@ -1,9 +1,12 @@
 const Redis = require('ioredis')
+const { default: Redlock } = require('redlock')
 
 const TYPES = ['anime', 'manga']
 let primaryClient = null
 let searchClient = null
 let malCacheClient = null
+
+let redlock = null
 
 const createClient = (url) => {
   return new Redis(url, {
@@ -44,6 +47,22 @@ const getMalCacheClient = () => {
     })
   }
   return malCacheClient
+}
+
+const acquireLock = async (key, duration) => {
+  if (redlock == null) {
+    redlock = new Redlock([
+      // for now, just use the search client
+      getSearchClient(),
+    ])
+  }
+
+  try {
+    return await redlock.acquire([key], duration, { retryCount: 0 })
+  } catch {
+    // lock is unavailable
+    return null
+  }
 }
 
 async function setSeries(malType, malId, value) {
@@ -221,4 +240,5 @@ module.exports = {
   searchLastUpdated,
   setMalCachePath,
   getMalCachePath,
+  acquireLock,
 }
