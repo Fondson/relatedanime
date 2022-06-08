@@ -44,7 +44,7 @@ export default function AutoSuggestInput<T>({
   const updateSuggestions = useCallback(
     async (str: string) => {
       if (shouldStartFetching(str)) {
-        debouncedOnFetch(str).then((suggestions) => {
+        debouncedOnFetch(str).then((suggestions: Suggestion<T>[]) => {
           setSuggestions(suggestions)
           setHighlight(null)
         })

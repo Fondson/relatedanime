@@ -1,7 +1,11 @@
 import kirinoMouse from 'media/kirino-mouse.gif'
 import Image from 'next/image'
 
-function LoadingPage({ loadingString }) {
+type LoadingPageProps = {
+  loadingString: string
+}
+
+const LoadingPage = ({ loadingString }: LoadingPageProps) => {
   return (
     <div className="mx-auto mt-10 w-8/12">
       <div className="flex justify-center pb-2">
