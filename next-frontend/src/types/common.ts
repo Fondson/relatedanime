@@ -22,3 +22,7 @@ export type SeasonalAnimeItem = {
   img: string
   title: string
 }
+
+export type AnimeItemsByType = {
+  [key: string]: AnimeItem[]
+}

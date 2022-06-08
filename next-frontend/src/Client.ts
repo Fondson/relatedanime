@@ -1,8 +1,18 @@
-import { MalType } from 'types/common'
+import { MalType, SeasonalAnimeItem } from 'types/common'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-function crawl(malType: string, id: string | number, updateListener, eventListener, errorListener) {
+type EventSourceEvent = {
+  data: string
+}
+
+function crawl(
+  malType: string,
+  id: string | number,
+  updateListener: (e: EventSourceEvent) => void,
+  eventListener: (e: EventSourceEvent) => void,
+  errorListener: (e: EventSourceEvent) => void,
+) {
   if (id === 0) id = 1
 
   const es = new EventSource(new URL(`/api/crawl/${malType}/${id}`, API_URL))
@@ -12,51 +22,34 @@ function crawl(malType: string, id: string | number, updateListener, eventListen
   es.addEventListener('done', () => es.close())
 }
 
-function search(query: string, cb, count = 10) {
-  fetchWithRetries(`/api/search/${encodeURIComponent(query)}?count=${count}`, cb)
-}
-
 async function searchSeasonal() {
-  return fetchWithRetriesWithoutCb('/api/searchSeasonal')
+  return fetchWithRetriesWithoutCb('/api/searchSeasonal') as Promise<{ data: SeasonalAnimeItem[] }>
 }
 
-async function getResourcePageSeoData(malType, malId) {
-  return fetchWithRetriesWithoutCb(`/api/mal-page-seo/${malType}/${malId}`)
+async function getResourcePageSeoData(malType: MalType, malId: string | number) {
+  return fetchWithRetriesWithoutCb(`/api/mal-page-seo/${malType}/${malId}`) as Promise<{
+    data: {
+      title: string
+      image: string
+    }
+  }>
 }
 
-async function searchWithoutCb(
+async function search(
   query: string,
   count: number,
 ): Promise<Array<{ name: string; malType: MalType; id: string }>> {
-  const obj = await fetchWithRetriesWithoutCb(
+  const obj = (await fetchWithRetriesWithoutCb(
     `/api/search/${encodeURIComponent(query)}?count=${count}`,
     3,
-  )
+  )) as { error: boolean; data: Array<{ name: string; malType: MalType; id: string }> }
   if (obj.error) {
     return []
   }
   return obj.data
 }
 
-async function fetchWithRetries(url: string, cb, retries = 0) {
-  try {
-    const response = await fetch(new URL(url, API_URL).href)
-    const obj = await processResponse(response)
-    cb(obj)
-  } catch (e) {
-    console.log(e)
-    // retry up to 2 times (3 tries total)
-    if (retries < 3) {
-      console.log('Retry count: ' + retries)
-      fetchWithRetries(url, cb, retries + 1)
-    } else {
-      console.log('Reached max retry count!')
-      cb({ error: true, why: e })
-    }
-  }
-}
-
-async function fetchWithRetriesWithoutCb(url: string, retries = 0) {
+async function fetchWithRetriesWithoutCb(url: string, retries = 0): Promise<unknown> {
   try {
     const response = await fetch(new URL(url, API_URL).href)
     const obj = await processResponse(response)
@@ -76,7 +69,7 @@ async function fetchWithRetriesWithoutCb(url: string, retries = 0) {
 
 type RepsponseError = Error & { response: Response; status: string }
 
-function processResponse(response) {
+function processResponse(response: Response) {
   if (response.status >= 200 && response.status < 300) {
     const obj = response.json()
     return obj
@@ -88,6 +81,6 @@ function processResponse(response) {
   throw error
 }
 
-const Client = { crawl, search, searchWithoutCb, searchSeasonal, getResourcePageSeoData }
+const Client = { crawl, search, searchSeasonal, getResourcePageSeoData }
 
 export default Client

@@ -10,20 +10,16 @@ import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
-import { AnimeItem, MalType } from 'types/common'
+import { AnimeItemsByType, MalType } from 'types/common'
 
 const defaultLoadingString = 'Scraping MAL...'
-
-type AnimeItemsByType = {
-  [key: string]: AnimeItem[]
-}
 
 type ResourcePageProps = {
   title: string
   image: string
 }
 
-const ResourcePage: NextPage = ({ title, image }: ResourcePageProps) => {
+const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
   const isMobile = useCheckMobile()
   const router = useRouter()
 
