@@ -15,7 +15,7 @@ type AnimeBackgroundProps = {
 }
 
 const AnimeBackground = ({ picNum, id, children }: AnimeBackgroundProps) => {
-  const [img, setImg] = useState(pics[0])
+  const [img, setImg] = useState<string>()
   useEffect(() => {
     setImg(pics[picNum ?? getRandomInt(0, numOfPics - 1)])
   }, [picNum])
@@ -23,7 +23,7 @@ const AnimeBackground = ({ picNum, id, children }: AnimeBackgroundProps) => {
   return (
     <div
       className="h-full w-full bg-cover bg-fixed bg-center bg-no-repeat"
-      style={{ backgroundImage: `url('${img}')` }}
+      style={{ backgroundImage: img ? `url('${img}')` : '' }}
       id={id}
     >
       {children}
