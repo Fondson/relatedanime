@@ -60,12 +60,15 @@ const LandingPage: NextPage<LandingPageProps> = ({ animes }) => {
 const getStaticProps: GetStaticProps<LandingPageProps> = async () => {
   try {
     const { data } = await Client.searchSeasonal()
-    return { props: { animes: data } }
+    return {
+      props: { animes: data },
+      revalidate: 60 * 60, // 1 hour
+    }
   } catch (e) {
     console.log(e)
     return {
       props: { animes: [] },
-      revalidate: 60 * 60, // 1 hour
+      revalidate: 1,
     }
   }
 }
