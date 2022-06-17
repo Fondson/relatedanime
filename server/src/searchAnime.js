@@ -11,19 +11,19 @@ var promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise, // the Promise library you are using
 })
 
-async function searchAnime(searchStr, count, proxy = false) {
+async function searchAnime(searchStr, count) {
   if (searchStr === searchSeasonal.SEASONAL_KEY) {
     throw new Error('invalid search string')
   }
-  return await scrapSearch(searchStr, count, proxy)
+  return await scrapSearch(searchStr, count)
 }
 
-async function scrapSearch(searchStr, count, proxy) {
+async function scrapSearch(searchStr, count) {
   try {
     const body = await promiseThrottle.add(
       request.bind(
         this,
-        new URL(`/search/all?q=${encodeURIComponent(searchStr)}`, crawlUrl.getUrl(proxy)).href,
+        new URL(`/search/all?q=${encodeURIComponent(searchStr)}`, crawlUrl.getUrl()).href,
       ),
     )
     let $ = cheerio.load(body)
@@ -78,7 +78,7 @@ async function scrapSearch(searchStr, count, proxy) {
   } catch (e) {
     if (e.statusCode == 429 || e.statusCode == 403) {
       // try again
-      return await scrapSearch(searchStr, null, count, proxy)
+      return await scrapSearch(searchStr, null, count)
     }
     throw e
   }

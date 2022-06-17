@@ -11,7 +11,7 @@ const promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise, // the Promise library you are using
 })
 
-async function getMalPage(relLink, proxy = false) {
+async function getMalPage(relLink) {
   let body
   // Try to load from Redis, then DynamoDB, then scrape
   const redisCacheResponse = await redis.getMalCachePath(relLink)
@@ -28,7 +28,7 @@ async function getMalPage(relLink, proxy = false) {
       // Add to Redis cache
       await redis.setMalCachePath(relLink, ddbCacheResponse.Item.page.S)
     } else {
-      const url = new URL(relLink, getUrl(proxy)).href
+      const url = new URL(relLink, getUrl()).href
       const fullBody = await promiseThrottle.add(request.bind(this, url))
       const $ = cheerioModule.load(fullBody)
       body = $('#contentWrapper').html()

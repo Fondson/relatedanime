@@ -18,8 +18,15 @@ const EDGES_EXCLUSION_LIST = {
   'manga:13': 'manga:25146',
 }
 
+const defaultCrawlOptions = {
+  res: undefined,
+  client: undefined,
+  forceRefresh: false,
+}
 // dfs crawl
-async function crawl(malType, malId, res, client, proxy = false, forceRefresh = false) {
+async function crawl(malType, malId, options) {
+  const { res, client, forceRefresh } = { ...defaultCrawlOptions, ...options }
+
   let pagesVisited = new Set()
   let pagesToVisit = [{ relLink: malTypeAndIdToRelLink(malType, malId) }]
   let allRelated = [] // array of all related animes
@@ -35,7 +42,6 @@ async function crawl(malType, malId, res, client, proxy = false, forceRefresh = 
         pagesVisited,
         pagesToVisit,
         allRelated,
-        proxy,
         forceRefresh,
         skipRelated,
       )
@@ -61,15 +67,12 @@ async function visitPage(
   pagesVisited,
   pagesToVisit,
   allRelated,
-  proxy,
   forceRefresh,
   skipRelated = false,
 ) {
-  const url = new URL(relLink, crawlUrl.getUrl(proxy)).href
+  const url = new URL(relLink, crawlUrl.getUrl()).href
   try {
-    const body = forceRefresh
-      ? await crawlAndCacheMalPage(relLink, proxy)
-      : await getMalPage(relLink, proxy)
+    const body = forceRefresh ? await crawlAndCacheMalPage(relLink) : await getMalPage(relLink)
 
     // Parse the document body
     let $ = cheerio.load(body)
@@ -142,7 +145,15 @@ async function visitPage(
     console.log(e)
     if (e.statusCode == 429 || e.statusCode == 403) {
       // try again
-      await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, proxy, forceRefresh)
+      await visitPage(
+        relLink,
+        client,
+        pagesVisited,
+        pagesToVisit,
+        allRelated,
+        forceRefresh,
+        skipRelated,
+      )
     } else {
       // unhandled error
       // skip entry

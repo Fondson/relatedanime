@@ -11,9 +11,9 @@ const promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise, // the Promise library you are using
 })
 
-const crawlAndCacheMalPage = async (relLink, proxy = false) => {
+const crawlAndCacheMalPage = async (relLink) => {
   // Crawl MAL page
-  const url = new URL(relLink, getUrl(proxy)).href
+  const url = new URL(relLink, getUrl()).href
   const fullBody = await promiseThrottle.add(request.bind(this, url))
 
   // Parse and store

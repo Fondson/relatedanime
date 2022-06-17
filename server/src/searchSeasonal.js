@@ -14,14 +14,14 @@ var promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise, // the Promise library you are using
 })
 
-function searchSeasonal(res = null, proxy = false) {
-  scrapSearch(res, proxy)
+function searchSeasonal(res = null) {
+  scrapSearch(res)
 }
 
-async function scrapSearch(res, proxy) {
+async function scrapSearch(res) {
   try {
     const body = await promiseThrottle.add(
-      request.bind(this, new URL('/anime/season', crawlUrl.getUrl(proxy)).href),
+      request.bind(this, new URL('/anime/season', crawlUrl.getUrl()).href),
     )
     let $ = cheerio.load(body)
 
@@ -65,7 +65,7 @@ async function scrapSearch(res, proxy) {
         JSON.stringify(ret) !== JSON.stringify(await redis.searchGet(SEASONAL_KEY))
       ) {
         ret.forEach(({ malType, id }) => {
-          crawl(malType, id, null, null, false, true)
+          crawl(malType, id, { forceRefresh: true })
         })
       }
 
@@ -79,7 +79,7 @@ async function scrapSearch(res, proxy) {
     if (e.statusCode == 429) {
       // too many requests error
       // try again
-      scrapSearch(searchStr, null, count, proxy)
+      scrapSearch(searchStr, null, count)
     } else {
       // unhandled error
       res.end(JSON.stringify({ error: true, why: e }))

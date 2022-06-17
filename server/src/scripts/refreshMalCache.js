@@ -17,7 +17,7 @@ const refreshEverything = async () => await _refreshEverything(undefined)
 
 const refreshASeries = async (startingPageRelLink) => {
   const { malType, malId } = relLinkToMalTypeAndId(startingPageRelLink)
-  await crawl(malType, malId, null, null, false, true)
+  await crawl(malType, malId, { forceRefresh: true })
 }
 
 const refreshMalCache = async (startingPageRelLink = '') => {
