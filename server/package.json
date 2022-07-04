@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node_modules/pm2/bin/pm2-runtime start ecosystem.config.js",
+    "dev": "node_modules/pm2/bin/pm2-runtime start ecosystem.config.js",
+    "start": "pm2-runtime start ecosystem.config.js",
     "lint": "yarn eslint . --fix --max-warnings=0 && yarn prettier . --write --ignore-unknown"
   },
   "dependencies": {
