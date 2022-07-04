@@ -24,6 +24,7 @@ const getMainClient = () => {
     primaryClient = createClient(process.env.REDIS_URL)
     primaryClient.on('error', function (err) {
       console.log('Redis: Something went wrong ' + err)
+      primaryClient = null
     })
   }
   return primaryClient
@@ -34,6 +35,7 @@ const getSearchClient = () => {
     searchClient = createClient(process.env.SEARCH_AND_SEASONAL_REDIS_URL)
     searchClient.on('error', function (err) {
       console.log('Search redis: Something went wrong ' + err)
+      searchClient = null
     })
   }
   return searchClient
@@ -44,6 +46,7 @@ const getMalCacheClient = () => {
     malCacheClient = createClient(process.env.MAL_CACHE_REDIS_URL)
     malCacheClient.on('error', function (err) {
       console.log('MAL cache redis: Something went wrong ' + err)
+      malCacheClient = null
     })
   }
   return malCacheClient
