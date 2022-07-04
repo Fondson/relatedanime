@@ -45,6 +45,8 @@ yarn setup
 
 ### Run the app locally
 
+Local dev uses Docker to spin up the backend server, nextjs server, and local Redis instances. Please make sure you have [Docker installed](https://docs.docker.com/get-docker/).
+
 ```bash
 # This runs the nextjs server on :3000 and the express server on :3001 by default
 yarn dev
