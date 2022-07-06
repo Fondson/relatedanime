@@ -44,6 +44,7 @@ services:
       SEARCH_AND_SEASONAL_REDIS_URL: 'redis://search-and-seasonal-redis:6379'
     env_file:
       - server/.env
+    command: ['yarn', 'dev']
     volumes:
       - ./server:/app
       - server-deps:/app/node_modules
