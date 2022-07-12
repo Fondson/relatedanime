@@ -1,5 +1,6 @@
 import 'styles/globals.css'
 
+import AckeeAnaytics from 'components/AckeeAnalytics'
 import GoogleAnaytics from 'components/GoogleAnalytics'
 import PwaTags from 'components/PwaTags'
 import type { AppProps } from 'next/app'
@@ -22,6 +23,7 @@ function App({ Component, pageProps }: AppProps) {
         }}
       />
       <GoogleAnaytics />
+      <AckeeAnaytics />
 
       <Component {...pageProps} />
     </>
