@@ -1,13 +1,15 @@
 import 'styles/globals.css'
 
-import AckeeAnaytics from 'components/AckeeAnalytics'
 import GoogleAnaytics from 'components/GoogleAnalytics'
 import PwaTags from 'components/PwaTags'
+import useAckeeDomain from 'hooks/useAckeeDomain'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { DefaultSeo } from 'next-seo'
 
 function App({ Component, pageProps }: AppProps) {
+  useAckeeDomain()
+
   return (
     <>
       <Head>
@@ -23,7 +25,6 @@ function App({ Component, pageProps }: AppProps) {
         }}
       />
       <GoogleAnaytics />
-      <AckeeAnaytics />
 
       <Component {...pageProps} />
     </>
