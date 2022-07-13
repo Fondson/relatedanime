@@ -26,8 +26,6 @@ async function initializeAckee(): Promise<void> {
       js = d.createElement('script')
       js.id = id
       js.src = ACKEE_URL ? new URL('/tracker.js', ACKEE_URL).href : ''
-      js.setAttribute('data-ackee-server', ACKEE_URL ?? '')
-      js.setAttribute('data-ackee-domain-id', ACKEE_DOMAIN_ID ?? '')
       if (fjs.parentNode) {
         fjs.parentNode.insertBefore(js, fjs)
         js.onload = onload
@@ -43,8 +41,7 @@ async function initializeAckee(): Promise<void> {
 const useAckeeDomain = () => {
   const router = useRouter()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleRouteChange = (url: string) => {
+  const handleRouteChange = () => {
     const ackeeWindow: AckeeWindow = window
     if (ACKEE_URL && ACKEE_DOMAIN_ID && ackeeWindow?.ackeeTracker) {
       const ackeeTracker = ackeeWindow.ackeeTracker
@@ -53,7 +50,9 @@ const useAckeeDomain = () => {
   }
 
   useEffect(() => {
-    initializeAckee()
+    initializeAckee().then(() => {
+      handleRouteChange()
+    })
   }, [])
 
   useEffect(() => {
