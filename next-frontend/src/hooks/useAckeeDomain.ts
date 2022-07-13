@@ -48,7 +48,7 @@ const useAckeeDomain = () => {
     const ackeeWindow: AckeeWindow = window
     if (ACKEE_URL && ACKEE_DOMAIN_ID && ackeeWindow?.ackeeTracker) {
       const ackeeTracker = ackeeWindow.ackeeTracker
-      ackeeTracker.create(ACKEE_URL).record(ACKEE_DOMAIN_ID)
+      ackeeTracker.create(ACKEE_URL, { detailed: true }).record(ACKEE_DOMAIN_ID)
     }
   }
 
