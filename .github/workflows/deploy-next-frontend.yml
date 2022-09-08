@@ -1,11 +1,11 @@
-name: Deploy to Vercel
+name: Deploy Next frontend
 on:
   push:
     branches:
       - main
     paths:
       - next-frontend/**
-      - .github/workflows/deploy-to-vercel.yml
+      - .github/workflows/deploy-next-frontend.yml
 
 jobs:
   deploy-to-vercel:

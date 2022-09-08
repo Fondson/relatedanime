@@ -2,7 +2,7 @@ const Redis = require('ioredis')
 const { default: Redlock } = require('redlock')
 
 const TYPES = ['anime', 'manga']
-let primaryClient = null
+let pageDataClient = null
 let searchClient = null
 let malCacheClient = null
 
@@ -19,15 +19,15 @@ const createClient = (url) => {
   })
 }
 
-const getMainClient = () => {
-  if (primaryClient == null) {
-    primaryClient = createClient(process.env.REDIS_URL)
-    primaryClient.on('error', function (err) {
-      console.log('Redis: Something went wrong ' + err)
-      primaryClient = null
+const getPageDataClient = () => {
+  if (pageDataClient == null) {
+    pageDataClient = createClient(process.env.PAGE_DATA_REDIS_URL)
+    pageDataClient.on('error', function (err) {
+      console.log('Page Data Redis: Something went wrong ' + err)
+      pageDataClient = null
     })
   }
-  return primaryClient
+  return pageDataClient
 }
 
 const getSearchClient = () => {
@@ -69,7 +69,7 @@ const acquireLock = async (key, duration) => {
 }
 
 async function setSeries(malType, malId, value) {
-  const client = getMainClient()
+  const client = getPageDataClient()
   const parentKey = createKey(malType, malId)
   console.log('Redis setting ' + parentKey)
   try {
@@ -84,7 +84,7 @@ async function setSeries(malType, malId, value) {
 // For parent anime:1 with child anime:2, set key anime:2 to value anime:1.
 // Note that parent is set to to the full series object.
 async function _linkChildrenToParent(parentKey, parentSeries) {
-  const client = getMainClient()
+  const client = getPageDataClient()
   const types = Object.values(parentSeries)
   for (let i = 0; i < types.length; ++i) {
     const children = types[i]
@@ -105,7 +105,7 @@ async function _linkChildrenToParent(parentKey, parentSeries) {
 
 async function getSeries(malType, malId) {
   try {
-    const client = getMainClient()
+    const client = getPageDataClient()
     const parentKey = await getParentKey(createKey(malType, malId))
     if (parentKey === null) {
       return null
@@ -149,7 +149,7 @@ function getMalTypeAndMalIdFromKey(key) {
 }
 
 async function getParentKey(key) {
-  const client = getMainClient()
+  const client = getPageDataClient()
   let ret = key
   const value = await client.get(key)
   if (isKey(value)) {
@@ -226,7 +226,7 @@ const getMalCachePath = async (path) => {
 }
 
 // initialize clients
-getMainClient()
+getPageDataClient()
 getSearchClient()
 getMalCacheClient()
 
@@ -235,7 +235,7 @@ module.exports = {
   getSeries,
   isKey,
   createKey,
-  getMainClient,
+  getPageDataClient,
   getSearchClient,
   getMalTypeAndMalIdFromKey,
   searchSet,

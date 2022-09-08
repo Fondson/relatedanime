@@ -5,4 +5,4 @@ COPY server/package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY server/ .
 
-CMD [ "yarn", "start" ]
+CMD [ "/bin/sh", "-c", "yarn start" ]

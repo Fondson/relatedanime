@@ -2,27 +2,19 @@ version: '3'
 
 services:
   redis:
-    image: 'redis:alpine'
+    build:
+      dockerfile: fly/redis/Dockerfile
+      context: .
     ports:
       - '6379:6379'
+      - '6380:6380'
+      - '6381:6381'
+    environment:
+      PAGE_DATA_REDIS_PW: '${DEV_REDIS_PW}'
+      MAL_CACHE_REDIS_PW: '${DEV_REDIS_PW}'
+      SEARCH_AND_SEASONAL_REDIS_PW: '${DEV_REDIS_PW}'
     volumes:
       - redis-data:/data
-    restart: always
-
-  mal-cache-redis:
-    image: 'redis:alpine'
-    ports:
-      - '6380:6379'
-    volumes:
-      - mal-cache-redis-data:/data
-    restart: always
-
-  search-and-seasonal-redis:
-    image: 'redis:alpine'
-    ports:
-      - '6381:6379'
-    volumes:
-      - search-and-seasonal-redis-data:/data
     restart: always
 
   server:
@@ -33,21 +25,15 @@ services:
       - '3001:3001'
     depends_on:
       - redis
-      - mal-cache-redis
-      - search-and-seasonal-redis
     environment:
-      NODE_ENV: 'development'
-      APP_ENV: 'dev'
-      PM2_ENV: 'dev'
-      REDIS_URL: 'redis://redis:6379'
-      MAL_CACHE_REDIS_URL: 'redis://mal-cache-redis:6379'
-      SEARCH_AND_SEASONAL_REDIS_URL: 'redis://search-and-seasonal-redis:6379'
+      PAGE_DATA_REDIS_URL: 'redis://:${DEV_REDIS_PW}@redis:6379'
+      MAL_CACHE_REDIS_URL: 'redis://:${DEV_REDIS_PW}@redis:6380'
+      SEARCH_AND_SEASONAL_REDIS_URL: 'redis://:${DEV_REDIS_PW}@redis:6381'
     env_file:
       - server/.env
-    command: ['yarn', 'dev']
     volumes:
       - ./server:/app
-      - server-deps:/app/node_modules
+      - ./node_modules:/app/node_modules
 
   next-frontend:
     build:
@@ -58,17 +44,13 @@ services:
     depends_on:
       - server
     environment:
-      NODE_ENV: 'development'
-      APP_ENV: 'dev'
+      API_URL: http://server:3001
+      NEXT_PUBLIC_API_URL: http://localhost:3001
     env_file:
       - next-frontend/.env.local
     volumes:
       - ./next-frontend:/app
-      - next-frontend-deps:/app/node_modules
+      - ./node_modules:/app/node_modules
 
 volumes:
-  server-deps:
-  next-frontend-deps:
   redis-data:
-  mal-cache-redis-data:
-  search-and-seasonal-redis-data:

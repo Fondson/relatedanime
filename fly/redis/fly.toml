@@ -1,0 +1,29 @@
+app = "related-anime-redis"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[mounts]
+  source = "redis_data"
+  destination = "/data"
+
+[[services]]
+  internal_port = 6379
+  protocol = "tcp"
+
+    [[services.ports]]
+    port = "6379"
+
+[[services]]
+  internal_port = 6380
+  protocol = "tcp"
+
+    [[services.ports]]
+    port = "6380"
+
+[[services]]
+  internal_port = 6381
+  protocol = "tcp"
+
+    [[services.ports]]
+    port = "6381"

@@ -1,0 +1,24 @@
+app = "related-anime-server"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  APP_ENV = "prod"
+  PORT = 3001
+  AWS_DYNAMODB_TABLE_NAME = "mal-cache"
+  AWS_REGION = "us-east-1"
+
+[[services]]
+  internal_port = 3001
+  protocol = "tcp"
+  
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true
+    
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443

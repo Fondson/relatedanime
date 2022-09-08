@@ -27,7 +27,7 @@ async function refreshRedis(dryrun = false) {
 }
 
 async function refreshAllSeries(dryrun) {
-  const client = redisHelper.getMainClient()
+  const client = redisHelper.getPageDataClient()
   let cursor = 0
   while (true) {
     const result = await client.scanAsync(cursor)

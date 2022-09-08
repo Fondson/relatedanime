@@ -1,0 +1,3 @@
+page-data-redis: redis-server /usr/local/etc/redis/page-data-redis.conf --requirepass ${PAGE_DATA_REDIS_PW}
+mal-cache-redis: redis-server /usr/local/etc/redis/mal-cache-redis.conf --requirepass ${MAL_CACHE_REDIS_PW}
+search-and-seasonal-redis: redis-server /usr/local/etc/redis/search-and-seasonal-redis.conf --requirepass ${SEARCH_AND_SEASONAL_REDIS_PW}

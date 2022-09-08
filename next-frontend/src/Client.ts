@@ -1,6 +1,6 @@
 import { MalType, SeasonalAnimeItem } from 'types/common'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
 
 type EventSourceEvent = {
   data: string
