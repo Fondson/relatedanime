@@ -3,7 +3,6 @@ var searchAnime = require('./searchAnime')
 var searchSeasonal = require('./searchSeasonal')
 var crawl = require('./crawl')
 var sse = require('simple-sse')
-var pingSelf = require('./pingSelf')
 var redis = require('./redis/redisHelper')
 // TODO: remove on experiment success
 // var refreshCron = require('./crons/refreshCron')
@@ -14,7 +13,6 @@ const { malTypeAndIdToRelLink } = require('./relLinkHelper')
 const transformAnimes = require('./transformAnimes')
 const getSeoData = require('./getSeoData')
 
-pingSelf.pingHomepage()
 // TODO: remove on experiment success
 // refreshCron.start()
 refreshMalCacheCron.start()
