@@ -1,3 +1,4 @@
+import FancyScrollbarContainer from 'components/FancyScrollbarContainer'
 import Spinner from 'components/Spinner'
 import debounce from 'debounce-promise'
 import React, { createRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -56,7 +57,7 @@ export default function AutoSuggestInput<T>({
     [debouncedOnFetch, shouldStartFetching],
   )
 
-  const listOptionsDivRef = useRef<HTMLDivElement>(null)
+  const listOptionsDivRef = useRef<HTMLDivElement>()
   useEffect(() => {
     if (listOptionsDivRef.current == null) return
     listOptionsDivRef.current.scrollTop = 0
@@ -131,11 +132,12 @@ export default function AutoSuggestInput<T>({
           {...rest}
         />
       </div>
-      <div
-        ref={listOptionsDivRef}
+      <FancyScrollbarContainer
+        passRef={listOptionsDivRef}
         className={`border-1 absolute z-10 max-h-60 w-full overflow-y-auto rounded-b-md border-gray-100 bg-white shadow-md ${
           !shouldShowDropdown ? 'hidden' : ''
         }`}
+        hide={false}
       >
         {suggestions.length === 0 ? (
           <div className="flex py-2 px-4 pr-2 text-left">
@@ -151,7 +153,7 @@ export default function AutoSuggestInput<T>({
             setSelected,
           )
         )}
-      </div>
+      </FancyScrollbarContainer>
     </div>
   )
 }

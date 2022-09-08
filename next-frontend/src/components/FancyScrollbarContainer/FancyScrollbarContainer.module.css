@@ -4,33 +4,68 @@
   --scrollbar-width: 0.5rem;
   --scrollbar-color: rgba(255, 255, 255, 0.75);
   --scrollbar-background-color: rgba(0, 0, 0, 0.3);
-  --scrollbar-track-border-radius: 20px;
+  --scrollbar-track-border-radius: 1rem;
+}
+
+/* Start "always-show" styles */
+.fancy-scrollbar-container-always-show {
   @apply transition-all;
 
   /* Works on Firefox */
   scrollbar-width: thin;
-  scrollbar-color: transparent;
+  scrollbar-color: var(--scrollbar-color) var(--scrollbar-background-color);
 }
 
 /* Works on Chrome, Edge, and Safari */
-.fancy-scrollbar-container::-webkit-scrollbar {
+.fancy-scrollbar-container-always-show::-webkit-scrollbar {
   width: var(--scrollbar-width);
   height: var(--scrollbar-width);
 }
 
-.fancy-scrollbar-container::-webkit-scrollbar-track {
+.fancy-scrollbar-container-always-show::-webkit-scrollbar-track {
+  background: var(--scrollbar-background-color);
+  border-radius: var(--scrollbar-track-border-radius);
+}
+
+.fancy-scrollbar-container-always-show::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color);
+  border-radius: var(--scrollbar-track-border-radius);
+}
+/* End "always-show" styles */
+
+/* Start "without-width" styles */
+.fancy-scrollbar-container-without-width {
+  @apply transition-all;
+
+  scrollbar-width: 0;
+  scrollbar-color: transparent;
+}
+
+.fancy-scrollbar-container-without-width::-webkit-scrollbar {
+  width: 0;
+  height: var(--scrollbar-width);
+}
+
+.fancy-scrollbar-container-without-width::-webkit-scrollbar-track {
   background: transparent;
   border-radius: var(--scrollbar-track-border-radius);
 }
 
-.fancy-scrollbar-container::-webkit-scrollbar-thumb {
+.fancy-scrollbar-container-without-width::-webkit-scrollbar-thumb {
   background-color: transparent;
   border-radius: var(--scrollbar-track-border-radius);
 }
+/* End "without-width" styles */
 
 /* Start "show" styles */
 .show-scrollbar {
   scrollbar-color: var(--scrollbar-color) var(--scrollbar-background-color);
+
+  scrollbar-width: thin;
+}
+
+.show-scrollbar::-webkit-scrollbar {
+  width: var(--scrollbar-width);
 }
 
 .show-scrollbar::-webkit-scrollbar-track {
