@@ -1,4 +1,4 @@
-import ImageIcon from 'icons/image.svg'
+import EmptyImage from 'components/EmptyImage'
 import { isEmpty } from 'lodash'
 import Image, { ImageProps } from 'next/image'
 
@@ -10,11 +10,7 @@ const EntryImage = ({ src, alt = '', ...rest }: EntryImageProps) => {
       {!isEmpty(src) ? (
         <Image className="rounded-md object-cover" src={src} alt={alt} layout="fill" {...rest} />
       ) : (
-        <div className="rounded-md w-full h-full border border-gray-400">
-          <div className="w-1/2 relative h-full mx-auto">
-            <Image src={ImageIcon} alt={alt} layout="fill" {...rest} />
-          </div>
-        </div>
+        <EmptyImage />
       )}
     </div>
   )

@@ -26,3 +26,11 @@ export type SeasonalAnimeItem = {
 export type AnimeItemsByType = {
   [key: string]: AnimeItem[]
 }
+
+export type SearchResult = {
+  name: string
+  malType: MalType
+  id: string
+  thumbnail?: string
+  type: string
+}

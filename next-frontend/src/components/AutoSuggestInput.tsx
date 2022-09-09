@@ -9,6 +9,8 @@ type Suggestion<T> = T & {
   suggestion: string
 }
 
+type RenderSuggestion<T> = (suggestion: Suggestion<T>, highlight: boolean) => React.ReactNode
+
 type AutoSuggestInputProps<T> = Partial<React.InputHTMLAttributes<HTMLInputElement>> & {
   onSuggestionSelect: (value: T) => void
   onFetch: (searchStr: string) => Promise<Suggestion<T>[]>
@@ -17,6 +19,7 @@ type AutoSuggestInputProps<T> = Partial<React.InputHTMLAttributes<HTMLInputEleme
   className?: string
   clearOnBlur?: boolean
   shouldStartFetching?: (searchStr: string) => boolean
+  renderCustonSuggestionButton?: RenderSuggestion<T>
 }
 
 export default function AutoSuggestInput<T>({
@@ -27,6 +30,7 @@ export default function AutoSuggestInput<T>({
   className = '',
   clearOnBlur = false,
   shouldStartFetching = () => true,
+  renderCustonSuggestionButton,
   ...rest
 }: AutoSuggestInputProps<T>) {
   const [searchStr, setSearchStr] = useState(initialValue)
@@ -134,7 +138,7 @@ export default function AutoSuggestInput<T>({
       </div>
       <FancyScrollbarContainer
         passRef={listOptionsDivRef}
-        className={`border-1 absolute z-10 max-h-60 w-full overflow-y-auto rounded-b-md border-gray-100 bg-white shadow-md ${
+        className={`flex flex-col border-1 absolute z-10 max-h-[50vh] w-full overflow-y-auto rounded-b-md border-gray-100 bg-white shadow-md ${
           !shouldShowDropdown ? 'hidden' : ''
         }`}
         hide={false}
@@ -145,37 +149,40 @@ export default function AutoSuggestInput<T>({
             <Spinner />
           </div>
         ) : (
-          computeSuggestionButtons(
-            suggestions,
-            suggestionButtonsRefs,
-            highlight,
-            setHighlight,
-            setSelected,
-          )
+          suggestions.map((suggestion, i) => {
+            const isHighligted = highlight === i
+            return (
+              <button
+                key={i}
+                ref={suggestionButtonsRefs[i]}
+                onMouseDown={(e) => e.preventDefault()} /* https://stackoverflow.com/a/57630197 */
+                onClick={() => setSelected(i)}
+                onMouseMove={() => setHighlight(i)}
+                type="button"
+              >
+                {renderCustonSuggestionButton
+                  ? renderCustonSuggestionButton(suggestion, isHighligted)
+                  : renderSuggestionButton(suggestion, isHighligted)}
+              </button>
+            )
+          })
         )}
       </FancyScrollbarContainer>
     </div>
   )
 }
 
-function computeSuggestionButtons<T>(
-  suggestions: Suggestion<T>[],
-  suggestionButtonsRefs: React.RefObject<HTMLButtonElement>[],
-  highlight: number | null,
-  setHighlight: (highlight: number) => void,
-  setSelected: (highlight?: number) => void,
-) {
-  return suggestions.map(({ suggestion }, i) => (
-    <button
-      key={i}
-      ref={suggestionButtonsRefs[i]}
-      className={`block w-full focus:outline-none ${highlight === i ? 'bg-gray-300' : ''}`}
-      onMouseDown={(e) => e.preventDefault()} /* https://stackoverflow.com/a/57630197 */
-      onClick={() => setSelected(i)}
-      onMouseMove={() => setHighlight(i)}
-      type="button"
+const renderSuggestionButton: RenderSuggestion<Suggestion<unknown>> = (
+  { suggestion },
+  highlight,
+) => {
+  return (
+    <div
+      className={`border-b border-gray-200 py-2 px-4 pr-2 text-left block w-full ${
+        highlight ? 'bg-gray-300' : ''
+      }`}
     >
-      <div className="border-b border-gray-200 py-2 px-4 pr-2 text-left">{suggestion}</div>
-    </button>
-  ))
+      {suggestion}
+    </div>
+  )
 }

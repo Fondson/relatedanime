@@ -1,4 +1,4 @@
-import { MalType, SeasonalAnimeItem } from 'types/common'
+import { MalType, SearchResult, SeasonalAnimeItem } from 'types/common'
 
 const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
 
@@ -35,14 +35,11 @@ async function getResourcePageSeoData(malType: MalType, malId: string | number) 
   }>
 }
 
-async function search(
-  query: string,
-  count: number,
-): Promise<Array<{ name: string; malType: MalType; id: string }>> {
+async function search(query: string, count: number): Promise<SearchResult[]> {
   const obj = (await fetchWithRetriesWithoutCb(
     `/api/search/${encodeURIComponent(query)}?count=${count}`,
     3,
-  )) as { error: boolean; data: Array<{ name: string; malType: MalType; id: string }> }
+  )) as { error: boolean; data: SearchResult[] }
   if (obj.error) {
     return []
   }

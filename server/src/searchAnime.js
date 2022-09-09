@@ -44,17 +44,22 @@ async function scrapSearch(searchStr, count) {
     }
 
     // get the entries for the header
-    let urlsAndNames = []
+    const rawEntries = []
     malEntries
-      .find('.information .hoverinfo_trigger')
+      .find('.list.di-t')
       .slice(0, count)
-      .each((index, element) =>
-        urlsAndNames.push({ name: $(element).text(), url: $(element).attr('href') }),
-      )
+      .each((index, element) => {
+        rawEntries.push({
+          name: $(element).find('.fw-b.fl-l').first().text(),
+          url: $(element).find('.fw-b.fl-l').first().attr('href'),
+          thumbnail: $(element).find('img').first().attr('data-src'),
+          type: $(element).find('.pt8 a').first().text(),
+        })
+      })
 
     let ret = []
-    for (let i = 0; i < urlsAndNames.length; ++i) {
-      const url = urlsAndNames[i].url
+    for (let i = 0; i < rawEntries.length; ++i) {
+      const { url, name, thumbnail, type } = rawEntries[i]
       // get the malId
       let pos = 0
       let slashCount = 0
@@ -67,9 +72,9 @@ async function scrapSearch(searchStr, count) {
       while (pos < url.length && url[pos] != '/') {
         id += url[pos++]
       }
-      ret.push({ name: urlsAndNames[i].name, malType: malType, id: id })
+      ret.push({ name, malType, id, thumbnail, type })
     }
-    console.log(urlsAndNames)
+    console.log(ret)
     if (ret.length > 0) {
       redis.searchSet(searchStr, ret)
       return ret
