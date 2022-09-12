@@ -30,7 +30,7 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
       renderCustonSuggestionButton={({ name, thumbnail, type }, highlight) => {
         return (
           <div
-            className={`grid grid-cols-[min-content_minmax(0,1fr)] border-b border-gray-200 py-2 px-4 text-left w-full ${
+            className={`grid grid-cols-[min-content_minmax(0,1fr)] items-center border-b border-gray-200 py-2 px-4 text-left w-full ${
               highlight ? 'bg-gray-300' : ''
             }`}
           >
