@@ -128,7 +128,11 @@ async function visitPage(
     let newEntry = {
       malType: malTypeAndId.malType,
       malId: malTypeAndId.malId,
-      type: $('div a[href*="?type="]')[0].children[0].data,
+      type: $('span')
+        .filter((i, span) => $(span).text().trim() === 'Type:')
+        .next()
+        .text()
+        .trim(),
       title,
       link: url,
       image: image.length < 1 ? null : image.attr('src') || image.attr('data-src'),
