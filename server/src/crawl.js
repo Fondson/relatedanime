@@ -95,7 +95,7 @@ async function visitPage(
           // 'Character' type can be really unrelated, we'll discard them
           if (thisType != 'Character:') {
             let children = type.next.children
-            children.forEach((element, elementIndex) => {
+            children.reverse().forEach((element, elementIndex) => {
               if (element.type === 'tag') {
                 const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
 
