@@ -4,4 +4,4 @@ mkdir -p /data/page-data-redis/
 mkdir -p /data/mal-cache-redis/
 mkdir -p /data/search-and-seasonal-redis/
 
-overmind start
+exec overmind start
