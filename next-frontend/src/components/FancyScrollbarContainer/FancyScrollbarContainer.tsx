@@ -1,6 +1,5 @@
-import styles from 'components/FancyScrollbarContainer/FancyScrollbarContainer.module.css'
-import debounce from 'lodash/debounce'
-import { useEffect, useMemo, useRef } from 'react'
+import styles from 'components/FancyScrollbarContainer/FancyScrollbarContainer.module.scss'
+import { useEffect, useRef } from 'react'
 
 type FancyScrollbarContainerProps = Partial<React.HTMLAttributes<HTMLDivElement>> & {
   children: React.ReactNode
@@ -12,9 +11,6 @@ const FancyScrollbarContainer = ({
   children,
   className = '',
   passRef = undefined,
-  onScroll = () => {
-    return
-  },
   hide = true,
   ...rest
 }: FancyScrollbarContainerProps) => {
@@ -23,10 +19,6 @@ const FancyScrollbarContainer = ({
     if (passRef == null) return
     ref.current = passRef.current
   }, [passRef])
-  const debouncedHideScrollbar = useMemo(
-    () => debounce(() => ref.current?.classList?.remove(styles['show-scrollbar']), 750),
-    [ref],
-  )
 
   return (
     <div
@@ -36,13 +28,6 @@ const FancyScrollbarContainer = ({
           ? styles['fancy-scrollbar-container-without-width']
           : styles['fancy-scrollbar-container-always-show']
       } ${className}`}
-      onScroll={(e) => {
-        onScroll(e)
-
-        // inspired by https://stackoverflow.com/a/68416028
-        ref.current?.classList?.add(styles['show-scrollbar'])
-        if (hide) debouncedHideScrollbar()
-      }}
       {...rest}
     >
       {children}

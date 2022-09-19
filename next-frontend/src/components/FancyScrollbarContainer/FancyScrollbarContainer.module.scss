@@ -1,16 +1,28 @@
 /* https://www.digitalocean.com/community/tutorials/css-scrollbars */
 
 .fancy-scrollbar-container {
+  @apply transition-all;
   --scrollbar-width: 0.5rem;
   --scrollbar-color: rgba(255, 255, 255, 0.75);
   --scrollbar-background-color: rgba(0, 0, 0, 0.3);
   --scrollbar-track-border-radius: 1rem;
+
+  &:hover {
+    @extend .show-scrollbar;
+  }
+  &:hover::-webkit-scrollbar {
+    @extend %show-scrollbar-webkit;
+  }
+  &:hover::-webkit-scrollbar-track {
+    @extend %show-scrollbar-webkit-track;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    @extend %show-scrollbar-webkit-thumb;
+  }
 }
 
 /* Start "always-show" styles */
 .fancy-scrollbar-container-always-show {
-  @apply transition-all;
-
   /* Works on Firefox */
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-color) var(--scrollbar-background-color);
@@ -35,8 +47,6 @@
 
 /* Start "without-width" styles */
 .fancy-scrollbar-container-without-width {
-  @apply transition-all;
-
   scrollbar-width: 0;
   scrollbar-color: transparent;
 }
@@ -64,14 +74,17 @@
   scrollbar-width: thin;
 }
 
+%show-scrollbar-webkit,
 .show-scrollbar::-webkit-scrollbar {
   width: var(--scrollbar-width);
 }
 
+%show-scrollbar-webkit-track,
 .show-scrollbar::-webkit-scrollbar-track {
   background: var(--scrollbar-background-color);
 }
 
+%show-scrollbar-webkit-thumb,
 .show-scrollbar::-webkit-scrollbar-thumb {
   background-color: var(--scrollbar-color);
 }
