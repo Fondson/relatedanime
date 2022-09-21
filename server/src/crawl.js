@@ -7,7 +7,9 @@ var sortAnimesByDate = require('./sortAnimesByDate')
 const { malTypeAndIdToRelLink } = require('./relLinkHelper')
 const crawlAndCacheMalPage = require('./crawlAndCacheMalPage')
 const getMalPage = require('./getMalPage')
+const isEmpty = require('lodash/isEmpty')
 
+const TEXT_NODE = 3
 /*
     These are (graph) edges that are problematic and can expand the series graph
     in a way that is unexpected. To deal with it, we remove specific edges to
@@ -125,14 +127,22 @@ async function visitPage(
     }
 
     let image = $('img[itemprop=image]')
+    let typeSpan = $('span').filter((i, span) => $(span).text().trim() === 'Type:')
     let newEntry = {
       malType: malTypeAndId.malType,
       malId: malTypeAndId.malId,
-      type: $('span')
-        .filter((i, span) => $(span).text().trim() === 'Type:')
-        .next()
-        .text()
-        .trim(),
+      type: !isEmpty(typeSpan.next().text().trim())
+        ? // Normal types
+          typeSpan.next().text().trim()
+        : // Non-normal types
+          typeSpan
+            .parent()
+            .contents()
+            .filter(function () {
+              return this.nodeType == TEXT_NODE
+            })
+            .text()
+            .trim(),
       title,
       link: url,
       image: image.length < 1 ? null : image.attr('src') || image.attr('data-src'),
