@@ -36,7 +36,7 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
           >
             <div className="relative w-12 aspect-square mr-2">
               {isEmpty(thumbnail) ? (
-                <EmptyImage />
+                <EmptyImage rounded="rounded-full" />
               ) : (
                 <Image
                   className="rounded-full object-cover"
