@@ -1,15 +1,15 @@
 import ImageIcon from 'icons/image.svg'
-import Image, { ImageProps } from 'next/image'
+import Image from 'next/image'
 
-type EmptyImageProps = Omit<ImageProps, 'src' | 'layout'> & {
-  rounded?: 'rounded-md' | 'rounded-full'
+type EmptyImageProps = React.HTMLAttributes<HTMLDivElement> & {
+  imageWidth?: string
 }
 
-const EmptyImage = ({ rounded, ...rest }: EmptyImageProps) => {
+const EmptyImage = ({ imageWidth = 'w-1/2', className, ...rest }: EmptyImageProps) => {
   return (
-    <div className={`${rounded ?? ''} w-full h-full border border-gray-400`}>
-      <div className="w-1/2 relative h-full mx-auto">
-        <Image src={ImageIcon} layout="fill" alt="" {...rest} />
+    <div className={`w-full h-full border border-gray-400 ${className}`} {...rest}>
+      <div className={`${imageWidth ?? ''} relative h-full mx-auto transition-all`}>
+        <Image src={ImageIcon} layout="fill" alt="" />
       </div>
     </div>
   )

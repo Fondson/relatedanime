@@ -20,8 +20,8 @@ const EntryImage = ({ src, alt = '', className, ...rest }: EntryImageProps) => {
         />
       ) : (
         <EmptyImage
-          rounded="rounded-md"
-          className={!isMobile ? 'transition group-hover:brightness-75' : ''}
+          className={`rounded-md`}
+          imageWidth={isMobile ? undefined : 'w-1/2 group-hover:w-[55%]'}
         />
       )}
     </div>
