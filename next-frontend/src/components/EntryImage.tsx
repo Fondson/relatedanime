@@ -4,11 +4,17 @@ import Image, { ImageProps } from 'next/image'
 
 type EntryImageProps = ImageProps
 
-const EntryImage = ({ src, alt = '', ...rest }: EntryImageProps) => {
+const EntryImage = ({ src, alt = '', className, ...rest }: EntryImageProps) => {
   return (
-    <div className="relative aspect-[225/350] w-full">
+    <div className={`relative aspect-[225/350] w-full rounded-md overflow-hidden ${className}`}>
       {!isEmpty(src) ? (
-        <Image className="rounded-md object-cover" src={src} alt={alt} layout="fill" {...rest} />
+        <Image
+          className="object-cover transition group-hover:scale-110"
+          src={src}
+          alt={alt}
+          layout="fill"
+          {...rest}
+        />
       ) : (
         <EmptyImage />
       )}

@@ -15,11 +15,7 @@ function SeasonalSection({ animes }: SeasonSectionProps) {
   return (
     <div className="py-2">
       <h3 className="mt-4 text-2xl font-medium uppercase">Currently Airing</h3>
-      <FancyScrollbarContainer
-        className="flex gap-6 overflow-x-auto px-2"
-        passRef={ref}
-        {...events}
-      >
+      <FancyScrollbarContainer className="flex gap-6 overflow-x-auto" passRef={ref} {...events}>
         {animes.map((anime) => {
           return (
             <div key={anime.malType + anime.id} className="my-5 flex-none">
