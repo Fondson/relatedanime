@@ -1,5 +1,6 @@
 name: Deploy Next frontend
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
