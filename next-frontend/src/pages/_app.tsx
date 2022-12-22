@@ -1,4 +1,5 @@
 import 'styles/globals.css'
+import 'styles/scrollbar.scss'
 
 import GoogleAnaytics from 'components/GoogleAnalytics'
 import PwaTags from 'components/PwaTags'

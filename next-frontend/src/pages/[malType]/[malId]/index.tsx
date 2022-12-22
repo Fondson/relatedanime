@@ -1,6 +1,5 @@
 import Client from 'Client'
 import AnimeSeriesAutoSuggestInput from 'components/AnimeSeriesAutoSuggestInput'
-import FancyScrollbarContainer from 'components/FancyScrollbarContainer'
 import HomeButton from 'components/HomeButton'
 import LoadingPage from 'components/LoadingPage'
 import SectionsContainer from 'components/SectionsContainer'
@@ -88,10 +87,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       {isLoading ? (
         <LoadingPage loadingString={loadingString} />
       ) : (
-        <FancyScrollbarContainer
-          className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}
-          hide={false}
-        >
+        <div className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
           <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
             <div className="min-h-10 mb-4 flex">
               <HomeButton />
@@ -101,7 +97,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
             </div>
             <SectionsContainer animes={animes} />
           </div>
-        </FancyScrollbarContainer>
+        </div>
       )}
     </>
   )

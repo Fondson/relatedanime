@@ -1,4 +1,3 @@
-import styles from 'components/FancyScrollbarContainer/FancyScrollbarContainer.module.scss'
 import debounce from 'lodash/debounce'
 import { useEffect, useMemo, useRef } from 'react'
 
@@ -24,23 +23,21 @@ const FancyScrollbarContainer = ({
     ref.current = passRef.current
   }, [passRef])
   const debouncedHideScrollbar = useMemo(
-    () => debounce(() => ref.current?.classList?.remove(styles['show-scrollbar']), 750),
+    () => debounce(() => ref.current?.classList?.remove('.show-scrollbar'), 750),
     [ref],
   )
 
   return (
     <div
       ref={(passRef ?? ref) as React.RefObject<HTMLDivElement>}
-      className={`${styles['fancy-scrollbar-container']} ${
-        hide
-          ? styles['fancy-scrollbar-container-without-width']
-          : styles['fancy-scrollbar-container-always-show']
+      className={`fancy-scrollbar-container ${
+        hide ? 'fancy-scrollbar-container-without-width' : 'fancy-scrollbar-container-always-show'
       } ${className}`}
       onScroll={(e) => {
         onScroll(e)
 
         // inspired by https://stackoverflow.com/a/68416028
-        ref.current?.classList?.add(styles['show-scrollbar'])
+        ref.current?.classList?.add('.show-scrollbar')
         if (hide) debouncedHideScrollbar()
       }}
       {...rest}
