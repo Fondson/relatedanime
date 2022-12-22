@@ -35,7 +35,6 @@ async function scrapSearch(searchStr, count) {
     // get the first header (either anime or manga)
     for (let i = 0; i < headers.length; ++i) {
       const curType = $(headers[i]).attr('id')
-      console.log(curType)
       if (MAL_TYPES.has(curType)) {
         malType = curType
         malEntries = $(headers[i]).next()
@@ -50,10 +49,19 @@ async function scrapSearch(searchStr, count) {
       .slice(0, count)
       .each((index, element) => {
         rawEntries.push({
-          name: $(element).find('.fw-b.fl-l').first().text(),
-          url: $(element).find('.fw-b.fl-l').first().attr('href'),
+          name: $(element).find('.fw-b').first().text(),
+          url: $(element).find('.fw-b').first().attr('href'),
           thumbnail: $(element).find('img').first().attr('data-src'),
-          type: $(element).find('.pt8 a').first().text(),
+          type: $(element)
+            .find('.fs10')
+            .first()
+            .text()
+            .trim()
+            // get first row
+            .split('\n')[0]
+            // only care about type and not any information in brackets
+            .split('(')[0]
+            .trim(),
         })
       })
 
