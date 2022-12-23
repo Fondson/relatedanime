@@ -15,7 +15,7 @@ const init = (app) => {
       new Tracing.Integrations.Express({ app }),
     ],
 
-    tracesSampleRate: 1.0,
+    tracesSampleRate: 0.25,
   })
 
   // RequestHandler creates a separate execution context using domains, so that every
