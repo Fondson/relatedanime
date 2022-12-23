@@ -12,6 +12,7 @@ const cors = require('cors')
 const { malTypeAndIdToRelLink } = require('./relLinkHelper')
 const transformAnimes = require('./transformAnimes')
 const getSeoData = require('./getSeoData')
+const sentry = require('./sentry')
 
 // TODO: remove on experiment success
 // refreshCron.start()
@@ -27,6 +28,8 @@ const corsOptions =
       }
     : {}
 app.use(cors(corsOptions))
+
+sentry.init(app)
 
 async function _preCrawl(malType, malId, req = null) {
   // check redis
@@ -122,6 +125,8 @@ app.get('/api/searchSeasonal', async function (req, res) {
 app.get('/health-check', async function (req, res) {
   res.send(new Date())
 })
+
+sentry.initErrorHandling(app)
 
 app.listen(app.get('port'), () => {
   console.log(`Find the server at: http://localhost:${app.get('port')}/`) // eslint-disable-line no-console
