@@ -9,14 +9,7 @@ let malCacheClient = null
 let redlock = null
 
 const createClient = (url) => {
-  return new Redis(url, {
-    retryStrategy: function (times) {
-      if (times > 10) {
-        return false
-      }
-      return Math.min(times * 50, 2000)
-    },
-  })
+  return new Redis(url)
 }
 
 const getPageDataClient = () => {
