@@ -1,24 +1,37 @@
+# fly.toml app configuration file generated for related-anime-server on 2023-06-23T20:53:40-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = "related-anime-server"
+primary_region = "yyz"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
 
 [build]
   dockerfile = "Dockerfile"
 
 [env]
-  NODE_ENV = "production"
   APP_ENV = "prod"
-  PORT = 3001
   AWS_DYNAMODB_TABLE_NAME = "mal-cache"
   AWS_REGION = "us-east-1"
+  NODE_ENV = "production"
+  PORT = "3001"
 
 [[services]]
-  internal_port = 3001
   protocol = "tcp"
-  
+  internal_port = 3001
+
   [[services.ports]]
-    handlers = ["http"]
     port = 80
+    handlers = ["http"]
     force_https = true
-    
+
   [[services.ports]]
-    handlers = ["tls", "http"]
     port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "requests"
+    hard_limit = 1000000
+    soft_limit = 20
