@@ -1,6 +1,6 @@
 # Related Anime
 
-<img src="https://image.thum.io/get/http://www.relatedanime.com/">
+<img src="http://free.pagepeeker.com/v2/thumbs.php?size=x&url=https%3A%2F%2Frelatedanime.com">
 
 [Visit relatedanime.com!](http://relatedanime.com/)
 
@@ -26,12 +26,14 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 ### Steins;Gate
 
 https://relatedanime.com/anime/9253
-<img src="https://image.thum.io/get/http://www.relatedanime.com/anime/9253/">
+
+<img src="http://free.pagepeeker.com/v2/thumbs.php?size=x&url=https%3A%2F%2Frelatedanime.com%2Fanime%2F9253">
 
 ### Love Live
 
 https://relatedanime.com/anime/15051
-<img src="https://image.thum.io/get/http://www.relatedanime.com/anime/15051/">
+
+<img src="http://free.pagepeeker.com/v2/thumbs.php?size=x&url=https%3A%2F%2Frelatedanime.com%2Fanime%2F15051">
 
 ## Development
 
