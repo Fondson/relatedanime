@@ -168,6 +168,9 @@ async function visitPage(
         forceRefresh,
         skipRelated,
       )
+    } else if (!forceRefresh) {
+      // try again with forceRefresh in case we cached a bad page
+      await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, true, skipRelated)
     } else {
       // unhandled error
       // skip entry
