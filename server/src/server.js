@@ -66,6 +66,7 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   console.log('Received ' + malType + ' ' + malId)
 
   const useCache = req.query.useCache !== 'false'
+  const forceRefresh = req.query.forceRefresh === 'true'
 
   if (useCache) {
     let cachedResult = await _preCrawl(malType, malId, req)
@@ -75,16 +76,16 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
       sse.remove(client)
       res.end()
 
-      const preTransform = await crawl(malType, malId)
+      const preTransform = await crawl(malType, malId, { forceRefresh })
       await redis.setSeries(malType, malId, transformAnimes(preTransform))
     } else {
-      const preTransform = await crawl(malType, malId, { res, client })
+      const preTransform = await crawl(malType, malId, { res, client, forceRefresh })
       await redis.setSeries(malType, malId, transformAnimes(preTransform))
     }
+    console.log(`Updated cache for ${malTypeAndIdToRelLink(malType, malId)}`)
   } else {
-    await crawl(malType, malId, { res, client, useCache: false })
+    await crawl(malType, malId, { res, client, useCache: false, forceRefresh })
   }
-  console.log(`Updated cache for ${malTypeAndIdToRelLink(malType, malId)}`)
 })
 
 app.get('/api/mal-page-seo/:malType(anime|manga)/:malId([0-9]+)', async function (req, res) {
