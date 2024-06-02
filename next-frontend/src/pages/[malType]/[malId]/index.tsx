@@ -24,13 +24,13 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
 
   const { malType, malId } = router.query as { malType: MalType; malId: string }
 
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [loadingString, setLoadingString] = useState(defaultLoadingString)
-  const [animes, setAnimes] = useState<AnimeItemsByType>({})
+  const [animes, setAnimes] = useState<AnimeItemsByType | null>(null)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (malId == null) {
+    if (malId == null || isLoading || animes) {
       return
     }
 
@@ -58,7 +58,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       },
       () => setError(true),
     )
-  }, [malType, malId, error, router])
+  }, [malType, malId, error, router, isLoading, animes])
 
   const seoData = {
     title,
@@ -84,7 +84,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
         }}
       />
 
-      {isLoading ? (
+      {isLoading || !animes ? (
         <LoadingPage loadingString={loadingString} />
       ) : (
         <div className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
