@@ -32,7 +32,6 @@ jobs:
         env:
           VERCEL_PROJECT_NAME: ${{ secrets.VERCEL_PROJECT_NAME }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_SCOPE: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: npx vercel remove ${VERCEL_PROJECT_NAME} --scope=${VERCEL_SCOPE} --token=${VERCEL_TOKEN} --safe --yes
+        run: npx vercel remove ${VERCEL_PROJECT_NAME} --token=${VERCEL_TOKEN} --safe --yes
