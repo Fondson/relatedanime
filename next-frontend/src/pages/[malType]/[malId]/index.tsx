@@ -30,7 +30,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (malId == null || isLoading || animes) {
+    if (malId == null || isLoading) {
       return
     }
 
@@ -58,7 +58,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       },
       () => setError(true),
     )
-  }, [malType, malId, error, router, isLoading, animes])
+  }, [malType, malId, error, router, isLoading])
 
   const seoData = {
     title,
