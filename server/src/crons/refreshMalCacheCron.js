@@ -12,9 +12,13 @@ function start() {
         return
       }
 
-      console.log('Starting refresh cron!')
-      await refreshMalCache()
-      console.log(`Refresh cron complete!`)
+      try {
+        console.log('Starting refresh cron!')
+        await refreshMalCache()
+        console.log(`Refresh cron complete!`)
+      } finally {
+        await lock.unlock()
+      }
     },
     undefined,
     true,
