@@ -26,7 +26,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [loadingString, setLoadingString] = useState(defaultLoadingString)
-  const [animes, setAnimes] = useState<AnimeItemsByType | null>(null)
+  const [animes, setAnimes] = useState<AnimeItemsByType>({})
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
         }}
       />
 
-      {isLoading || !animes ? (
+      {isLoading ? (
         <LoadingPage loadingString={loadingString} />
       ) : (
         <div className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
