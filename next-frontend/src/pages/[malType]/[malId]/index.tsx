@@ -30,7 +30,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (malId == null || isLoading) {
+    if (malId == null) {
       return
     }
 
@@ -58,7 +58,8 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       },
       () => setError(true),
     )
-  }, [malType, malId, error, router, isLoading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [malType, malId, error])
 
   const seoData = {
     title,
