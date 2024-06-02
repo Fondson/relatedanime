@@ -11,34 +11,46 @@ const promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise, // the Promise library you are using
 })
 
-async function getMalPage(relLink) {
+const defaultOptions = {
+  useCache: true,
+}
+async function getMalPage(relLink, options) {
+  const { useCache } = { ...defaultOptions, ...options }
+
   let body
-  // Try to load from Redis, then DynamoDB, then scrape
-  const redisCacheResponse = await redis.getMalCachePath(relLink)
-  if (redisCacheResponse != null) {
-    body = await decompressHtml(redisCacheResponse)
-    console.log(`${relLink} loaded from Redis`)
+  if (!useCache) {
+    const url = new URL(relLink, getUrl()).href
+    const fullBody = await promiseThrottle.add(request.bind(this, url))
+    const $ = cheerioModule.load(fullBody)
+    body = $('#contentWrapper').html()
   } else {
-    const ddbCacheResponse = await ddb.getMalCachePath(relLink)
-
-    if (ddbCacheResponse?.Item != null) {
-      body = await decompressHtml(ddbCacheResponse.Item.page.S)
-      console.log(`${relLink} loaded from DynamoDB`)
-
-      // Add to Redis cache
-      await redis.setMalCachePath(relLink, ddbCacheResponse.Item.page.S)
+    // Try to load from Redis, then DynamoDB, then scrape
+    const redisCacheResponse = await redis.getMalCachePath(relLink)
+    if (redisCacheResponse != null) {
+      body = await decompressHtml(redisCacheResponse)
+      console.log(`${relLink} loaded from Redis`)
     } else {
-      const url = new URL(relLink, getUrl()).href
-      const fullBody = await promiseThrottle.add(request.bind(this, url))
-      const $ = cheerioModule.load(fullBody)
-      body = $('#contentWrapper').html()
+      const ddbCacheResponse = await ddb.getMalCachePath(relLink)
 
-      // put in data stores
-      const compressedBody = await compressHtml(body)
-      await Promise.allSettled([
-        ddb.setMalCachePath(relLink, compressedBody),
-        redis.setMalCachePath(relLink, compressedBody),
-      ])
+      if (ddbCacheResponse?.Item != null) {
+        body = await decompressHtml(ddbCacheResponse.Item.page.S)
+        console.log(`${relLink} loaded from DynamoDB`)
+
+        // Add to Redis cache
+        await redis.setMalCachePath(relLink, ddbCacheResponse.Item.page.S)
+      } else {
+        const url = new URL(relLink, getUrl()).href
+        const fullBody = await promiseThrottle.add(request.bind(this, url))
+        const $ = cheerioModule.load(fullBody)
+        body = $('#contentWrapper').html()
+
+        // put in data stores
+        const compressedBody = await compressHtml(body)
+        await Promise.allSettled([
+          ddb.setMalCachePath(relLink, compressedBody),
+          redis.setMalCachePath(relLink, compressedBody),
+        ])
+      }
     }
   }
 

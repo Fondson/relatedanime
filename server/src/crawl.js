@@ -24,10 +24,11 @@ const defaultCrawlOptions = {
   res: undefined,
   client: undefined,
   forceRefresh: false,
+  useCache: true,
 }
 // dfs crawl
 async function crawl(malType, malId, options) {
-  const { res, client, forceRefresh } = { ...defaultCrawlOptions, ...options }
+  const { res, client, forceRefresh, useCache } = { ...defaultCrawlOptions, ...options }
 
   let pagesVisited = new Set()
   let pagesToVisit = [{ relLink: malTypeAndIdToRelLink(malType, malId) }]
@@ -45,6 +46,7 @@ async function crawl(malType, malId, options) {
         pagesToVisit,
         allRelated,
         forceRefresh,
+        useCache,
         skipRelated,
       )
     }
@@ -70,11 +72,14 @@ async function visitPage(
   pagesToVisit,
   allRelated,
   forceRefresh,
+  useCache,
   skipRelated = false,
 ) {
   const url = new URL(relLink, crawlUrl.getUrl()).href
   try {
-    const body = forceRefresh ? await crawlAndCacheMalPage(relLink) : await getMalPage(relLink)
+    const body = forceRefresh
+      ? await crawlAndCacheMalPage(relLink)
+      : await getMalPage(relLink, { useCache })
 
     // Parse the document body
     let $ = cheerio.load(body)
@@ -166,11 +171,21 @@ async function visitPage(
         pagesToVisit,
         allRelated,
         forceRefresh,
+        useCache,
         skipRelated,
       )
     } else if (!forceRefresh) {
       // try again with forceRefresh in case we cached a bad page
-      await visitPage(relLink, client, pagesVisited, pagesToVisit, allRelated, true, skipRelated)
+      await visitPage(
+        relLink,
+        client,
+        pagesVisited,
+        pagesToVisit,
+        allRelated,
+        true,
+        useCache,
+        skipRelated,
+      )
     } else {
       // unhandled error
       // skip entry

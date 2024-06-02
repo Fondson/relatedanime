@@ -65,18 +65,24 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   const malId = req.params.malId || 1
   console.log('Received ' + malType + ' ' + malId)
 
-  let cachedResult = await _preCrawl(malType, malId, req)
-  if (cachedResult != null) {
-    sse.send(client, 'full-data', JSON.stringify(cachedResult))
-    sse.send(client, 'done', 'success')
-    sse.remove(client)
-    res.end()
+  const useCache = req.query.useCache !== 'false'
 
-    const preTransform = await crawl(malType, malId)
-    await redis.setSeries(malType, malId, transformAnimes(preTransform))
+  if (useCache) {
+    let cachedResult = await _preCrawl(malType, malId, req)
+    if (cachedResult != null) {
+      sse.send(client, 'full-data', JSON.stringify(cachedResult))
+      sse.send(client, 'done', 'success')
+      sse.remove(client)
+      res.end()
+
+      const preTransform = await crawl(malType, malId)
+      await redis.setSeries(malType, malId, transformAnimes(preTransform))
+    } else {
+      const preTransform = await crawl(malType, malId, { res, client })
+      await redis.setSeries(malType, malId, transformAnimes(preTransform))
+    }
   } else {
-    const preTransform = await crawl(malType, malId, { res, client })
-    await redis.setSeries(malType, malId, transformAnimes(preTransform))
+    await crawl(malType, malId, { res, client, useCache: false })
   }
   console.log(`Updated cache for ${malTypeAndIdToRelLink(malType, malId)}`)
 })

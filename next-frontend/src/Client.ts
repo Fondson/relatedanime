@@ -15,7 +15,14 @@ function crawl(
 ) {
   if (id === 0) id = 1
 
-  const es = new EventSource(new URL(`/api/crawl/${malType}/${id}`, API_URL))
+  // get query params on page
+  const pageUrl = new URL(window.location.href)
+  const pageUrlParams = new URLSearchParams(pageUrl.search)
+
+  const esUrl = new URL(`/api/crawl/${malType}/${id}`, API_URL)
+  esUrl.search = pageUrlParams.toString()
+
+  const es = new EventSource(esUrl)
   es.addEventListener('update', updateListener)
   es.addEventListener('full-data', eventListener)
   es.addEventListener('error', errorListener)
