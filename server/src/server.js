@@ -66,7 +66,8 @@ app.get('/api/crawl/:malType(anime|manga)/:malId([0-9]+)', async function (req, 
   console.log('Received ' + malType + ' ' + malId)
 
   const useCache = req.query.useCache !== 'false'
-  const forceRefresh = req.query.forceRefresh === 'true'
+  // for now, force refresh on all queries bc MAL is changing their UI
+  const forceRefresh = true // req.query.forceRefresh === 'true'
 
   if (useCache) {
     let cachedResult = await _preCrawl(malType, malId, req)
