@@ -92,43 +92,36 @@ async function visitPage(
     }
 
     const malTypeAndId = getMalTypeAndId(relLink)
+
     // collect related anime links
     if (!skipRelated) {
-      let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass')
-      Array.from(relatedTypes)
-        .reverse()
-        .forEach((type) => {
-          const thisType = type.children[0].data.trim()
-          // 'Character' type can be really unrelated, we'll discard them
-          if (thisType != 'Character:') {
-            let children = type.next.children
-            children.reverse().forEach((element, elementIndex) => {
-              if (element.type === 'tag') {
-                const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
+      const entries = getRelatedEntriesOld($)
 
-                // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
-                const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':')
-                const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId
-                if (
-                  // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
-                  (sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
-                    EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey) ||
-                  // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
-                  (destMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
-                    EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey)
-                ) {
-                  return
-                }
+      if (isEmpty(entries)) {
+        const newEntries = getRelatedEntries($)
+        entries.push(...newEntries)
+      }
 
-                pagesToVisit.push({
-                  relLink: destMalTypeAndIdRelLink,
-                  // instead of outright skipping "Other" pages, we'll traverse them only down to a depth of one
-                  skipRelated: thisType === 'Other:',
-                })
-              }
-            })
-          }
-        })
+      // do not add page links that are excluded as part of EDGES_EXCLUSION_LIST
+      const filteredEntries = entries.filter(({ relLink: destMalTypeAndIdRelLink }) => {
+        const destMalTypeAndIdKey = destMalTypeAndIdRelLink.slice(1).replace('/', ':')
+        const sourceMalTypeAndIdKey = malTypeAndId.malType + ':' + malTypeAndId.malId
+        if (
+          // check forward facing link sourceMalTypeAndIdKey -> destMalTypeAndIdKey
+          (sourceMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
+            EDGES_EXCLUSION_LIST[sourceMalTypeAndIdKey] == destMalTypeAndIdKey) ||
+          // check backward facing link destMalTypeAndIdKey -> sourceMalTypeAndIdKey
+          (destMalTypeAndIdKey in EDGES_EXCLUSION_LIST &&
+            EDGES_EXCLUSION_LIST[destMalTypeAndIdKey] == sourceMalTypeAndIdKey)
+        ) {
+          return false
+        }
+        return true
+      })
+
+      pagesToVisit.push(
+        ...filteredEntries.reverse(), // reverse so that pagesToVisit stack traverses the first entries first
+      )
     }
 
     let image = $('img[itemprop=image]')
@@ -193,6 +186,70 @@ async function visitPage(
   }
 }
 
+function getRelatedEntriesOld($) {
+  let relatedTypes = $('table.anime_detail_related_anime td.ar.fw-n.borderClass')
+  return Array.from(relatedTypes)
+    .flatMap((type) => {
+      const thisType = type.children[0].data.trim()
+      // 'Character' type can be really unrelated, we'll discard them
+      if (thisType != 'Character:') {
+        return []
+      }
+
+      let children = type.next.children
+      return children.map((element, elementIndex) => {
+        if (element.type === 'tag') {
+          const destMalTypeAndIdRelLink = stripToMalTypeAndId(element.attribs.href)
+          return {
+            relLink: destMalTypeAndIdRelLink,
+            // instead of outright skipping "Other" pages, we'll traverse them only down to a depth of one
+            skipRelated: thisType === 'Other:',
+          }
+        }
+        return null
+      })
+    })
+    .filter(Boolean)
+}
+
+function getRelatedEntries($) {
+  const relatedTiles = $('.related-entries .entries-tile .entry')
+  const linksFromTiles = Array.from(relatedTiles)
+    .map((tile) => {
+      const anchorTags = $(tile).find('a')
+      if (anchorTags.length < 1) return null
+
+      return { link: anchorTags.first().attr('href') }
+    })
+    .filter(Boolean)
+
+  const relatedTableEntries = $('.related-entries .entries-table tr')
+  const linksFromTable = Array.from(relatedTableEntries)
+    .flatMap((tableEntry) => {
+      const type = $(tableEntry).find('td').first().text().trim()
+      // 'Character' type can be really unrelated, we'll discard them
+      if (type === 'Character:') return []
+
+      const anchorTags = $(tableEntry).find('a')
+      if (anchorTags.length < 1) return []
+
+      return Array.from(anchorTags).map((anchorTag) => {
+        return {
+          link: $(anchorTag).attr('href'),
+          // instead of outright skipping "Other" pages, we'll traverse them only down to a depth of one
+          skipRelated: type === 'Other:',
+        }
+      })
+    })
+    .filter(Boolean)
+
+  const relatedLinks = [...linksFromTiles, ...linksFromTable]
+  return relatedLinks.map(({ link, skipRelated }) => {
+    const destMalTypeAndIdRelLink = stripToMalTypeAndId(link)
+    return { relLink: destMalTypeAndIdRelLink, skipRelated }
+  })
+}
+
 // assumes url is a relative url following the format '/(anime|manga)/ID/...'
 function getMalTypeAndId(url) {
   let pos = 1
@@ -209,22 +266,14 @@ function getMalTypeAndId(url) {
   return { malType: malType, malId: +id }
 }
 
-// assumes url is a relative url following the format '/(anime|manga)/ID/...'
 function stripToMalTypeAndId(url) {
-  let ret = ''
-  let slashCount = 0
-  let pos = 0
-  while (pos < url.length) {
-    if (url[pos] == '/') {
-      slashCount += 1
-    }
-    if (slashCount == 3) {
-      break
-    }
-    ret += url[pos++]
-  }
+  const parts = url.split('/')
+  if (parts.length < 1) return null
 
-  return ret
+  const startingIndex = parts.findIndex((part) => part === 'anime' || part === 'manga')
+  if (startingIndex === undefined) return null
+
+  return `/${parts[startingIndex]}/${parts[startingIndex + 1]}`
 }
 
 module.exports = crawl
