@@ -7,6 +7,7 @@ app = "related-anime-server"
 primary_region = "yyz"
 kill_signal = "SIGINT"
 kill_timeout = "5s"
+swap_size_mb = 512
 
 [build]
   dockerfile = "Dockerfile"
