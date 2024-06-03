@@ -1,4 +1,5 @@
 import debounce from 'lodash/debounce'
+import React from 'react'
 import { useEffect, useMemo, useRef } from 'react'
 
 type FancyScrollbarContainerProps = Partial<React.HTMLAttributes<HTMLDivElement>> & {
@@ -42,7 +43,16 @@ const FancyScrollbarContainer = ({
       }}
       {...rest}
     >
-      {children}
+      {React.Children.map(children, (child) =>
+        React.isValidElement(child)
+          ? React.cloneElement(child as React.ReactElement, {
+              // https://stackoverflow.com/a/53048959
+              onDragStart: (e: React.DragEvent<HTMLDivElement>) => {
+                e.preventDefault()
+              },
+            })
+          : child,
+      )}
     </div>
   )
 }
