@@ -19,6 +19,7 @@ type AutoSuggestInputProps<T> = Partial<React.InputHTMLAttributes<HTMLInputEleme
   clearOnBlur?: boolean
   shouldStartFetching?: (searchStr: string) => boolean
   renderCustonSuggestionButton?: RenderSuggestion<T>
+  renderCustomLoader?: () => React.ReactNode
 }
 
 export default function AutoSuggestInput<T>({
@@ -30,9 +31,11 @@ export default function AutoSuggestInput<T>({
   clearOnBlur = false,
   shouldStartFetching = () => true,
   renderCustonSuggestionButton,
+  renderCustomLoader,
   ...rest
 }: AutoSuggestInputProps<T>) {
   const [searchStr, setSearchStr] = useState(initialValue)
+  const [loading, setLoading] = useState(false)
   useEffect(() => setSearchStr(initialValue), [initialValue])
 
   const debouncedOnFetch = useMemo(
@@ -48,9 +51,11 @@ export default function AutoSuggestInput<T>({
   const updateSuggestions = useCallback(
     async (str: string) => {
       if (shouldStartFetching(str)) {
+        setLoading(true)
         debouncedOnFetch(str).then((suggestions: Suggestion<T>[]) => {
           setSuggestions(suggestions)
           setHighlight(null)
+          setLoading(false)
         })
       } else {
         setSuggestions([])
@@ -137,15 +142,19 @@ export default function AutoSuggestInput<T>({
       </div>
       <div
         ref={listOptionsDivRef}
-        className={`flex flex-col border-1 absolute z-10 max-h-[50vh] w-full overflow-y-auto rounded-b-md border-gray-100 bg-white shadow-md ${
+        className={`border-1 absolute z-10 flex max-h-[50vh] w-full flex-col overflow-y-auto rounded-b-md border-gray-100 bg-white shadow-md ${
           !shouldShowDropdown ? 'hidden' : ''
         }`}
       >
-        {suggestions.length === 0 ? (
-          <div className="flex py-2 px-4 pr-2 text-left">
-            <div className="pr-2">Loading...</div>
-            <Spinner />
-          </div>
+        {suggestions.length === 0 || loading ? (
+          renderCustomLoader ? (
+            renderCustomLoader()
+          ) : (
+            <div className="flex py-2 px-4 pr-2 text-left">
+              <div className="pr-2">Loading...</div>
+              <Spinner />
+            </div>
+          )
         ) : (
           suggestions.map((suggestion, i) => {
             const isHighligted = highlight === i
@@ -176,7 +185,7 @@ const renderSuggestionButton: RenderSuggestion<Suggestion<unknown>> = (
 ) => {
   return (
     <div
-      className={`border-b border-gray-200 py-2 px-4 pr-2 text-left block w-full ${
+      className={`block w-full border-b border-gray-200 py-2 px-4 pr-2 text-left ${
         highlight ? 'bg-gray-300' : ''
       }`}
     >
