@@ -44,7 +44,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       malType,
       malId,
       (e) => {
-        setLoadingString('Found ' + e.data)
+        setLoadingString((prev) => [`Found ${e.data}`, prev].join('\n'))
       },
       (e) => {
         setLoadingString(defaultLoadingString)

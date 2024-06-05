@@ -7,11 +7,11 @@ type LoadingPageProps = {
 
 const LoadingPage = ({ loadingString }: LoadingPageProps) => {
   return (
-    <div className="mx-auto mt-10 w-8/12">
+    <div className="mx-auto mt-10 px-6 md:w-1/2">
       <div className="flex justify-center pb-2">
         <Image className="rounded-xl" src={kirinoMouse} alt="Loading..." />
       </div>
-      <p className="px-6 text-center">{loadingString}</p>
+      <p className="whitespace-pre-line">{loadingString}</p>
     </div>
   )
 }
