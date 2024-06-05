@@ -54,7 +54,7 @@ export default function AutoSuggestInput<T>({
         setLoading(true)
         debouncedOnFetch(str).then((suggestions: Suggestion<T>[]) => {
           setSuggestions(suggestions)
-          setHighlight(null)
+          setHighlight(suggestions.length > 0 ? 0 : null)
           setLoading(false)
         })
       } else {
