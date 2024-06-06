@@ -9,7 +9,7 @@ import {
   Text,
 } from '@mantine/core'
 import { IconAdjustments } from '@tabler/icons-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export type View = 'grouped' | 'timeline'
 
@@ -23,6 +23,10 @@ const ViewOptionsButton = ({
   onViewChange: onViewChangeProp,
 }: ViewOptionsButtonProps) => {
   const [view, setView] = useState<View>(defaultView)
+
+  useEffect(() => {
+    setView(defaultView)
+  }, [defaultView])
 
   const onViewChange = useCallback(
     (view: View) => {

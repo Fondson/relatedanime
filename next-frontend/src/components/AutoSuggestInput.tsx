@@ -137,6 +137,7 @@ export default function AutoSuggestInput<T>({
               default:
             }
           }}
+          spellCheck={false}
           {...rest}
         />
       </div>
