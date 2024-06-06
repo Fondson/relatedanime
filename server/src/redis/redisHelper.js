@@ -9,7 +9,22 @@ let malCacheClient = null
 let redlock = null
 
 const createClient = (url) => {
-  return new Redis(url)
+  const parsed = new URL(url)
+
+  if (parsed.protocol !== 'redis:') {
+    throw new Error(`Unknown Redis protocol: ${parsed.protocol}`)
+  }
+
+  return new Redis({
+    port: parsed.port === '' ? undefined : Number(parsed.port),
+    host: parsed.hostname,
+    username: parsed.username === '' ? undefined : parsed.username,
+    password: parsed.password === '' ? undefined : parsed.password,
+    options: {
+      family:
+        parsed.searchParams.get('family') == null ? 4 : Number(parsed.searchParams.get('family')),
+    },
+  })
 }
 
 const getPageDataClient = () => {
