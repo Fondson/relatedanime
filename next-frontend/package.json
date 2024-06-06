@@ -47,5 +47,8 @@
     "sass": "^1.54.9",
     "tailwindcss": "^3.0.19",
     "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
