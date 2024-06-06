@@ -1,48 +1,46 @@
-import Section from 'components/Section'
-import { useCallback } from 'react'
-import { AnimeItem } from 'types/common'
-const topOrder = ['TV', 'ONA', 'Manga', 'Light Novel', 'Movie']
-
-type AnimeItemsByType = {
-  [key: string]: AnimeItem[]
-}
+import GroupedEntryView from 'components/GroupedEntryView'
+import TimelineEntryView from 'components/TimelineEntryView'
+import ViewOptionsButton, { View } from 'components/ViewOptionsButton'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { AnimeItemsByType } from 'types/common'
 
 type SectionsContainerProps = {
   animes: AnimeItemsByType
 }
 
 function SectionsContainer({ animes }: SectionsContainerProps) {
-  const getOrderIndex = useCallback((type: string) => {
-    const index = topOrder.indexOf(type)
-    return index === -1 ? topOrder.length : index
-  }, [])
+  const router = useRouter()
+  const { view: viewFromQuery }: { view?: View } = router.query
 
-  const relatedSeries = Object.values(animes)
-    .flat()
-    .filter(({ maybeRelated }) => maybeRelated)
-    .map((anime) => ({ ...anime, link: `/${anime.link.split('/').slice(-2).join('/')}` }))
+  const [view, setView] = useState<View | undefined>()
+
+  const onViewChange = useCallback(
+    (view: View) => {
+      router.push({ pathname: router.pathname, query: { ...router.query, view } }, undefined, {
+        shallow: true,
+      })
+      setView(view)
+    },
+    [router],
+  )
+
+  useEffect(() => {
+    if (router.isReady) {
+      setView(viewFromQuery ?? 'grouped')
+    }
+  }, [viewFromQuery, router])
 
   return (
     <>
-      {Object.entries(animes)
-        .sort((a, b) => {
-          return getOrderIndex(a[0]) - getOrderIndex(b[0]) || a[0].localeCompare(b[0])
-        })
-        .map(([key, value]) => {
-          const animes = value.filter(({ maybeRelated }) => !maybeRelated)
-          if (animes.length === 0) return null
+      <div className="flex w-full">
+        <div className="ml-auto">
+          {view && <ViewOptionsButton defaultView={view} onViewChange={onViewChange} />}
+        </div>
+      </div>
 
-          return <Section key={key} data={{ header: key, animes }} />
-        })}
-
-      {relatedSeries.length > 0 && (
-        <Section
-          data={{
-            header: 'Related series',
-            animes: relatedSeries,
-          }}
-        />
-      )}
+      {view === 'grouped' && <GroupedEntryView animes={animes} />}
+      {view === 'timeline' && <TimelineEntryView animes={animes} />}
     </>
   )
 }

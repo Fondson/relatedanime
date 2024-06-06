@@ -97,7 +97,7 @@ export default function AutoSuggestInput<T>({
     <div className="relative w-full text-black">
       <div className="block w-full">
         <input
-          className={`px-4 ${shouldShowDropdown ? 'rounded-b-none' : ''} ${className}`}
+          className={`px-4 ${shouldShowDropdown ? 'rounded-b-none' : ''} bg-white ${className}`}
           placeholder={placeholder}
           value={searchStr}
           onChange={(event) => {

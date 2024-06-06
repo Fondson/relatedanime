@@ -1,12 +1,18 @@
+import '@mantine/core/styles.css'
 import 'styles/globals.css'
 import 'styles/scrollbar.scss'
 
+import { createTheme, MantineProvider } from '@mantine/core'
 import GoogleAnaytics from 'components/GoogleAnalytics'
 import PwaTags from 'components/PwaTags'
 import useAckeeDomain from 'hooks/useAckeeDomain'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { DefaultSeo } from 'next-seo'
+
+const theme = createTheme({
+  primaryColor: 'gray',
+})
 
 function App({ Component, pageProps }: AppProps) {
   useAckeeDomain()
@@ -27,7 +33,9 @@ function App({ Component, pageProps }: AppProps) {
       />
       <GoogleAnaytics />
 
-      <Component {...pageProps} />
+      <MantineProvider theme={theme} forceColorScheme="dark">
+        <Component {...pageProps} />
+      </MantineProvider>
     </>
   )
 }

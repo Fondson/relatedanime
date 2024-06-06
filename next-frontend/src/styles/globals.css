@@ -1,4 +1,6 @@
-@tailwind base;
+@layer tailwind {
+  @tailwind base;
+}
 @tailwind components;
 @tailwind utilities;
 
@@ -8,7 +10,10 @@ body {
   margin: 0;
   font-family: sans-serif;
   @apply text-[14px] md:text-[16px];
-  @apply bg-[#181818] text-white;
+
+  --mantine-color-text: rgb(255, 255, 255);
+  --mantine-color-body: #181818;
+  --mantine-color-dimmed: rgb(156 163 175);
 }
 
 a {
