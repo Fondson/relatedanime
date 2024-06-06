@@ -12,7 +12,6 @@ type TimelineEntryViewProps = {
 
 const TimelineEntryView = ({ animes, mediaTypeFilters }: TimelineEntryViewProps) => {
   const [latestActive, setLatestActive] = useState(0)
-  const { ref: bottomRef, inViewport: bottomInViewport } = useInViewport()
 
   const filteredAnimes = Object.fromEntries(
     Object.entries(animes).filter(([key]) =>
@@ -31,12 +30,10 @@ const TimelineEntryView = ({ animes, mediaTypeFilters }: TimelineEntryViewProps)
   const inViewportChange = useCallback(
     (index: number) => (inViewport: boolean) => {
       if (inViewport) {
-        setLatestActive(index - 1)
+        setLatestActive(index)
       }
-
-      bottomInViewport && setLatestActive(sortedAnimes.length - 1)
     },
-    [bottomInViewport, sortedAnimes],
+    [],
   )
 
   return (
@@ -50,7 +47,6 @@ const TimelineEntryView = ({ animes, mediaTypeFilters }: TimelineEntryViewProps)
           ))}
         </Timeline>
       </div>
-      <div ref={bottomRef} className="h-[1px]" />
     </>
   )
 }
@@ -68,11 +64,12 @@ const EntryItem = ({ anime, inViewportChange }: EntryItemProps) => {
   }, [inViewport, inViewportChange])
 
   return (
-    <div ref={ref}>
+    <div>
       <Text className="font-bold">{anime.type}</Text>
       <div className="max-w-[500px]">
         <Entry data={anime} layout="horizontal" />
       </div>
+      <div className="h-[1px]" ref={ref} />
     </div>
   )
 }
