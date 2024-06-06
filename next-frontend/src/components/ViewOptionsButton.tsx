@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Button,
   Checkbox,
   CheckboxGroup,
   Popover,
@@ -7,6 +8,7 @@ import {
   PopoverTarget,
   Radio,
   RadioGroup,
+  Text,
 } from '@mantine/core'
 import { IconAdjustments } from '@tabler/icons-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -70,38 +72,69 @@ const ViewOptionsButton = ({
         </ActionIcon>
       </PopoverTarget>
       <PopoverDropdown>
-        <div>
-          <p className="mb-2">View</p>
-          <RadioGroup value={view} onChange={onViewChange as (view: string) => void}>
-            <div className="flex flex-col gap-2">
-              <Radio
-                value="grouped"
-                label="Grouped"
-                description="Group entries by media type"
-                size="md"
-              />
-              <Radio
-                value="timeline"
-                label="Timeline"
-                description="View entries as a timeline"
-                size="md"
-              />
-            </div>
-          </RadioGroup>
-
-          <p className="mb-2">Filter</p>
-          <CheckboxGroup value={selectedMediaTypes} onChange={onSelectedMediaTypesChange}>
-            <div className="flex flex-col gap-2">
-              {mediaTypes.map((mediaType) => (
-                <Checkbox
-                  key={mediaType}
-                  value={mediaType}
-                  label={`${mediaType} (${animes[mediaType].length})`}
+        <div className="flex flex-col gap-2">
+          <div>
+            <p className="mb-2">View</p>
+            <RadioGroup value={view} onChange={onViewChange as (view: string) => void}>
+              <div className="flex flex-col gap-2">
+                <Radio
+                  value="grouped"
+                  label="Grouped"
+                  description="Group entries by media type"
                   size="md"
                 />
-              ))}
+                <Radio
+                  value="timeline"
+                  label="Timeline"
+                  description="View entries as a timeline"
+                  size="md"
+                />
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div>
+            <p>Filter</p>
+            <div className="mb-2 flex">
+              <div className="ml-auto flex">
+                <Button
+                  variant="transparent"
+                  size="compact-sm"
+                  color="blue"
+                  onClick={() => onSelectedMediaTypesChange(mediaTypes)}
+                >
+                  Select All
+                </Button>
+                <Button
+                  variant="transparent"
+                  size="compact-sm"
+                  color="blue"
+                  onClick={() => onSelectedMediaTypesChange([])}
+                >
+                  Clear
+                </Button>
+              </div>
             </div>
-          </CheckboxGroup>
+            <CheckboxGroup value={selectedMediaTypes} onChange={onSelectedMediaTypesChange}>
+              <div className="flex flex-col gap-2">
+                {mediaTypes.map((mediaType) => (
+                  <Checkbox
+                    key={mediaType}
+                    value={mediaType}
+                    label={
+                      <span>
+                        <Text span>{mediaType}</Text>{' '}
+                        <Text span c="dimmed">
+                          {`(${animes[mediaType].length})`}
+                        </Text>
+                      </span>
+                    }
+                    size="md"
+                  />
+                ))}
+              </div>
+            </CheckboxGroup>
+          </div>
         </div>
       </PopoverDropdown>
     </Popover>
