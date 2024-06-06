@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Button,
   Checkbox,
   CheckboxGroup,
   Popover,
@@ -11,6 +10,7 @@ import {
   Text,
 } from '@mantine/core'
 import { IconAdjustments } from '@tabler/icons-react'
+import LinkButton from 'components/LinkButton'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimeItemsByType } from 'types/common'
 
@@ -46,6 +46,7 @@ const ViewOptionsButton = ({
 
   useEffect(() => {
     setSelectedMediaTypes(defaultSelectedMediaTypes ? defaultSelectedMediaTypes : mediaTypes)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedMediaTypes])
 
   const onViewChange = useCallback(
@@ -94,25 +95,18 @@ const ViewOptionsButton = ({
           </div>
 
           <div>
-            <p>Filter</p>
+            <div>
+              <span>
+                <span>Filter</span>{' '}
+                <Text span c="dimmed">{`(${Object.values(animes).flat().length})`}</Text>
+              </span>
+            </div>
             <div className="mb-2 flex">
               <div className="ml-auto flex">
-                <Button
-                  variant="transparent"
-                  size="compact-sm"
-                  color="blue"
-                  onClick={() => onSelectedMediaTypesChange(mediaTypes)}
-                >
+                <LinkButton onClick={() => onSelectedMediaTypesChange(mediaTypes)}>
                   Select All
-                </Button>
-                <Button
-                  variant="transparent"
-                  size="compact-sm"
-                  color="blue"
-                  onClick={() => onSelectedMediaTypesChange([])}
-                >
-                  Clear
-                </Button>
+                </LinkButton>
+                <LinkButton onClick={() => onSelectedMediaTypesChange([])}>Clear</LinkButton>
               </div>
             </div>
             <CheckboxGroup value={selectedMediaTypes} onChange={onSelectedMediaTypesChange}>
