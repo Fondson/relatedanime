@@ -20,10 +20,8 @@ const createClient = (url) => {
     host: parsed.hostname,
     username: parsed.username === '' ? undefined : parsed.username,
     password: parsed.password === '' ? undefined : parsed.password,
-    options: {
-      family:
-        parsed.searchParams.get('family') == null ? 4 : Number(parsed.searchParams.get('family')),
-    },
+    family:
+      parsed.searchParams.get('family') == null ? 4 : Number(parsed.searchParams.get('family')),
   })
 }
 
