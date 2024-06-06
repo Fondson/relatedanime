@@ -10,17 +10,23 @@ const getOrderIndex = (type: string) => {
 
 type GroupedEntryViewProps = {
   animes: AnimeItemsByType
+  mediaTypeFilters?: string[]
 }
 
-const GroupedEntryView = ({ animes }: GroupedEntryViewProps) => {
-  const relatedSeries = Object.values(animes)
+const GroupedEntryView = ({ animes, mediaTypeFilters }: GroupedEntryViewProps) => {
+  const filteredAnimes = Object.fromEntries(
+    Object.entries(animes).filter(([key]) =>
+      mediaTypeFilters ? mediaTypeFilters.includes(key) : true,
+    ),
+  )
+  const relatedSeries = Object.values(filteredAnimes)
     .flat()
     .filter(({ maybeRelated }) => maybeRelated)
     .map((anime) => ({ ...anime, link: `/${anime.link.split('/').slice(-2).join('/')}` }))
 
   return (
     <>
-      {Object.entries(animes)
+      {Object.entries(filteredAnimes)
         .sort((a, b) => {
           return getOrderIndex(a[0]) - getOrderIndex(b[0]) || a[0].localeCompare(b[0])
         })

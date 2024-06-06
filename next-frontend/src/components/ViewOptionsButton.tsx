@@ -1,32 +1,50 @@
 import {
   ActionIcon,
+  Checkbox,
+  CheckboxGroup,
   Popover,
   PopoverDropdown,
   PopoverTarget,
-  RadioCard as MantineRadioCard,
+  Radio,
   RadioGroup,
-  RadioIndicator,
-  Text,
 } from '@mantine/core'
 import { IconAdjustments } from '@tabler/icons-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AnimeItemsByType } from 'types/common'
 
 export type View = 'grouped' | 'timeline'
 
 type ViewOptionsButtonProps = {
   defaultView: View
   onViewChange: (view: View) => void
+  animes: AnimeItemsByType
+  defaultSelectedMediaTypes?: string[]
+  onSelectedMediaTypesChange: (mediaTypes: string[]) => void
 }
 
 const ViewOptionsButton = ({
   defaultView,
   onViewChange: onViewChangeProp,
+  animes,
+  defaultSelectedMediaTypes,
+  onSelectedMediaTypesChange: onSelectedMediaTypesChangeProp,
 }: ViewOptionsButtonProps) => {
   const [view, setView] = useState<View>(defaultView)
+  const [selectedMediaTypes, setSelectedMediaTypes] = useState<string[] | undefined>(
+    defaultSelectedMediaTypes,
+  )
+
+  const mediaTypes = useMemo(() => {
+    return Object.keys(animes).sort()
+  }, [animes])
 
   useEffect(() => {
     setView(defaultView)
   }, [defaultView])
+
+  useEffect(() => {
+    setSelectedMediaTypes(defaultSelectedMediaTypes ? defaultSelectedMediaTypes : mediaTypes)
+  }, [defaultSelectedMediaTypes])
 
   const onViewChange = useCallback(
     (view: View) => {
@@ -34,6 +52,14 @@ const ViewOptionsButton = ({
       onViewChangeProp(view)
     },
     [onViewChangeProp],
+  )
+
+  const onSelectedMediaTypesChange = useCallback(
+    (mediaTypes: string[]) => {
+      setSelectedMediaTypes(mediaTypes)
+      onSelectedMediaTypesChangeProp(mediaTypes)
+    },
+    [onSelectedMediaTypesChangeProp],
   )
 
   return (
@@ -48,43 +74,37 @@ const ViewOptionsButton = ({
           <p className="mb-2">View</p>
           <RadioGroup value={view} onChange={onViewChange as (view: string) => void}>
             <div className="flex flex-col gap-2">
-              <RadioCard
+              <Radio
                 value="grouped"
                 label="Grouped"
                 description="Group entries by media type"
+                size="md"
               />
-              <RadioCard
+              <Radio
                 value="timeline"
                 label="Timeline"
                 description="View entries as a timeline"
+                size="md"
               />
             </div>
           </RadioGroup>
+
+          <p className="mb-2">Filter</p>
+          <CheckboxGroup value={selectedMediaTypes} onChange={onSelectedMediaTypesChange}>
+            <div className="flex flex-col gap-2">
+              {mediaTypes.map((mediaType) => (
+                <Checkbox
+                  key={mediaType}
+                  value={mediaType}
+                  label={`${mediaType} (${animes[mediaType].length})`}
+                  size="md"
+                />
+              ))}
+            </div>
+          </CheckboxGroup>
         </div>
       </PopoverDropdown>
     </Popover>
-  )
-}
-
-type RadioCardProps = {
-  value: View
-  label: string
-  description: string
-}
-
-const RadioCard = ({ value, label, description }: RadioCardProps) => {
-  return (
-    <MantineRadioCard value={value} className="border-0">
-      <div className="flex">
-        <RadioIndicator />
-        <div className="ml-2">
-          <Text>{label}</Text>
-          <Text className="text-sm" c="dimmed">
-            {description}
-          </Text>
-        </div>
-      </div>
-    </MantineRadioCard>
   )
 }
 
