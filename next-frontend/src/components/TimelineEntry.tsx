@@ -3,22 +3,20 @@ import useCheckMobile from 'hooks/useCheckMobile'
 import Link from 'next/link'
 import { AnimeItem } from 'types/common'
 
-type EntryProps = {
+type TimelineEntryProps = {
   data: AnimeItem
 }
 
-function Entry({ data }: EntryProps) {
+function TimelineEntry({ data }: TimelineEntryProps) {
   const { image, title, link, startDate } = data
   const isMobile = useCheckMobile()
 
   return (
     <Link href={link}>
-      <a className={`group block`}>
-        <EntryImage src={image} alt={title} unoptimized />
-        <div className={`${!isMobile ? 'transition group-hover:brightness-[.8]' : ''}`}>
-          <div className={`pt-2 line-clamp-2`} title={title}>
-            {title}
-          </div>
+      <a className={`horizontal group grid grid-cols-3 gap-2`}>
+        <EntryImage src={image} alt={title} unoptimized className={`col-span-1`} />
+        <div className={`col-span-2 ${!isMobile ? 'transition group-hover:brightness-[.8]' : ''}`}>
+          <div title={title}>{title}</div>
           <div className="italic text-gray-200">{startDate}</div>
         </div>
       </a>
@@ -26,4 +24,4 @@ function Entry({ data }: EntryProps) {
   )
 }
 
-export default Entry
+export default TimelineEntry

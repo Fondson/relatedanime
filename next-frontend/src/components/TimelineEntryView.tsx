@@ -1,6 +1,6 @@
 import { Text, Timeline, TimelineItem } from '@mantine/core'
 import { useInViewport } from '@mantine/hooks'
-import Entry from 'components/Entry'
+import TimelineEntry from 'components/TimelineEntry'
 import { compareAsc } from 'date-fns'
 import { useCallback, useEffect, useState } from 'react'
 import { AnimeItem, AnimeItemsByType } from 'types/common'
@@ -39,7 +39,12 @@ const TimelineEntryView = ({ animes, mediaTypeFilters }: TimelineEntryViewProps)
   return (
     <>
       <div className="flex justify-center">
-        <Timeline active={latestActive} bulletSize={24} lineWidth={2}>
+        <Timeline
+          className="max-w-[550px] grow"
+          active={latestActive}
+          bulletSize={24}
+          lineWidth={2}
+        >
           {sortedAnimes.map((anime, i) => (
             <TimelineItem key={anime.link}>
               <EntryItem anime={anime} inViewportChange={inViewportChange(i)} />
@@ -66,9 +71,7 @@ const EntryItem = ({ anime, inViewportChange }: EntryItemProps) => {
   return (
     <div>
       <Text className="font-bold">{anime.type}</Text>
-      <div className="max-w-[500px]">
-        <Entry data={anime} layout="horizontal" />
-      </div>
+      <TimelineEntry data={anime} />
       <div className="h-[1px]" ref={ref} />
     </div>
   )
