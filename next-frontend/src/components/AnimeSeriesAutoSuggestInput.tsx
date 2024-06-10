@@ -1,3 +1,4 @@
+import { Text } from '@mantine/core'
 import { useHotkeys, useOs } from '@mantine/hooks'
 import Client from 'Client'
 import AutoSuggestInput from 'components/AutoSuggestInput'
@@ -7,7 +8,7 @@ import useCheckMobile from 'hooks/useCheckMobile'
 import { isEmpty } from 'lodash'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { SearchResult } from 'types/common'
 
 type AnimeSeriesAutoSuggestInputProps = {
@@ -18,6 +19,24 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
   const router = useRouter()
   const os = useOs()
   const isMobile = useCheckMobile()
+
+  const [defaultSuggestions, setDefaultSuggestions] = useState<SearchResult[]>([])
+  useEffect(() => {
+    const fetchDefaultSuggestions = async () => {
+      const { data } = await Client.searchSeasonal()
+      setDefaultSuggestions(
+        data.map(({ malType, id, title, img }) => ({
+          malType,
+          id: String(id),
+          name: title,
+          type: 'TV',
+          thumbnail: img,
+        })),
+      )
+    }
+
+    fetchDefaultSuggestions()
+  }, [])
 
   const inputRef = useRef<HTMLInputElement>(null)
   useHotkeys([['mod + K', () => inputRef.current?.focus()]])
@@ -49,6 +68,11 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
     <AutoSuggestInput<SearchResult>
       inputRef={inputRef}
       className={`${className}`}
+      defaultSuggestions={defaultSuggestions.map(({ name, ...rest }) => ({
+        suggestion: name,
+        name,
+        ...rest,
+      }))}
       onSuggestionSelect={({ malType, id }) => router.push(`/${malType}/${id}`)}
       onFetch={onFetch}
       placeholder="Search anime..."
@@ -99,6 +123,13 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
           >
             <p className="text-sm font-medium">{os === 'macos' ? '⌘ + K' : 'Ctrl + K'}</p>
           </div>
+        )
+      }}
+      renderDefaultSuggestionsHeader={() => {
+        return (
+          <Text className="px-4 py-1" c="dimmed">
+            This anime season
+          </Text>
         )
       }}
     />

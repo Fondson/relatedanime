@@ -25,6 +25,8 @@ type AutoSuggestInputProps<T> = Partial<React.InputHTMLAttributes<HTMLInputEleme
   renderLeftSection?: RenderSectionFunction
   renderRightSection?: RenderSectionFunction
   inputRef?: React.RefObject<HTMLInputElement>
+  defaultSuggestions?: Suggestion<T>[]
+  renderDefaultSuggestionsHeader?: () => React.ReactNode
 }
 
 export default function AutoSuggestInput<T>({
@@ -40,6 +42,8 @@ export default function AutoSuggestInput<T>({
   renderLeftSection,
   renderRightSection,
   inputRef: inputRefProp,
+  defaultSuggestions = [],
+  renderDefaultSuggestionsHeader,
   ...rest
 }: AutoSuggestInputProps<T>) {
   const [searchStr, setSearchStr] = useState(initialValue)
@@ -54,26 +58,32 @@ export default function AutoSuggestInput<T>({
   const [suggestions, setSuggestions] = useState<Suggestion<T>[]>([])
   const [highlight, setHighlight] = useState<number | null>(null)
   const [isActive, setIsActive] = useState(false)
-  const shouldShowDropdown = isActive && shouldStartFetching(searchStr)
+  const shouldShowDropdown =
+    isActive && (shouldStartFetching(searchStr) || defaultSuggestions.length > 0)
 
   const localInputRef = useRef<HTMLInputElement>(null)
   const inputRef = inputRefProp ?? localInputRef
+
+  const suggestionsToShow = useMemo(
+    () => (searchStr.length === 0 ? defaultSuggestions : suggestions),
+    [defaultSuggestions, searchStr.length, suggestions],
+  )
 
   const updateSuggestions = useCallback(
     async (str: string) => {
       if (shouldStartFetching(str)) {
         setLoading(true)
-        debouncedOnFetch(str).then((suggestions: Suggestion<T>[]) => {
-          setSuggestions(suggestions)
-          setHighlight(suggestions.length > 0 ? 0 : null)
+        debouncedOnFetch(str).then((_suggestions: Suggestion<T>[]) => {
+          setSuggestions(_suggestions)
+          setHighlight(_suggestions.length > 0 ? 0 : null)
           setLoading(false)
         })
       } else {
         setSuggestions([])
-        setHighlight(null)
+        setHighlight(suggestionsToShow.length - 1 >= 0 ? 0 : null)
       }
     },
-    [debouncedOnFetch, shouldStartFetching],
+    [debouncedOnFetch, shouldStartFetching, suggestionsToShow.length],
   )
 
   const listOptionsDivRef = useRef<HTMLDivElement>(null)
@@ -82,18 +92,21 @@ export default function AutoSuggestInput<T>({
     listOptionsDivRef.current.scrollTop = 0
   }, [searchStr])
 
-  const setSelected = (highlightOverride?: number) => {
-    const selectedSuggestionIndex = highlightOverride ?? highlight
-    if (selectedSuggestionIndex != null) {
-      onSuggestionSelect(suggestions[selectedSuggestionIndex])
-    }
-    setSearchStr('')
-    setSuggestions([])
-    setHighlight(null)
-  }
+  const setSelected = useCallback(
+    (highlightOverride?: number) => {
+      const selectedSuggestionIndex = highlightOverride ?? highlight
+      if (selectedSuggestionIndex != null) {
+        onSuggestionSelect(suggestionsToShow[selectedSuggestionIndex])
+      }
+      setSearchStr('')
+      setSuggestions([])
+      setHighlight(null)
+    },
+    [highlight, onSuggestionSelect, suggestionsToShow],
+  )
 
   const suggestionButtonsRefs: React.RefObject<HTMLButtonElement>[] = Array.from(
-    { length: suggestions.length },
+    { length: suggestionsToShow.length },
     () => createRef(),
   )
   useEffect(() => {
@@ -103,6 +116,27 @@ export default function AutoSuggestInput<T>({
       block: 'nearest',
     })
   }, [highlight, suggestionButtonsRefs])
+
+  const renderSuggestions = useCallback(
+    (suggestion: Suggestion<T>, i: number) => {
+      const isHighligted = highlight === i
+      return (
+        <button
+          key={i}
+          ref={suggestionButtonsRefs[i]}
+          onMouseDown={(e) => e.preventDefault()} /* https://stackoverflow.com/a/57630197 */
+          onClick={() => setSelected(i)}
+          onMouseMove={() => setHighlight(i)}
+          type="button"
+        >
+          {renderCustonSuggestionButton
+            ? renderCustonSuggestionButton(suggestion, isHighligted)
+            : renderSuggestionButton(suggestion, isHighligted)}
+        </button>
+      )
+    },
+    [highlight, suggestionButtonsRefs, renderCustonSuggestionButton, setSelected],
+  )
 
   return (
     <div className="relative w-full text-black">
@@ -147,11 +181,11 @@ export default function AutoSuggestInput<T>({
               switch (event.code) {
                 case 'ArrowDown':
                   event.preventDefault()
-                  setHighlight((prev) => Math.min((prev ?? -1) + 1, suggestions.length - 1))
+                  setHighlight((prev) => Math.min((prev ?? -1) + 1, suggestionsToShow.length - 1))
                   break
                 case 'ArrowUp':
                   event.preventDefault()
-                  setHighlight((prev) => Math.max((prev ?? suggestions.length) - 1, 0))
+                  setHighlight((prev) => Math.max((prev ?? suggestionsToShow.length) - 1, 0))
                   break
                 case 'Enter':
                   event.preventDefault()
@@ -174,7 +208,7 @@ export default function AutoSuggestInput<T>({
           !shouldShowDropdown ? 'hidden' : ''
         }`}
       >
-        {suggestions.length === 0 || loading ? (
+        {loading ? (
           renderCustomLoader ? (
             renderCustomLoader()
           ) : (
@@ -184,23 +218,10 @@ export default function AutoSuggestInput<T>({
             </div>
           )
         ) : (
-          suggestions.map((suggestion, i) => {
-            const isHighligted = highlight === i
-            return (
-              <button
-                key={i}
-                ref={suggestionButtonsRefs[i]}
-                onMouseDown={(e) => e.preventDefault()} /* https://stackoverflow.com/a/57630197 */
-                onClick={() => setSelected(i)}
-                onMouseMove={() => setHighlight(i)}
-                type="button"
-              >
-                {renderCustonSuggestionButton
-                  ? renderCustonSuggestionButton(suggestion, isHighligted)
-                  : renderSuggestionButton(suggestion, isHighligted)}
-              </button>
-            )
-          })
+          <>
+            {searchStr.length === 0 && renderDefaultSuggestionsHeader?.()}
+            {suggestionsToShow.map(renderSuggestions)}
+          </>
         )}
       </div>
     </div>
