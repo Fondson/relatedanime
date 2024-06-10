@@ -31,7 +31,7 @@ async function main() {
           `Refreshed everything.<br/><br/>Finished in ${formatDistanceToNow(start)}`,
         )
       } finally {
-        await lock.unlock()
+        await lock.release()
       }
     } else if (args.length >= 1) {
       const key = args[0]
@@ -46,7 +46,7 @@ async function main() {
       await refreshMalCache(key)
       await sendMail(
         'Refresh MAL cache complete',
-        `Refreshed ${key}.<br/><br/>Finished in ${formatDistanceToNow(start)}`,
+        `Refreshed ${key}<br/><br/>Finished in ${formatDistanceToNow(start)}`,
       )
     } else {
       console.log(
