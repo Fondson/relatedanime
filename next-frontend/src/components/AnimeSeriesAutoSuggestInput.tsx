@@ -1,10 +1,13 @@
+import { useHotkeys, useOs } from '@mantine/hooks'
 import Client from 'Client'
 import AutoSuggestInput from 'components/AutoSuggestInput'
 import EmptyImage from 'components/EmptyImage'
 import Skeleton from 'components/Skeleton'
+import useCheckMobile from 'hooks/useCheckMobile'
 import { isEmpty } from 'lodash'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+import { useCallback, useRef } from 'react'
 import { SearchResult } from 'types/common'
 
 type AnimeSeriesAutoSuggestInputProps = {
@@ -13,6 +16,22 @@ type AnimeSeriesAutoSuggestInputProps = {
 
 const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputProps) => {
   const router = useRouter()
+  const os = useOs()
+  const isMobile = useCheckMobile()
+
+  const inputRef = useRef<HTMLInputElement>(null)
+  useHotkeys([['mod + K', () => inputRef.current?.focus()]])
+
+  const onFetch = useCallback(async (str: string) => {
+    const result = await Client.search(str, 10)
+    return result.map(({ name, ...rest }) => ({
+      suggestion: name,
+      name,
+      ...rest,
+    }))
+  }, [])
+
+  const shouldStartFetching = useCallback((str: string) => str.length > 2, [])
 
   const SuggestionSkeleton = () => {
     return (
@@ -28,18 +47,12 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
 
   return (
     <AutoSuggestInput<SearchResult>
-      className={`w-full rounded-md py-2 outline-none ${className}`}
+      inputRef={inputRef}
+      className={`${className}`}
       onSuggestionSelect={({ malType, id }) => router.push(`/${malType}/${id}`)}
-      onFetch={async (str) => {
-        const result = await Client.search(str, 10)
-        return result.map(({ name, ...rest }) => ({
-          suggestion: name,
-          name,
-          ...rest,
-        }))
-      }}
+      onFetch={onFetch}
       placeholder="Search anime..."
-      shouldStartFetching={(str) => str.length > 2}
+      shouldStartFetching={shouldStartFetching}
       renderCustonSuggestionButton={({ name, thumbnail, type }, highlight) => {
         return (
           <div
@@ -75,6 +88,17 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
               <SuggestionSkeleton key={i} />
             ))}
           </>
+        )
+      }}
+      renderRightSection={({ isInputActive }) => {
+        return (
+          <div
+            className={`${
+              isMobile || isInputActive ? 'invisible' : ''
+            } -my-1 -mr-3 flex h-min gap-1 rounded border bg-gray-100 px-2 py-0.5`}
+          >
+            <p className="text-sm font-medium">{os === 'macos' ? '⌘ + K' : 'Ctrl + K'}</p>
+          </div>
         )
       }}
     />

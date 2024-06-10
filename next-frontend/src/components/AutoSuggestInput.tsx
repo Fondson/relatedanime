@@ -10,6 +10,8 @@ type Suggestion<T> = T & {
 
 type RenderSuggestion<T> = (suggestion: Suggestion<T>, highlight: boolean) => React.ReactNode
 
+type RenderSectionFunction = ({ isInputActive }: { isInputActive: boolean }) => React.ReactNode
+
 type AutoSuggestInputProps<T> = Partial<React.InputHTMLAttributes<HTMLInputElement>> & {
   onSuggestionSelect: (value: T) => void
   onFetch: (searchStr: string) => Promise<Suggestion<T>[]>
@@ -20,6 +22,9 @@ type AutoSuggestInputProps<T> = Partial<React.InputHTMLAttributes<HTMLInputEleme
   shouldStartFetching?: (searchStr: string) => boolean
   renderCustonSuggestionButton?: RenderSuggestion<T>
   renderCustomLoader?: () => React.ReactNode
+  renderLeftSection?: RenderSectionFunction
+  renderRightSection?: RenderSectionFunction
+  inputRef?: React.RefObject<HTMLInputElement>
 }
 
 export default function AutoSuggestInput<T>({
@@ -32,6 +37,9 @@ export default function AutoSuggestInput<T>({
   shouldStartFetching = () => true,
   renderCustonSuggestionButton,
   renderCustomLoader,
+  renderLeftSection,
+  renderRightSection,
+  inputRef: inputRefProp,
   ...rest
 }: AutoSuggestInputProps<T>) {
   const [searchStr, setSearchStr] = useState(initialValue)
@@ -47,6 +55,9 @@ export default function AutoSuggestInput<T>({
   const [highlight, setHighlight] = useState<number | null>(null)
   const [isActive, setIsActive] = useState(false)
   const shouldShowDropdown = isActive && shouldStartFetching(searchStr)
+
+  const localInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = inputRefProp ?? localInputRef
 
   const updateSuggestions = useCallback(
     async (str: string) => {
@@ -96,50 +107,66 @@ export default function AutoSuggestInput<T>({
   return (
     <div className="relative w-full text-black">
       <div className="block w-full">
-        <input
-          className={`px-4 ${shouldShowDropdown ? 'rounded-b-none' : ''} bg-white ${className}`}
-          placeholder={placeholder}
-          value={searchStr}
-          onChange={(event) => {
-            const str = event.target.value
-            setSearchStr(str)
-            updateSuggestions(str)
+        <div
+          className={`flex w-full items-center rounded-md border-2 bg-white py-1.5 px-4 ${
+            shouldShowDropdown
+              ? 'rounded-b-none'
+              : isActive
+              ? 'border-blue-600'
+              : 'border-slate-300'
+          } ${className}`}
+          onClick={() => {
+            inputRef.current?.focus()
           }}
-          onFocus={() => {
-            setIsActive(true)
-            updateSuggestions(searchStr)
-          }}
-          onBlur={() => {
-            if (clearOnBlur) {
-              setSearchStr('')
-            }
+        >
+          {renderLeftSection?.({ isInputActive: isActive })}
+          <input
+            ref={inputRef}
+            className="grow bg-inherit outline-none"
+            placeholder={placeholder}
+            value={searchStr}
+            onChange={(event) => {
+              const str = event.target.value
+              setSearchStr(str)
+              updateSuggestions(str)
+            }}
+            onFocus={() => {
+              setIsActive(true)
+              updateSuggestions(searchStr)
+            }}
+            onBlur={() => {
+              if (clearOnBlur) {
+                setSearchStr('')
+              }
 
-            setIsActive(false)
-            setHighlight(null)
-            setSuggestions([])
-          }}
-          onKeyDown={(event) => {
-            switch (event.code) {
-              case 'ArrowDown':
-                event.preventDefault()
-                setHighlight((prev) => Math.min((prev ?? -1) + 1, suggestions.length - 1))
-                break
-              case 'ArrowUp':
-                event.preventDefault()
-                setHighlight((prev) => Math.max((prev ?? suggestions.length) - 1, 0))
-                break
-              case 'Enter':
-                event.preventDefault()
-                if (highlight !== null) {
-                  setSelected()
-                }
-                break
-              default:
-            }
-          }}
-          spellCheck={false}
-          {...rest}
-        />
+              setIsActive(false)
+              setHighlight(null)
+              setSuggestions([])
+            }}
+            onKeyDown={(event) => {
+              switch (event.code) {
+                case 'ArrowDown':
+                  event.preventDefault()
+                  setHighlight((prev) => Math.min((prev ?? -1) + 1, suggestions.length - 1))
+                  break
+                case 'ArrowUp':
+                  event.preventDefault()
+                  setHighlight((prev) => Math.max((prev ?? suggestions.length) - 1, 0))
+                  break
+                case 'Enter':
+                  event.preventDefault()
+                  if (highlight !== null) {
+                    setSelected()
+                  }
+                  break
+                default:
+              }
+            }}
+            spellCheck={false}
+            {...rest}
+          />
+          {renderRightSection?.({ isInputActive: isActive })}
+        </div>
       </div>
       <div
         ref={listOptionsDivRef}
