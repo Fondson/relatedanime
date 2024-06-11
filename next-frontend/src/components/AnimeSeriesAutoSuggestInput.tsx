@@ -116,13 +116,12 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
       }}
       renderRightSection={({ isInputActive }) => {
         return (
-          <div
-            className={`${
-              isMobile || isInputActive ? 'invisible' : ''
-            } -my-1 -mr-3 flex h-min gap-1 rounded border bg-gray-100 px-2 py-0.5`}
-          >
-            <p className="text-sm font-medium">{os === 'macos' ? '⌘ + K' : 'Ctrl + K'}</p>
-          </div>
+          !isMobile &&
+          !isInputActive && (
+            <div className={`-my-1 -mr-3 flex h-min gap-1 rounded border bg-gray-100 px-2 py-0.5`}>
+              <p className="text-sm font-medium">{os === 'macos' ? '⌘ + K' : 'Ctrl + K'}</p>
+            </div>
+          )
         )
       }}
       renderDefaultSuggestionsHeader={() => {
