@@ -80,10 +80,10 @@ export default function AutoSuggestInput<T>({
         })
       } else {
         setSuggestions([])
-        setHighlight(suggestionsToShow.length - 1 >= 0 ? 0 : null)
+        setHighlight(null)
       }
     },
-    [debouncedOnFetch, shouldStartFetching, suggestionsToShow.length],
+    [debouncedOnFetch, shouldStartFetching],
   )
 
   const listOptionsDivRef = useRef<HTMLDivElement>(null)
