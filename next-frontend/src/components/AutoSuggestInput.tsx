@@ -101,6 +101,7 @@ export default function AutoSuggestInput<T>({
       setSearchStr('')
       setSuggestions([])
       setHighlight(null)
+      setIsActive(false)
     },
     [highlight, onSuggestionSelect, suggestionsToShow],
   )
