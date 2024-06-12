@@ -14,6 +14,8 @@ body {
   --mantine-color-text: rgb(255, 255, 255);
   --mantine-color-body: #181818;
   --mantine-color-dimmed: rgb(156 163 175);
+
+  --mantine-color-anchor: var(--mantine-color-blue-4);
 }
 
 a {
@@ -34,5 +36,11 @@ a {
       var(--outline-width) var(--outline-width) 0 #000, 0 var(--outline-width) 0 #000,
       calc(0px - var(--outline-width)) var(--outline-width) 0 #000,
       calc(0px - var(--outline-width)) 0 0 #000;
+  }
+
+  .web-link,
+  .web-link:visited {
+    color: var(--mantine-color-anchor);
+    text-decoration: underline;
   }
 }

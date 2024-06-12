@@ -7,6 +7,7 @@ import Skeleton from 'components/Skeleton'
 import useCheckMobile from 'hooks/useCheckMobile'
 import { isEmpty } from 'lodash'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SearchResult } from 'types/common'
@@ -65,73 +66,85 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
   }
 
   return (
-    <AutoSuggestInput<SearchResult>
-      inputRef={inputRef}
-      className={`${className}`}
-      defaultSuggestions={defaultSuggestions.map(({ name, ...rest }) => ({
-        suggestion: name,
-        name,
-        ...rest,
-      }))}
-      onSuggestionSelect={({ malType, id }) => router.push(`/${malType}/${id}`)}
-      onFetch={onFetch}
-      placeholder="Search anime..."
-      shouldStartFetching={shouldStartFetching}
-      renderCustonSuggestionButton={({ name, thumbnail, type }, highlight) => {
-        return (
-          <div
-            className={`grid w-full grid-cols-[min-content_minmax(0,1fr)] items-center border-b border-gray-200 py-2 px-4 text-left ${
-              highlight ? 'bg-gray-300' : ''
-            }`}
-          >
-            <div className="relative mr-2 aspect-square w-12">
-              {isEmpty(thumbnail) ? (
-                <EmptyImage className="rounded-full" />
-              ) : (
-                <Image
-                  className="rounded-full object-cover"
-                  src={thumbnail as string}
-                  unoptimized
-                  alt={name}
-                  layout="fill"
-                />
-              )}
-            </div>
+    <div className="w-full">
+      <div className="flex items-center py-1">
+        <div className="ml-auto">
+          <Link href="https://forms.gle/xEJS6iq6epgyYxdM8" target="_blank">
+            <a className="web-link text-sm">Feedback</a>
+          </Link>
+        </div>
+      </div>
 
-            <div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap">{name}</div>
-              <div className="text-neutral-500">{type}</div>
-            </div>
-          </div>
-        )
-      }}
-      renderCustomLoader={() => {
-        return (
-          <>
-            {Array.from({ length: 10 }).map((_, i) => (
-              <SuggestionSkeleton key={i} />
-            ))}
-          </>
-        )
-      }}
-      renderRightSection={({ isInputActive }) => {
-        return (
-          !isMobile &&
-          !isInputActive && (
-            <div className={`-my-1 -mr-3 flex h-min gap-1 rounded border bg-gray-100 px-2 py-0.5`}>
-              <p className="text-sm font-medium">{os === 'macos' ? '⌘ + K' : 'Ctrl + K'}</p>
+      <AutoSuggestInput<SearchResult>
+        inputRef={inputRef}
+        className={`${className}`}
+        defaultSuggestions={defaultSuggestions.map(({ name, ...rest }) => ({
+          suggestion: name,
+          name,
+          ...rest,
+        }))}
+        onSuggestionSelect={({ malType, id }) => router.push(`/${malType}/${id}`)}
+        onFetch={onFetch}
+        placeholder="Search anime..."
+        shouldStartFetching={shouldStartFetching}
+        renderCustonSuggestionButton={({ name, thumbnail, type }, highlight) => {
+          return (
+            <div
+              className={`grid w-full grid-cols-[min-content_minmax(0,1fr)] items-center border-b border-gray-200 py-2 px-4 text-left ${
+                highlight ? 'bg-gray-300' : ''
+              }`}
+            >
+              <div className="relative mr-2 aspect-square w-12">
+                {isEmpty(thumbnail) ? (
+                  <EmptyImage className="rounded-full" />
+                ) : (
+                  <Image
+                    className="rounded-full object-cover"
+                    src={thumbnail as string}
+                    unoptimized
+                    alt={name}
+                    layout="fill"
+                  />
+                )}
+              </div>
+
+              <div>
+                <div className="overflow-hidden text-ellipsis whitespace-nowrap">{name}</div>
+                <div className="text-neutral-500">{type}</div>
+              </div>
             </div>
           )
-        )
-      }}
-      renderDefaultSuggestionsHeader={() => {
-        return (
-          <Text className="px-4 py-1" c="dimmed">
-            This anime season
-          </Text>
-        )
-      }}
-    />
+        }}
+        renderCustomLoader={() => {
+          return (
+            <>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <SuggestionSkeleton key={i} />
+              ))}
+            </>
+          )
+        }}
+        renderRightSection={({ isInputActive }) => {
+          return (
+            !isMobile &&
+            !isInputActive && (
+              <div
+                className={`-my-1 -mr-3 flex h-min gap-1 rounded border bg-gray-100 px-2 py-0.5`}
+              >
+                <p className="text-sm font-medium">{os === 'macos' ? '⌘ + K' : 'Ctrl + K'}</p>
+              </div>
+            )
+          )
+        }}
+        renderDefaultSuggestionsHeader={() => {
+          return (
+            <Text className="px-4 py-1" c="dimmed">
+              This anime season
+            </Text>
+          )
+        }}
+      />
+    </div>
   )
 }
 

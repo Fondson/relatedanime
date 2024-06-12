@@ -21,7 +21,6 @@ function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <PwaTags />
-        <base target="_blank" />
       </Head>
 
       {/* These only work if they're OUTSIDE the Head component */}
