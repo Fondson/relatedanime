@@ -67,14 +67,6 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-1">
-        <div className="ml-auto">
-          <Link href="https://forms.gle/xEJS6iq6epgyYxdM8" target="_blank">
-            <a className="web-link text-sm">Feedback</a>
-          </Link>
-        </div>
-      </div>
-
       <AutoSuggestInput<SearchResult>
         inputRef={inputRef}
         className={`${className}`}
@@ -144,6 +136,14 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
           )
         }}
       />
+
+      <div className="flex items-center py-1">
+        <div className="ml-auto">
+          <Link href="https://forms.gle/xEJS6iq6epgyYxdM8" target="_blank">
+            <a className="web-link text-sm">Feedback</a>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

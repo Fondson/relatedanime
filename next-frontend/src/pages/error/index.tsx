@@ -13,7 +13,7 @@ const ErrorPage: NextPage<ErrorPageProps> = ({ message }) => {
       <AnimeBackground>
         <div className="flex h-full w-full items-center justify-center overflow-visible bg-black bg-opacity-40">
           <div className="mx-auto px-6 py-7 md:w-1/2 lg:py-14">
-            <div className="mb-4 flex items-end">
+            <div className="mb-2 flex items-start">
               <HomeButton />
               <div className="flex-grow">
                 <AnimeSeriesAutoSuggestInput />

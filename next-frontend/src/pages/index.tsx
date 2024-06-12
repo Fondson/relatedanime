@@ -45,7 +45,7 @@ const LandingPage: NextPage<LandingPageProps> = ({ animes }) => {
                 <AnimeSeriesAutoSuggestInput />
               </div>
               {animes.length > 0 && (
-                <div className="mt-4 md:px-6">
+                <div className="mt-2 md:px-6">
                   <SeasonalSection animes={animes} />
                 </div>
               )}

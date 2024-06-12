@@ -90,7 +90,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       ) : (
         <div className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
           <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
-            <div className="mb-4 flex items-end">
+            <div className="mb-2 flex items-start">
               <HomeButton />
               <div className="flex-grow">
                 <AnimeSeriesAutoSuggestInput />
