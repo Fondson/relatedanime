@@ -139,8 +139,10 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
 
       <div className="flex items-center py-1">
         <div className="ml-auto">
-          <Link href="https://forms.gle/xEJS6iq6epgyYxdM8" target="_blank">
-            <a className="web-link text-sm">Feedback</a>
+          <Link href="https://forms.gle/xEJS6iq6epgyYxdM8">
+            <a className="web-link text-sm" target="_blank">
+              Feedback
+            </a>
           </Link>
         </div>
       </div>

@@ -12,8 +12,8 @@ function TimelineEntry({ data }: TimelineEntryProps) {
   const isMobile = useCheckMobile()
 
   return (
-    <Link href={link} target="_blank">
-      <a className={`horizontal group grid grid-cols-3 gap-2`}>
+    <Link href={link}>
+      <a className={`horizontal group grid grid-cols-3 gap-2`} target="_blank">
         <EntryImage src={image} alt={title} unoptimized className={`col-span-1`} />
         <div className={`col-span-2 ${!isMobile ? 'transition group-hover:brightness-[.8]' : ''}`}>
           <div title={title}>{title}</div>

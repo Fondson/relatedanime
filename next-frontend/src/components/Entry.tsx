@@ -12,8 +12,8 @@ function Entry({ data }: EntryProps) {
   const isMobile = useCheckMobile()
 
   return (
-    <Link href={link} target="_blank">
-      <a className={`group block`}>
+    <Link href={link}>
+      <a className={`group block`} target="_blank">
         <EntryImage src={image} alt={title} unoptimized />
         <div className={`${!isMobile ? 'transition group-hover:brightness-[.8]' : ''}`}>
           <div className={`pt-2 line-clamp-2`} title={title}>
