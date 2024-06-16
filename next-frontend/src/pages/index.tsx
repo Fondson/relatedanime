@@ -38,7 +38,7 @@ const LandingPage: NextPage<LandingPageProps> = ({ animes }) => {
           <div className="flex h-full w-full items-center justify-center overflow-visible bg-black bg-opacity-40">
             <div className="mx-4 min-w-0">
               <h1 className="text-center text-6xl font-bold tracking-wide">Related Anime</h1>
-              <h2 className="mx-auto mt-6 mb-4 text-center text-2xl font-medium md:w-1/3">
+              <h2 className="mx-auto mt-6 mb-4 text-center text-2xl font-medium md:w-1/2 md:px-1">
                 {description}
               </h2>
               <div className="mx-auto flex justify-center md:w-1/2">
