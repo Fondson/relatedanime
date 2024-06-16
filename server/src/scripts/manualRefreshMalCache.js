@@ -24,15 +24,11 @@ async function main() {
         throw new Error('Refresh cron lock is unavailable! Aborting refresh cron run...')
       }
 
-      try {
-        await refreshMalCache()
-        await sendMail(
-          'Refresh MAL cache complete',
-          `Refreshed everything.<br/><br/>Finished in ${formatDistanceToNow(start)}`,
-        )
-      } finally {
-        await lock.release()
-      }
+      await refreshMalCache()
+      await sendMail(
+        'Refresh MAL cache complete',
+        `Refreshed everything.<br/><br/>Finished in ${formatDistanceToNow(start)}`,
+      )
     } else if (args.length >= 1) {
       const key = args[0]
 
