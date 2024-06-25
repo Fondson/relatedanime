@@ -88,6 +88,8 @@ async function scrapSearch(res) {
 }
 
 function refreshSeasonal(interval) {
+  searchSeasonal()
+
   setInterval(function () {
     console.log('Refreshing seasonal...')
     searchSeasonal()
