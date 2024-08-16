@@ -13,17 +13,17 @@ function SeasonalEntry({ data }: SeasonalEntryProps) {
 
   return (
     <Link href={`/${malType}/${id}`}>
-      <a className="group block w-28 md:w-44">
+      <div className="group block w-28 md:w-44">
         <EntryImage src={img} alt={title} />
         <div
-          className={`line-clamp-2 pt-2 ${
+          className={`pt-2 line-clamp-2 ${
             !isMobile ? 'transition group-hover:brightness-[.8]' : ''
           }`}
           title={title}
         >
           {title}
         </div>
-      </a>
+      </div>
     </Link>
   )
 }
