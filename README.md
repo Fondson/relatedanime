@@ -1,7 +1,5 @@
 # Related Anime
 
-<img src="http://free.pagepeeker.com/v2/thumbs.php?size=x&url=https%3A%2F%2Frelatedanime.com">
-
 [Visit relatedanime.com!](http://relatedanime.com/)
 
 ## Description
@@ -27,13 +25,9 @@ The creation of Related Anime was motivated by the fact that the popular anime r
 
 https://relatedanime.com/anime/9253
 
-<img src="http://free.pagepeeker.com/v2/thumbs.php?size=x&url=https%3A%2F%2Frelatedanime.com%2Fanime%2F9253">
-
 ### Love Live
 
 https://relatedanime.com/anime/15051
-
-<img src="http://free.pagepeeker.com/v2/thumbs.php?size=x&url=https%3A%2F%2Frelatedanime.com%2Fanime%2F15051">
 
 ## Development
 
