@@ -24,7 +24,8 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
 
   const { malType, malId } = router.query as { malType: MalType; malId: string }
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [needsScraping, setNeedsScraping] = useState(false)
   const [loadingString, setLoadingString] = useState(defaultLoadingString)
   const [animes, setAnimes] = useState<AnimeItemsByType>({})
   const [error, setError] = useState(false)
@@ -44,6 +45,9 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
       malType,
       malId,
       (e) => {
+        if (!needsScraping) {
+          setNeedsScraping(true)
+        }
         setLoadingString((prev) => [`Found ${e.data}`, prev].join('\n'))
       },
       (e) => {
@@ -52,6 +56,7 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
         if (data && !isEmpty(data)) {
           setAnimes(data)
           setIsLoading(false)
+          setNeedsScraping(false)
         } else {
           setError(true)
         }
@@ -85,9 +90,9 @@ const ResourcePage: NextPage<ResourcePageProps> = ({ title, image }) => {
         }}
       />
 
-      {isLoading ? (
+      {needsScraping ? (
         <LoadingPage loadingString={loadingString} />
-      ) : (
+      ) : isLoading ? null : (
         <div className={`${isMobile ? '' : 'h-screen'} overflow-y-auto`}>
           <div className="mx-auto max-w-6xl px-6 py-7 lg:py-14">
             <div className="mb-2 flex items-start">
