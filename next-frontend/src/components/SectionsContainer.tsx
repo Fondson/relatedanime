@@ -31,10 +31,16 @@ function SectionsContainer({ animes }: SectionsContainerProps) {
 
   const onSelectedMediaTypesChange = useCallback(
     (mediaTypes: string[]) => {
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, mediaTypesFilter: JSON.stringify(mediaTypes) },
-      })
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, mediaTypesFilter: JSON.stringify(mediaTypes) },
+        },
+        undefined,
+        {
+          shallow: true,
+        },
+      )
       setMediaTypeFilters(mediaTypes)
     },
     [router],

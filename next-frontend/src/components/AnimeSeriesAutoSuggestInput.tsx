@@ -8,7 +8,6 @@ import useCheckMobile from 'hooks/useCheckMobile'
 import { isEmpty } from 'lodash'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SearchResult } from 'types/common'
 
@@ -17,7 +16,6 @@ type AnimeSeriesAutoSuggestInputProps = {
 }
 
 const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputProps) => {
-  const router = useRouter()
   const os = useOs()
   const isMobile = useCheckMobile()
 
@@ -75,7 +73,9 @@ const AnimeSeriesAutoSuggestInput = ({ className }: AnimeSeriesAutoSuggestInputP
           name,
           ...rest,
         }))}
-        onSuggestionSelect={({ malType, id }) => router.push(`/${malType}/${id}`)}
+        onSuggestionSelect={({ malType, id }) =>
+          (window.location.href = `${window.location.origin}/${malType}/${id}`)
+        }
         onFetch={onFetch}
         placeholder="Search anime..."
         shouldStartFetching={shouldStartFetching}
