@@ -38,6 +38,17 @@ function sortAnimesByDate(items) {
 }
 
 function formatDate(date) {
+  // Check if date is January 1st at midnight (special case for year-only date)
+  if (
+    date.getUTCMonth() === 0 &&
+    date.getUTCDate() === 1 &&
+    date.getUTCHours() === 0 &&
+    date.getUTCMinutes() === 0 &&
+    date.getUTCSeconds() === 0
+  ) {
+    return date.getUTCFullYear().toString()
+  }
+
   var monthNames = [
     'Jan',
     'Feb',

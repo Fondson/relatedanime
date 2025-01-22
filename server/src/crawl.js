@@ -144,9 +144,26 @@ async function visitPage(
       title,
       link: url,
       image: image.length < 1 ? null : image.attr('src') || image.attr('data-src'),
-      startDate: chrono.parseDate(
-        $('span:contains("Aired:"), span:contains("Published:")')[0].next.data.trim(),
-      ),
+      startDate: (() => {
+        const dateText = $(
+          'span:contains("Aired:"), span:contains("Published:")',
+        )[0].next.data.trim()
+        // Try normal date parsing first
+        let parsedDate = chrono.parseDate(dateText)
+
+        if (parsedDate == null) {
+          // Check for year-only format
+          const yearMatch = dateText.match(/(\d{4})/)
+          if (yearMatch) {
+            // If only year is found, set to January 1st at midnight
+            const date = new Date(parseInt(yearMatch[1]), 0, 1)
+            date.setUTCHours(0, 0, 0, 0)
+            return date
+          }
+          return null
+        }
+        return parsedDate
+      })(),
       // mark "Other" pages as maybeRelated
       maybeRelated: skipRelated,
     }
