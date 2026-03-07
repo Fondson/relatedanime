@@ -11,7 +11,7 @@ const nextConfig = withPWA({
   },
   reactStrictMode: true,
   images: {
-    domains: ['cdn.myanimelist.net'],
+    domains: ['cdn.myanimelist.net', 'myanimelist.net'],
   },
   i18n: {
     locales: ['en'],
