@@ -7,13 +7,16 @@ type EntryImageProps = ImageProps
 
 const EntryImage = ({ src, alt = '', className, ...rest }: EntryImageProps) => {
   const isMobile = useCheckMobile()
+  const decodedSrc = typeof src === 'string' && !src.includes('://')
+    ? decodeURIComponent(src)
+    : src
 
   return (
     <div className={`relative aspect-[225/350] w-full rounded-md overflow-hidden ${className}`}>
       {!isEmpty(src) ? (
         <Image
           className={`object-cover ${!isMobile ? 'transition group-hover:scale-110' : ''}`}
-          src={src}
+          src={decodedSrc}
           alt={alt}
           layout="fill"
           {...rest}
