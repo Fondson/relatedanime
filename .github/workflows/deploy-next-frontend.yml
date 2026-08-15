@@ -35,4 +35,17 @@ jobs:
           VERCEL_SCOPE: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: npx vercel remove ${VERCEL_PROJECT_NAME} --scope=${VERCEL_SCOPE} --token=${VERCEL_TOKEN} --safe --yes
+        run: |
+          set +e
+          output=$(npx vercel remove "${VERCEL_PROJECT_NAME}" --scope="${VERCEL_SCOPE}" --token="${VERCEL_TOKEN}" --safe --yes 2>&1)
+          code=$?
+          echo "$output"
+          if [ "$code" -eq 0 ]; then
+            exit 0
+          fi
+          if echo "$output" | grep -qi "could not find unaliased deployments or projects"; then
+            echo "No stale deployments to remove — nothing to clean up."
+            exit 0
+          fi
+          echo "vercel remove failed (exit $code)."
+          exit "$code"
